@@ -10,7 +10,7 @@ const __dirname = dirname(__filename)
 const backendTarget = process.env.VITE_BACKEND_URL || 'http://localhost:59607'
 
 export default defineConfig({
-  publicDir: '../wwwroot',
+  publicDir: 'public',
   plugins: [tailwindcss(), react()],
   resolve: {
     alias: {

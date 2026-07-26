@@ -43,32 +43,21 @@ namespace LichCongTac.Data
                 Console.WriteLine($"[DB Warning] Could not set DELETE mode: {ex.Message}");
             }
 
-            string createDocumentsTable = @"
-                CREATE TABLE IF NOT EXISTS Documents (
+            string createSchedulesTable = @"
+                CREATE TABLE IF NOT EXISTS Schedules (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    SoVanBan TEXT,
-                    TenCongVan TEXT,
-                    TrichYeu TEXT,
-                    FullText TEXT,
-                    OcrPagesJson TEXT DEFAULT '[]',
-                    NgayBanHanh TEXT,
-                    CoQuanBanHanh TEXT,
-                    CoQuanChuQuan TEXT,
-                    ThoiHan TEXT,
-                    DonViChiDao TEXT,
-                    FilePath TEXT,
-                    Status TEXT DEFAULT 'Chưa xử lý',
-                    Priority TEXT DEFAULT 'Thường',
-                    DepartmentId INTEGER,
-                    AssignedTo INTEGER,
-                    EvidencePaths TEXT DEFAULT '[]',
-                    EvidenceNotes TEXT,
-                    CompletionDate TEXT,
-                    LabelId INTEGER,
-                    NgayThem TEXT,
-                    DaTaoLich INTEGER DEFAULT 0,
-                    UploadedByUserId INTEGER DEFAULT 1,
-                    ContentHash TEXT
+                    Title TEXT NOT NULL,
+                    Date TEXT NOT NULL,
+                    StartTime TEXT,
+                    Location TEXT,
+                    Content TEXT,
+                    Presider TEXT,
+                    PreparingUnit TEXT,
+                    Participants TEXT,
+                    IsPublic INTEGER DEFAULT 1,
+                    CreatedAt TEXT DEFAULT (datetime('now')),
+                    CreatedBy INTEGER,
+                    UpdatedAt TEXT
                 )";
 
             string createUsersTable = @"
@@ -96,21 +85,7 @@ namespace LichCongTac.Data
                     IsActive INTEGER DEFAULT 1
                 )";
 
-            string createLabelsTable = @"
-                CREATE TABLE IF NOT EXISTS Labels (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name TEXT,
-                    Color TEXT
-                )";
 
-            string createAutoRulesTable = @"
-                CREATE TABLE IF NOT EXISTS AutoRules (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Keyword TEXT,
-                    LabelId INTEGER,
-                    DepartmentId INTEGER,
-                    DefaultDeadlineDays INTEGER
-                )";
 
             string createSettingsTable = @"
                 CREATE TABLE IF NOT EXISTS AppSettings (
@@ -130,83 +105,13 @@ namespace LichCongTac.Data
                     FailReason TEXT
                 )";
 
-            string createNotificationsTable = @"
-                CREATE TABLE IF NOT EXISTS Notifications (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    UserId INTEGER,
-                    Title TEXT,
-                    Body TEXT,
-                    Type TEXT,
-                    DocId INTEGER,
-                    IsRead INTEGER DEFAULT 0,
-                    CreatedAt TEXT
-                )";
 
-            string createCommentsTable = @"
-                CREATE TABLE IF NOT EXISTS Comments (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    DocumentId INTEGER,
-                    UserId INTEGER,
-                    Username TEXT,
-                    Content TEXT,
-                    AttachmentPaths TEXT DEFAULT '[]',
-                    CreatedAt TEXT,
-                    FOREIGN KEY(DocumentId) REFERENCES Documents(Id)
-                )";
 
-            string createCommentReactionsTable = @"
-                CREATE TABLE IF NOT EXISTS CommentReactions (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CommentId INTEGER,
-                    UserId INTEGER,
-                    Username TEXT,
-                    Reaction TEXT,
-                    CreatedAt TEXT,
-                    FOREIGN KEY(CommentId) REFERENCES Comments(Id),
-                    UNIQUE(CommentId, UserId, Reaction)
-                )";
-
-            string createDocumentRoutingsTable = @"
-                CREATE TABLE IF NOT EXISTS DocumentRoutings (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    DocumentId INTEGER NOT NULL,
-                    SenderId INTEGER NOT NULL,
-                    ReceiverId INTEGER NOT NULL,
-                    ParentRoutingId INTEGER,
-                    ActionType TEXT,
-                    Note TEXT,
-                    Status TEXT DEFAULT 'Đang xử lý',
-                    ProcessingContent TEXT,
-                    CreatedAt TEXT,
-                    UpdatedAt TEXT,
-                    FOREIGN KEY(DocumentId) REFERENCES Documents(Id) ON DELETE CASCADE,
-                    FOREIGN KEY(SenderId) REFERENCES Users(Id),
-                    FOREIGN KEY(ReceiverId) REFERENCES Users(Id)
-                )";
-
-            string createPushSubscriptionsTable = @"
-                CREATE TABLE IF NOT EXISTS PushSubscriptions (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    UserId INTEGER NOT NULL,
-                    Endpoint TEXT UNIQUE NOT NULL,
-                    P256dh TEXT NOT NULL,
-                    Auth TEXT NOT NULL,
-                    CreatedAt TEXT
-                )";
-
-            new SqliteCommand(createDocumentsTable, connection).ExecuteNonQuery();
+            new SqliteCommand(createSchedulesTable, connection).ExecuteNonQuery();
             new SqliteCommand(createUsersTable, connection).ExecuteNonQuery();
             new SqliteCommand(createDepartmentsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createLabelsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createAutoRulesTable, connection).ExecuteNonQuery();
             new SqliteCommand(createSettingsTable, connection).ExecuteNonQuery();
             new SqliteCommand(createAuditLogsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createNotificationsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createCommentsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createCommentReactionsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createDocumentRoutingsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createPushSubscriptionsTable, connection).ExecuteNonQuery();
-
             // Insert default admin if not exists
             using var checkCmd = new SqliteCommand("SELECT COUNT(*) FROM Users WHERE Role='Admin'", connection);
             long adminCount = (long)checkCmd.ExecuteScalar();

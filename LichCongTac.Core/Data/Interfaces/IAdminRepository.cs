@@ -9,13 +9,5 @@ namespace LichCongTac.Core.Data.Interfaces
         int InsertDepartment(Department dept);
         void UpdateDepartment(Department dept);
         void DeleteDepartment(int id);
-        
-        List<DocumentLabel> GetLabels();
-        int InsertLabel(DocumentLabel label);
-        void DeleteLabel(int id);
-        
-        List<AutoRule> GetAutoRules();
-        int InsertAutoRule(AutoRule rule);
-        void DeleteAutoRule(int id);
     }
 }

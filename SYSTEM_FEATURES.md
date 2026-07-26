@@ -21,10 +21,9 @@ Tài liệu này là "Bộ não" của hệ thống, chứa các thông tin thi�
 - **`Departments`**: Quản lý phòng ban (`Id`, `Name`, `Code`, `ParentId`).
 - **`AppSettings`**: Cấu hình hệ thống.
 - **`AuditLogs` & `LoginAuditLog`**: Nhật ký hoạt động và nhật ký đăng nhập.
-- **`PushSubscriptions`**: Đăng ký nhận thông báo.
 
 ### Bảng Nghiệp vụ (Lịch Công Tác)
-*(Đang chờ định nghĩa cấu trúc chi tiết cho các bảng Lịch, Sự kiện, Lịch công tác cá nhân, Đơn vị, v.v...)*
+- **`Schedules`**: `Id`, `Title`, `Date`, `StartTime`, `Location`, `Content`, `Presider`, `PreparingUnit`, `Participants`, `IsPublic`, `CreatedBy`. Dùng để lưu trữ các lịch tuần, sự kiện.
 
 ---
 
@@ -57,9 +56,8 @@ Tất cả API có prefix `/api/`. Đa số yêu cầu Header `Authorization: Be
 ---
 
 ## 5. Kế Hoạch Triển Khai Tính Năng Mới
-Hệ thống hiện tại đã dọn dẹp các tính năng Quản lý công văn (OCR, Phòng họp không giấy tờ) để mở đường cho Lịch Công Tác.
+Hệ thống hiện tại đã dọn dẹp xong các tính năng Quản lý công văn cũ và đã thiết lập xong cấu trúc CSDL mới.
 Các module chuẩn bị phát triển:
-- Cơ sở dữ liệu lưu Lịch tuần, sự kiện.
-- API Thêm/Sửa/Xóa lịch.
-- Giao diện Admin quản lý Lịch.
-- Giao diện Công khai hiển thị Lịch.
+- API Thêm/Sửa/Xóa lịch trong `SchedulesController`.
+- Giao diện Admin quản lý Lịch (`Admin/Schedules.jsx`).
+- Giao diện Công khai hiển thị Lịch (`WorkSchedule.jsx` đọc từ DB thật).

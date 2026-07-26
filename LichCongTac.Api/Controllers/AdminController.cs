@@ -52,51 +52,6 @@ namespace LichCongTac.Api.Controllers
             return Ok(ApiResponse.Ok("Xóa phòng ban thành công."));
         }
 
-        // --- LABELS ---
-        [Authorize(Roles = "Admin")]
-        [HttpGet("labels")]
-        public IActionResult GetLabels() => Ok(ApiResponse.Ok(_adminRepo.GetLabels()));
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost("labels")]
-        public IActionResult AddLabel([FromBody] DocumentLabel label)
-        {
-            if (label == null) return BadRequest(ApiResponse.Fail("Dữ liệu nhãn không hợp lệ."));
-            int id = _adminRepo.InsertLabel(label);
-            label.Id = id;
-            return Ok(ApiResponse.Ok(label));
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("labels/{id}")]
-        public IActionResult DeleteLabel(int id)
-        {
-            _adminRepo.DeleteLabel(id);
-            return Ok(ApiResponse.Ok("Xóa nhãn thành công."));
-        }
-
-        // --- AUTO RULES ---
-        [Authorize(Roles = "Admin")]
-        [HttpGet("rules")]
-        public IActionResult GetRules() => Ok(ApiResponse.Ok(_adminRepo.GetAutoRules()));
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost("rules")]
-        public IActionResult AddRule([FromBody] AutoRule rule)
-        {
-            if (rule == null) return BadRequest(ApiResponse.Fail("Dữ liệu luật không hợp lệ."));
-            int id = _adminRepo.InsertAutoRule(rule);
-            rule.Id = id;
-            return Ok(ApiResponse.Ok(rule));
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpDelete("rules/{id}")]
-        public IActionResult DeleteRule(int id)
-        {
-            _adminRepo.DeleteAutoRule(id);
-            return Ok(ApiResponse.Ok("Xóa luật tự động thành công."));
-        }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("audit-logs")]

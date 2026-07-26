@@ -96,7 +96,7 @@ class ErrorBoundary extends React.Component {
 
 // ─── Root Component ─────────────────────────────────────────────────────────
 function Root() {
-  const path = window.location.pathname;
+  const path = window.location.pathname
 
   if (path === '/campha/manager/login' || path === '/campha/manager/login/') {
     return <AdminLogin />

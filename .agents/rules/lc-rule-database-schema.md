@@ -33,57 +33,27 @@ CREATE TABLE Users (
 );
 ```
 
-### `Documents` — Công văn
+### `Schedules` — Lịch công tác / Sự kiện
 ```sql
-CREATE TABLE Documents (
+CREATE TABLE Schedules (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    SoVanBan TEXT,
-    TenCongVan TEXT NOT NULL,
-    TrichYeu TEXT,
-    FullText TEXT,             -- Nội dung OCR
-    NgayBanHanh TEXT,          -- ISO 8601
-    CoQuanBanHanh TEXT,
-    CoQuanChuQuan TEXT,
-    ThoiHan TEXT,              -- ISO 8601 — DEADLINE (dùng cho thuật toán 7-3-1)
-    DonViChiDao TEXT,
-    Status TEXT NOT NULL,      -- 'Chưa xử lý' | 'Đang xử lý' | 'Hoàn thành' | 'Lỗi OCR'
-    Priority TEXT DEFAULT 'Thường', -- 'Thường' | 'Khẩn' | 'Hỏa tốc'
-    FilePath TEXT,
-    ContentHash TEXT,          -- SHA256 — chống trùng lặp file
-    DepartmentId INTEGER,
-    AssignedTo INTEGER,        -- UserId
-    AssignedUserIds TEXT,      -- JSON Array: "[1, 2, 3]"
-    AssignedDepartmentIds TEXT,-- JSON Array: "[1, 2]"
-    EvidencePaths TEXT,        -- JSON Array paths
-    EvidenceNotes TEXT,
-    CompletionDate TEXT,       -- ISO 8601
+    Title TEXT NOT NULL,           -- Tên lịch / Sự kiện
+    Date TEXT NOT NULL,            -- Ngày diễn ra (ISO 8601: YYYY-MM-DD)
+    StartTime TEXT,                -- Giờ bắt đầu (VD: "08:30")
+    Location TEXT,                 -- Địa điểm
+    Content TEXT,                  -- Nội dung chi tiết
+    Presider TEXT,                 -- Chủ trì (Text hoặc ID)
+    PreparingUnit TEXT,            -- Đơn vị chuẩn bị
+    Participants TEXT,             -- Thành phần tham dự
+    IsPublic INTEGER DEFAULT 1,    -- 1: Hiển thị ra trang chủ, 0: Nội bộ
     CreatedAt TEXT DEFAULT (datetime('now')),
+    CreatedBy INTEGER,             -- UserId người tạo
     UpdatedAt TEXT
 );
 ```
 
-### `DocumentRoutings` — Luân chuyển
-```sql
-CREATE TABLE DocumentRoutings (
-    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    DocumentId INTEGER NOT NULL,
-    SenderId INTEGER NOT NULL,
-    ReceiverId INTEGER NOT NULL,
-    ParentRoutingId INTEGER,
-    Role TEXT,                 -- 'Chủ trì' | 'Phối hợp'
-    ForwardDate TEXT,
-    Deadline TEXT,
-    Status TEXT DEFAULT 'Chưa xử lý' -- 'Chưa xử lý' | 'Đang xử lý' | 'Hoàn thành' | 'Từ chối'
-);
-```
-
 ### Bảng phụ khác
-- `Comments`, `CommentReactions` — Bình luận và thả tim
 - `Departments` — Phòng ban (`Id`, `Name`, `Code`, `ParentId`)
-- `Labels` — Nhãn phân loại
-- `AutoRules` — Luật tự động gán nhãn/người
-- `PushSubscriptions` — Web Push subscriptions
-- `Notifications` — Thông báo in-app
 - `AuditLogs`, `LoginAuditLog` — Nhật ký hệ thống
 
 ## 2. Quy trình Thay đổi Schema

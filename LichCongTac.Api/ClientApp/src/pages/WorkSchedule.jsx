@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react'
+import { Loader2 } from 'lucide-react'
 
 export default function WorkSchedule() {
-  const [scheduleData, setScheduleData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [scheduleData, setScheduleData] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch('/api/meetings/public-schedule')
-      .then(res => res.json())
-      .then(json => {
+      .then((res) => res.json())
+      .then((json) => {
         // Interceptor might wrap data
-        let data = [];
-        if (Array.isArray(json)) data = json;
-        else if (json.data) data = json.data;
-        else if (json.success && Array.isArray(json.data)) data = json.data;
-        
-        setScheduleData(data);
-        setLoading(false);
+        let data = []
+        if (Array.isArray(json)) data = json
+        else if (json.data) data = json.data
+        else if (json.success && Array.isArray(json.data)) data = json.data
+
+        setScheduleData(data)
+        setLoading(false)
       })
-      .catch(err => {
-        console.error('Lỗi tải dữ liệu lịch:', err);
-        setLoading(false);
-      });
-  }, []);
+      .catch((err) => {
+        console.error('Lỗi tải dữ liệu lịch:', err)
+        setLoading(false)
+      })
+  }, [])
 
   const navItems = [
     { label: 'HOME', href: '/' },
@@ -30,38 +30,32 @@ export default function WorkSchedule() {
     { label: 'CỔNG THÔNG TIN', href: '#' },
     { label: 'THƯ ĐIỆN TỬ', href: '#' },
     { label: 'TÌM KIẾM', href: '#' },
-    { label: 'QUẢN TRỊ', href: '/campha/manager/login' }
-  ];
+    { label: 'QUẢN TRỊ', href: '/campha/manager/login' },
+  ]
 
-  const todaySchedule = scheduleData.find(d => d.isToday) || null;
-  const upcomingSchedules = scheduleData.filter(d => !d.isToday);
+  const todaySchedule = scheduleData.find((d) => d.isToday) || null
+  const upcomingSchedules = scheduleData.filter((d) => !d.isToday)
 
   // Fallback if no "today" in data but we want to show something
   const displayToday = todaySchedule || {
-      dayLabel: 'Hôm nay',
-      date: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-      items: []
-  };
+    dayLabel: 'Hôm nay',
+    date: new Date().toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }),
+    items: [],
+  }
 
   return (
     <div className="min-h-screen bg-white font-sans text-sm text-gray-800">
-      {/* Header */}
-      <div className="max-w-6xl mx-auto px-4 py-6 flex items-center">
-        <div>
-          <h1 className="text-[28px] font-bold text-[#1d5792] leading-none mb-1">
-            LỊCH CÔNG TÁC
-          </h1>
-          <h2 className="text-[22px] font-bold text-[#c8102e] leading-none">
-            UBND PHƯỜNG CẨM PHẢ
-          </h2>
-        </div>
-        
-        {/* Placeholder Logo from screenshot (Quốc huy) */}
-        <div className="ml-8 w-16 h-16 bg-yellow-100 rounded-full border-2 border-yellow-500 flex items-center justify-center">
-          <div className="text-yellow-600 text-xs font-bold text-center leading-tight">
-            CỘNG HÒA<br/>XÃ HỘI...
-          </div>
-        </div>
+      {/* Header Image */}
+      <div className="max-w-6xl mx-auto bg-white flex justify-start">
+        <img
+          src="/assets/header-banner.png"
+          alt="Lịch Công Tác UBND Phường Cẩm Phả"
+          className="h-auto max-h-[86px] object-contain"
+        />
       </div>
 
       {/* Navigation */}
@@ -87,37 +81,39 @@ export default function WorkSchedule() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
             {/* Left Column (Today & Empty Background) */}
             <div className="flex flex-col h-full">
               {/* Today's Schedule */}
               <div className="mb-4">
                 <h3 className="text-2xl font-semibold text-[#1d5792] text-center mb-4">
-                  {displayToday.dayLabel}: {displayToday.dayLabel === 'Hôm nay' ? '' : 'Chủ nhật,'} ngày {displayToday.date}
+                  {displayToday.dayLabel}: {displayToday.dayLabel === 'Hôm nay' ? '' : 'Chủ nhật,'}{' '}
+                  ngày {displayToday.date}
                 </h3>
-                
+
                 {displayToday.items.length > 0 ? (
-                    <div className="space-y-3 px-4">
-                      {displayToday.items.map((item, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          <span className="text-[#c8102e] shrink-0 font-medium">{item.startTime}:</span>
-                          <span className="font-medium text-gray-800 text-[13px] leading-relaxed">
-                            {item.title} 
-                            {item.location && ` (${item.location}) `}
-                            {item.content && ` ${item.content} `}
-                            {item.presider && ` Dự Đ/c ${item.presider}.`}
-                            {item.preparingUnit && ` /.`} 
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="space-y-3 px-4">
+                    {displayToday.items.map((item, idx) => (
+                      <div key={idx} className="flex gap-2">
+                        <span className="text-[#c8102e] shrink-0 font-medium">
+                          {item.startTime}:
+                        </span>
+                        <span className="font-medium text-gray-800 text-[13px] leading-relaxed">
+                          {item.title}
+                          {item.location && ` (${item.location}) `}
+                          {item.content && ` ${item.content} `}
+                          {item.presider && ` Dự Đ/c ${item.presider}.`}
+                          {item.preparingUnit && ` /.`}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 ) : (
-                    <p className="text-center text-gray-500 italic py-4">Không có lịch công tác</p>
+                  <p className="text-center text-gray-500 italic py-4">Không có lịch công tác</p>
                 )}
               </div>
 
               {/* Light blue/gray filler box mimicking screenshot */}
-              <div className="bg-[#f0f4f8] flex-grow mt-4 rounded-sm min-h-[300px]"></div>
+              <div className="bg-[#f0f4f8] flex-grow mt-4 rounded-sm min-h-[300px]" />
             </div>
 
             {/* Right Column (Upcoming Days) */}
@@ -131,9 +127,11 @@ export default function WorkSchedule() {
                     <div className="space-y-4">
                       {day.items.map((item, idx) => (
                         <div key={idx} className="flex flex-col gap-0.5">
-                          <span className="text-[#c8102e] font-medium text-[13px]">{item.startTime}:</span>
+                          <span className="text-[#c8102e] font-medium text-[13px]">
+                            {item.startTime}:
+                          </span>
                           <span className="font-medium text-gray-800 text-[13px] leading-relaxed">
-                            {item.title} 
+                            {item.title}
                             {item.location && ` (${item.location}) `}
                             {item.content && ` ${item.content} `}
                             {item.presider && ` Dự Đ/c ${item.presider}.`}
@@ -151,5 +149,5 @@ export default function WorkSchedule() {
         )}
       </main>
     </div>
-  );
+  )
 }
