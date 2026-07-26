@@ -1,0 +1,64 @@
+# Visual Studio
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet Packages
+packages/
+*.nupkg
+
+# Environment & Secrets
+.env
+.htpasswd
+nginx/certs/*
+!nginx/certs/.gitkeep
+nginx/conf.d/.htpasswd
+# appsettings chứa secret - KHÔNG commit lên git
+appsettings.Production.json
+appsettings.Staging.json
+appsettings.Development.json
+
+# TLS/SSL Certificates
+*.pem
+*.key
+*.crt
+*.pfx
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+sqlite.zip
+sqlite_tools/
+sqlite/
+
+# User Data & Uploads
+*Uploads/
+*.signed.pdf
+/data/
+
+# Generated test artifacts
+tests/test_results/**/debug_images/
+tests/test_results/**/*.pdf
+tests/test_results/**/Comparison_*.md
+tests/test_results/actual_test/*_result.md
+
+# Build Artifacts
+publish/
+test_ssl/
+client_setup/
+node_modules/
+.vite/
+ToolCalendar.Api/ClientApp/node_modules/
+ToolCalendar.Api/ClientApp/dist/
+
+# Local Caches and Models
+.nuget_cache/
+ToolCalendar.Core/Models/PaddleOCR/
+Models/PaddleOCR/
+scratch/
+

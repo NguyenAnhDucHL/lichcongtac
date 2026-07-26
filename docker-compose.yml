@@ -1,0 +1,104 @@
+services:
+  official-doc-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: doc-coordination-system
+    expose:
+      - "5000"
+    ports:
+      - "59607:5000"
+    # ✅ Tầng 5: Chạy container với quyền tối thiểu — chống leo thang quyền (ransomware)
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_PATH=/app/data/documents.db
+      - TZ=Asia/Ho_Chi_Minh
+      - JWT_SECRET=${JWT_SECRET}
+      - PUBLIC_ID_SECRET=${PUBLIC_ID_SECRET}
+      - VAPID_SUBJECT=${VAPID_SUBJECT}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      # --- ClamAV Config ---
+      - ClamAv__Host=clamav
+      - ClamAv__Port=3310
+      # --- OCR Performance Tuning ---
+      - OcrSettings__RenderDpi=300
+      - OcrSettings__MaxParallelPages=2
+      - OcrSettings__MaxPagesToScan=7
+      - OcrSettings__EnableOsd=false
+      - OcrSettings__EnableDeskew=true
+      # --- RabbitMQ Settings ---
+      - RabbitMQ__HostName=rabbitmq
+      - RabbitMQ__UserName=${RABBITMQ_USER}
+      - RabbitMQ__Password=${RABBITMQ_PASS}
+    depends_on:
+      - rabbitmq
+      - clamav
+    volumes:
+      - ./data_dump:/app/data
+      - ./LichCongTac.Api/Uploads:/app/Uploads
+      - ./LichCongTac.Core/Models/PaddleOCR:/app/Models/PaddleOCR:ro
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: doc-coordination-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
+    restart: always
+
+  # ✅ Tầng 1: ClamAV Anti-Virus Scanner
+  # Container riêng biệt, cô lập hoàn toàn với backend
+  clamav:
+    image: clamav/clamav:latest
+    platform: linux/amd64
+    container_name: doc-clamav
+    environment:
+      - CLAMAV_NO_FRESHCLAMD=false  # Cập nhật database virus tự động
+      - CLAMD_CONF_MaxFileSize=100M
+      - CLAMD_CONF_StreamMaxLength=100M
+    volumes:
+      - clamav-db:/var/lib/clamav  # Database virus được persist giữa các lần khởi động
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    platform: linux/amd64
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - official-doc-backend
+    restart: always
+
+  ngrok:
+    image: ngrok/ngrok:alpine
+    platform: linux/amd64
+    container_name: doc-coordination-ngrok
+    restart: always
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+      - NGROK_DOMAIN=${NGROK_DOMAIN}
+    entrypoint: /bin/sh
+    command:
+      - "-c"
+      - |
+        if [ -n "$$NGROK_DOMAIN" ]; then
+          ngrok http nginx-proxy:80 --url=$$NGROK_DOMAIN --log=stdout
+        else
+          ngrok http nginx-proxy:80 --log=stdout
+        fi
+    depends_on:
+      - nginx
+
+volumes:
+  clamav-db:  # Named volume — ClamAV virus database tồn tại giữa các lần restart
