@@ -4,6 +4,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-07-31 17:03] Thiết kế giao diện Quản trị tài khoản
+- **Mô tả**: Thiết kế và tạo trang quản trị tài khoản (`AdminAccounts.jsx`) với form thêm tài khoản và danh sách tài khoản theo giao diện mẫu yêu cầu. Đã kết nối trang này vào routing chung trong `main.jsx`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(admin): tạo trang quản trị tài khoản và thêm routing cho AdminAccounts"`
+
 ### [2026-07-26 11:30] Dọn dẹp dự án, loại bỏ hoàn toàn các chức năng Quản lý công văn và OCR cũ
 - **Mô tả**: Dự án được yêu cầu tập trung vào nghiệp vụ Lịch Công Tác. Đã tiến hành xóa toàn bộ thư mục model AI nặng (`tessdata/`, `PaddleOCR/`), gỡ các dependencies về OCR, PDF trong `LichCongTac.Core.csproj`. Ở backend, xóa toàn bộ Models, Services, Repositories và Controllers thuộc các phân hệ không dùng tới (Document, Cabinet, Notification, Stats). Ở frontend, xóa toàn bộ các trang giao diện dư thừa (Dashboard, Documents, Cabinet, v.v.), chỉ giữ lại `WorkSchedule.jsx` và `AdminLogin.jsx`.
 - **Tệp thay đổi**:
