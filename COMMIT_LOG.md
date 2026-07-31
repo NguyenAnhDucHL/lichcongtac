@@ -64,3 +64,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/Controllers/SchedulesController.cs` (Mới)
   - `LichCongTac.Api/Program.cs` (Sửa đổi: Đăng ký DI cho IScheduleRepository)
 - **Lệnh git commit**: `git commit -m "feat(api): viết các REST endpoint cho Lịch công tác sử dụng ADO.NET"`
+### [2026-07-31 17:15] Update AdminSchedules to fetch users dynamically and fix wording
+- **Mô tả**: Sửa UI trang Quản trị lịch để tự động fetch danh sách user thay vì input cứng. Đổi lại tên từ "Hệ Thống Điều Phối Công Văn" thành "Phần Mềm Lịch Công Tác" ở title web.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/index.html` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(schedules): fetch users for participants and update title"`

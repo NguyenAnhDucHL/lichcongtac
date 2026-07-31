@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 
 export default function AdminSchedules() {
   const [schedules, setSchedules] = useState([])
+  const [users, setUsers] = useState([])
   const [formData, setFormData] = useState({
     dateStr: '',
     timeStr: '',
@@ -13,6 +14,7 @@ export default function AdminSchedules() {
     isPublic: true,
     participants: '',
   })
+  const [selectedParticipants, setSelectedParticipants] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -36,8 +38,29 @@ export default function AdminSchedules() {
     }
   }
 
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('/api/users', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+      })
+      if (res.ok) {
+        const json = await res.json()
+        let data = []
+        if (Array.isArray(json)) data = json
+        else if (json.data) data = json.data
+        else if (json.success && Array.isArray(json.data)) data = json.data
+        setUsers(data)
+      }
+    } catch (err) {
+      console.error('Lỗi tải danh sách người dùng:', err)
+    }
+  }
+
   useEffect(() => {
     fetchSchedules()
+    fetchUsers()
   }, [])
 
   const navItems = [
@@ -71,7 +94,7 @@ export default function AdminSchedules() {
         content: formData.content,
         presider: formData.presider,
         preparingUnit: formData.department,
-        participants: formData.participants,
+        participants: selectedParticipants.join(', '),
         isPublic: formData.isPublic ? 1 : 0,
       }
 
@@ -92,8 +115,8 @@ export default function AdminSchedules() {
           location: '',
           presider: '',
           content: '',
-          participants: '',
         })
+        setSelectedParticipants([])
         fetchSchedules()
       } else {
         const errData = await res.json()
@@ -299,17 +322,42 @@ export default function AdminSchedules() {
               <tr>
                 <td className="py-2 font-medium align-top pt-3">Người được thông báo</td>
                 <td className="py-2">
-                  <input
-                    type="text"
-                    name="participants"
-                    value={formData.participants}
-                    onChange={handleChange}
-                    placeholder="Lựa chọn..."
-                    className="w-[100%] max-w-[500px] border border-[#5cb85c] rounded px-3 py-2 outline-none focus:ring-1 focus:ring-[#5cb85c] block mb-2"
-                  />
-                  <select className="w-[200px] border border-[#5cb85c] rounded px-2 py-1 text-gray-700 outline-none">
-                    <option>Tìm kiếm</option>
-                  </select>
+                  <div className="flex flex-wrap gap-2 mb-2 w-[100%] max-w-[500px]">
+                    {users.map((user) => (
+                      <label
+                        key={user.id}
+                        className="flex items-center gap-1.5 bg-gray-100 px-2 py-1 rounded border border-gray-200 cursor-pointer hover:bg-gray-200"
+                      >
+                        <input
+                          type="checkbox"
+                          className="w-3.5 h-3.5 text-[#5cb85c] focus:ring-[#5cb85c]"
+                          checked={selectedParticipants.includes(user.fullName || user.username)}
+                          onChange={(e) => {
+                            const name = user.fullName || user.username
+                            if (e.target.checked) {
+                              setSelectedParticipants([...selectedParticipants, name])
+                            } else {
+                              setSelectedParticipants(
+                                selectedParticipants.filter((p) => p !== name)
+                              )
+                            }
+                          }}
+                        />
+                        <span className="text-xs">{user.fullName || user.username}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {selectedParticipants.length === 0 && (
+                    <span className="text-xs text-gray-500 italic block mb-2">
+                      Chưa chọn người được thông báo
+                    </span>
+                  )}
+                  {selectedParticipants.length > 0 && (
+                    <div className="text-xs text-gray-700 bg-green-50 p-2 rounded border border-green-200 mb-2 max-w-[500px]">
+                      <span className="font-bold text-green-700">Đã chọn:</span>{' '}
+                      {selectedParticipants.join(', ')}
+                    </div>
+                  )}
                 </td>
               </tr>
               <tr>
