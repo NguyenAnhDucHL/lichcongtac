@@ -36,7 +36,7 @@ export default function AdminLogin() {
           localStorage.setItem('auth_token', token)
           localStorage.setItem('user_name', user_name)
           localStorage.setItem('user_role', role)
-          window.location.href = '/'
+          window.location.href = '/campha/manager/schedules'
         } else {
           setError('Đăng nhập thành công nhưng không lấy được token.')
         }

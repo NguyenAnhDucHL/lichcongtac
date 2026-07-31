@@ -202,6 +202,8 @@ namespace LichCongTac.Api.Controllers
                 return Unauthorized(ApiResponse.Fail("Không tìm thấy thông tin người dùng."));
 
             // Validation
+            if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+                return BadRequest(ApiResponse.Fail("Vui lòng nhập mật khẩu hiện tại."));
             if (string.IsNullOrWhiteSpace(request.NewPassword))
                 return BadRequest(ApiResponse.Fail("Mật khẩu mới không được để trống."));
             if (request.NewPassword.Length < 8)
@@ -220,13 +222,17 @@ namespace LichCongTac.Api.Controllers
             if (user == null) 
                 return NotFound(ApiResponse.Fail("Tài khoản không tồn tại."));
 
-            // Đặt mật khẩu mới qua UserManager → tự động hash + cập nhật SecurityStamp
-            var removeResult = await _userManager.RemovePasswordAsync(user);
-            if (!removeResult.Succeeded)
-                return BadRequest(ApiResponse.Fail("Không thể đổi mật khẩu. Vui lòng thử lại."));
+            // 1. Kiểm tra mật khẩu hiện tại có đúng không
+            var isCurrentCorrect = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
+            if (!isCurrentCorrect)
+                return BadRequest(ApiResponse.Fail("Mật khẩu hiện tại không chính xác."));
 
-            var addResult = await _userManager.AddPasswordAsync(user, request.NewPassword);
-            if (addResult.Succeeded)
+            // 2. Vì một số mật khẩu cũ là PlainText/Bcrypt, RemovePasswordAsync có thể lỗi. 
+            // Dùng GeneratePasswordResetTokenAsync để đặt lại pass an toàn nhất.
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var resetResult = await _userManager.ResetPasswordAsync(user, token, request.NewPassword);
+
+            if (resetResult.Succeeded)
             {
                 // Xóa cache để token validation nhận SecurityStamp mới ngay lập tức
                 var cache = HttpContext.RequestServices.GetService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
@@ -235,7 +241,7 @@ namespace LichCongTac.Api.Controllers
                 return Ok(ApiResponse.Ok("Đổi mật khẩu thành công. Vui lòng đăng nhập lại."));
             }
 
-            var errors = addResult.Errors.Select(e => e.Description).ToList();
+            var errors = resetResult.Errors.Select(e => e.Description).ToList();
             return BadRequest(ApiResponse.Fail("Không thể đổi mật khẩu.", errors));
         }
     }
@@ -248,6 +254,7 @@ namespace LichCongTac.Api.Controllers
 
     public class ChangePasswordRequest
     {
+        public string CurrentPassword { get; set; } = "";
         public string NewPassword { get; set; } = "";
     }
 }

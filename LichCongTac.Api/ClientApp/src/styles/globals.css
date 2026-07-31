@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin "@tailwindcss/typography";
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
@@ -240,7 +241,8 @@
 
   @media (max-width: 767px) {
     .main-content {
-      padding-bottom: 4rem; /* 64px = h-16 bottom nav height */
+      padding-bottom: 4rem;
+      /* 64px = h-16 bottom nav height */
     }
   }
 
@@ -254,12 +256,10 @@
 
 @layer utilities {
   .bg-sidebar-gradient {
-    background: linear-gradient(
-      to bottom,
-      var(--color-sidebar-start),
-      var(--color-sidebar-mid),
-      var(--color-sidebar-end)
-    );
+    background: linear-gradient(to bottom,
+        var(--color-sidebar-start),
+        var(--color-sidebar-mid),
+        var(--color-sidebar-end));
   }
 
   .glass-card {
@@ -275,12 +275,10 @@
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.4) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%);
     animation: shimmer-premium 2s infinite ease-out;
   }
 
@@ -310,6 +308,7 @@
 
 /* Prevent horizontal overflow on mobile */
 @media (max-width: 767px) {
+
   html,
   body {
     overflow-x: hidden;
@@ -360,12 +359,10 @@
 
   /* The header gradient stays for the brand area */
   [data-sidebar='sidebar'][data-mobile='true'] .bg-sidebar-gradient {
-    background: linear-gradient(
-      to bottom,
-      var(--color-sidebar-start),
-      var(--color-sidebar-mid),
-      var(--color-sidebar-end)
-    ) !important;
+    background: linear-gradient(to bottom,
+        var(--color-sidebar-start),
+        var(--color-sidebar-mid),
+        var(--color-sidebar-end)) !important;
   }
 }
 
@@ -399,11 +396,11 @@
   border-radius: var(--radius-xl);
 }
 
-.density-compact .glass-card > div:first-child {
+.density-compact .glass-card>div:first-child {
   padding: 1rem 1.25rem;
 }
 
-.density-compact .glass-card > div:nth-child(2) {
+.density-compact .glass-card>div:nth-child(2) {
   padding: 0.75rem 1.25rem;
 }
 

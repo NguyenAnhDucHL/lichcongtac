@@ -46,6 +46,7 @@ namespace LichCongTac.Core.Data.Repositories
                 StartTime = reader.IsDBNull(reader.GetOrdinal("StartTime")) ? null : reader.GetString(reader.GetOrdinal("StartTime")),
                 Location = reader.IsDBNull(reader.GetOrdinal("Location")) ? null : reader.GetString(reader.GetOrdinal("Location")),
                 Content = reader.IsDBNull(reader.GetOrdinal("Content")) ? null : reader.GetString(reader.GetOrdinal("Content")),
+                InvitationNumber = reader.IsDBNull(reader.GetOrdinal("InvitationNumber")) ? null : reader.GetString(reader.GetOrdinal("InvitationNumber")),
                 Presider = reader.IsDBNull(reader.GetOrdinal("Presider")) ? null : reader.GetString(reader.GetOrdinal("Presider")),
                 PreparingUnit = reader.IsDBNull(reader.GetOrdinal("PreparingUnit")) ? null : reader.GetString(reader.GetOrdinal("PreparingUnit")),
                 Participants = reader.IsDBNull(reader.GetOrdinal("Participants")) ? null : reader.GetString(reader.GetOrdinal("Participants")),
@@ -129,8 +130,8 @@ namespace LichCongTac.Core.Data.Repositories
 
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-                INSERT INTO Schedules (Title, Date, StartTime, Location, Content, Presider, PreparingUnit, Participants, IsPublic, CreatedBy)
-                VALUES (@Title, @Date, @StartTime, @Location, @Content, @Presider, @PreparingUnit, @Participants, @IsPublic, @CreatedBy);
+                INSERT INTO Schedules (Title, Date, StartTime, Location, Content, InvitationNumber, Presider, PreparingUnit, Participants, IsPublic, CreatedBy)
+                VALUES (@Title, @Date, @StartTime, @Location, @Content, @InvitationNumber, @Presider, @PreparingUnit, @Participants, @IsPublic, @CreatedBy);
                 SELECT last_insert_rowid();";
 
             cmd.Parameters.AddWithValue("@Title", schedule.Title);
@@ -138,6 +139,7 @@ namespace LichCongTac.Core.Data.Repositories
             cmd.Parameters.AddWithValue("@StartTime", schedule.StartTime ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Location", schedule.Location ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Content", schedule.Content ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@InvitationNumber", schedule.InvitationNumber ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Presider", schedule.Presider ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@PreparingUnit", schedule.PreparingUnit ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Participants", schedule.Participants ?? (object)DBNull.Value);
@@ -161,6 +163,7 @@ namespace LichCongTac.Core.Data.Repositories
                     StartTime = @StartTime,
                     Location = @Location,
                     Content = @Content,
+                    InvitationNumber = @InvitationNumber,
                     Presider = @Presider,
                     PreparingUnit = @PreparingUnit,
                     Participants = @Participants,
@@ -174,6 +177,7 @@ namespace LichCongTac.Core.Data.Repositories
             cmd.Parameters.AddWithValue("@StartTime", schedule.StartTime ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Location", schedule.Location ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Content", schedule.Content ?? (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@InvitationNumber", schedule.InvitationNumber ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Presider", schedule.Presider ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@PreparingUnit", schedule.PreparingUnit ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Participants", schedule.Participants ?? (object)DBNull.Value);

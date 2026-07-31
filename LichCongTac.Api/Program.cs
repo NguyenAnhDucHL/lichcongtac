@@ -82,6 +82,7 @@ builder.Services.AddScoped<ISettingRepository, SettingRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 
 // ✅ ASP.NET Core Identity (Custom UserStore — không cần EF Core)
 // Toàn bộ dữ liệu vẫn lưu trong SQLite hiện có, không mất dữ liệu cũ

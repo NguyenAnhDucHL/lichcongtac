@@ -82,6 +82,7 @@ namespace LichCongTac.Api.Controllers
                 StartTime = dto.StartTime,
                 Location = dto.Location,
                 Content = dto.Content,
+                InvitationNumber = dto.InvitationNumber,
                 Presider = dto.Presider,
                 PreparingUnit = dto.PreparingUnit,
                 Participants = dto.Participants,
@@ -116,6 +117,7 @@ namespace LichCongTac.Api.Controllers
             existing.StartTime = dto.StartTime;
             existing.Location = dto.Location;
             existing.Content = dto.Content;
+            existing.InvitationNumber = dto.InvitationNumber;
             existing.Presider = dto.Presider;
             existing.PreparingUnit = dto.PreparingUnit;
             existing.Participants = dto.Participants;

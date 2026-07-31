@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-const backendTarget = process.env.VITE_BACKEND_URL || 'http://localhost:59607'
+const backendTarget = process.env.VITE_BACKEND_URL || 'http://localhost:59608'
 
 export default defineConfig({
   publicDir: 'public',

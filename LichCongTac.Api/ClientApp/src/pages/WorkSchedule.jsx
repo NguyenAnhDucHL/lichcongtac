@@ -6,16 +6,48 @@ export default function WorkSchedule() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/meetings/public-schedule')
+    fetch('/api/schedules/public-schedule')
       .then((res) => res.json())
       .then((json) => {
-        // Interceptor might wrap data
         let data = []
         if (Array.isArray(json)) data = json
         else if (json.data) data = json.data
         else if (json.success && Array.isArray(json.data)) data = json.data
 
-        setScheduleData(data)
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayFormatted = `${yyyy}-${mm}-${dd}`;
+
+        const grouped = {};
+        data.forEach(item => {
+          if (!item.date) return;
+          const dateStr = item.date.split('T')[0];
+          if (!grouped[dateStr]) grouped[dateStr] = [];
+          grouped[dateStr].push(item);
+        });
+
+        const sortedDates = Object.keys(grouped).sort();
+        const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+
+        const transformedData = sortedDates.map(dateStr => {
+          const isToday = dateStr === todayFormatted;
+          const d = new Date(dateStr);
+          const dayOfWeek = d.getDay();
+          const dayLabel = isToday ? 'Hôm nay' : days[dayOfWeek];
+          const formattedDate = dateStr.split('-').reverse().join('/');
+
+          return {
+            isToday: isToday,
+            dayLabel: dayLabel,
+            date: formattedDate,
+            originalDate: dateStr,
+            items: grouped[dateStr].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''))
+          };
+        }).filter(d => d.originalDate >= todayFormatted);
+
+        setScheduleData(transformedData)
         setLoading(false)
       })
       .catch((err) => {
@@ -97,13 +129,20 @@ export default function WorkSchedule() {
                         <span className="text-[#c8102e] shrink-0 font-medium">
                           {item.startTime}:
                         </span>
-                        <span className="font-medium text-gray-800 text-[13px] leading-relaxed">
-                          {item.title}
-                          {item.location && ` (${item.location}) `}
-                          {item.content && ` ${item.content} `}
-                          {item.presider && ` Dự Đ/c ${item.presider}.`}
-                          {item.preparingUnit && ` /.`}
-                        </span>
+                        <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
+                          <span>
+                            {item.invitationNumber && `${item.invitationNumber} `}
+                            {item.location && `(${item.location}) `}
+                            {item.title}
+                          </span>
+                          {item.content && (
+                            <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />
+                          )}
+                          <span>
+                            {item.presider && ` Dự Đ/c ${item.presider}.`}
+                            {item.preparingUnit && ` /.`}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -126,16 +165,24 @@ export default function WorkSchedule() {
                     </h3>
                     <div className="space-y-4">
                       {day.items.map((item, idx) => (
-                        <div key={idx} className="flex flex-col gap-0.5">
-                          <span className="text-[#c8102e] font-medium text-[13px]">
+                        <div key={idx} className="flex gap-2">
+                          <span className="text-[#c8102e] shrink-0 font-medium">
                             {item.startTime}:
                           </span>
-                          <span className="font-medium text-gray-800 text-[13px] leading-relaxed">
-                            {item.title}
-                            {item.location && ` (${item.location}) `}
-                            {item.content && ` ${item.content} `}
-                            {item.presider && ` Dự Đ/c ${item.presider}.`}
-                          </span>
+                          <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
+                            <span>
+                              {item.invitationNumber && `${item.invitationNumber} `}
+                              {item.location && `(${item.location}) `}
+                              {item.title}
+                            </span>
+                            {item.content && (
+                              <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />
+                            )}
+                            <span>
+                              {item.presider && ` Dự Đ/c ${item.presider}.`}
+                              {item.preparingUnit && ` /.`}
+                            </span>
+                          </div>
                         </div>
                       ))}
                     </div>

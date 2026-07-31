@@ -52,6 +52,9 @@ import WorkSchedule from './pages/WorkSchedule.jsx'
 import AdminLogin from './pages/AdminLogin.jsx'
 import AdminAccounts from './pages/AdminAccounts.jsx'
 import AdminSchedules from './pages/AdminSchedules.jsx'
+import AdminChangePassword from './pages/AdminChangePassword.jsx'
+import AdminDepartments from './pages/AdminDepartments.jsx'
+import AdminEmployees from './pages/AdminEmployees.jsx'
 import './styles/globals.css'
 
 import { AlertTriangle, RefreshCw } from 'lucide-react'
@@ -96,23 +99,50 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// ─── Auth Guard ─────────────────────────────────────────────────────────────
+function RequireAuth({ children }) {
+  const token = localStorage.getItem('auth_token')
+  if (!token) {
+    window.location.replace('/campha/manager/login')
+    return null
+  }
+  return children
+}
+
 // ─── Root Component ─────────────────────────────────────────────────────────
 function Root() {
   const path = window.location.pathname
 
   if (path === '/campha/manager/login' || path === '/campha/manager/login/') {
+    // Nếu đã đăng nhập, chuyển thẳng vào trang quản trị
+    if (localStorage.getItem('auth_token')) {
+      window.location.replace('/campha/manager/schedules')
+      return null
+    }
     return <AdminLogin />
   }
 
   if (path === '/campha/manager/accounts' || path === '/campha/manager/accounts/') {
-    return <AdminAccounts />
+    return <RequireAuth><AdminAccounts /></RequireAuth>
   }
 
   if (path === '/campha/manager/schedules' || path === '/campha/manager/schedules/') {
-    return <AdminSchedules />
+    return <RequireAuth><AdminSchedules /></RequireAuth>
   }
 
-  // Default to Work Schedule for now
+  if (path === '/campha/manager/change-password' || path === '/campha/manager/change-password/') {
+    return <RequireAuth><AdminChangePassword /></RequireAuth>
+  }
+
+  if (path === '/campha/manager/departments' || path === '/campha/manager/departments/') {
+    return <RequireAuth><AdminDepartments /></RequireAuth>
+  }
+
+  if (path === '/campha/manager/employees' || path === '/campha/manager/employees/') {
+    return <RequireAuth><AdminEmployees /></RequireAuth>
+  }
+
+  // Default to Work Schedule
   return <WorkSchedule />
 }
 

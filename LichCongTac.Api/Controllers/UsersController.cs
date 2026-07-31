@@ -146,6 +146,8 @@ namespace LichCongTac.Api.Controllers
             user.PhoneNumber = request.PhoneNumber;
             user.Role        = request.Role;
             user.DepartmentId = request.DepartmentId;
+            user.ZaloId       = request.ZaloId;
+            user.NotificationPreference = request.NotificationPreference;
 
             _userRepository.UpdateUser(user);
             return Ok(ApiResponse.Ok("Cập nhật người dùng thành công."));
@@ -172,5 +174,7 @@ namespace LichCongTac.Api.Controllers
         public string Role { get; set; } = "CanBo";
         public int? DepartmentId { get; set; }
         public string? PasswordHash { get; set; } // Để trống nếu không đổi mật khẩu
+        public string? ZaloId { get; set; }
+        public string? NotificationPreference { get; set; }
     }
 }

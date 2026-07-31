@@ -7,7 +7,7 @@ services:
     expose:
       - "5000"
     ports:
-      - "59607:5000"
+      - "59608:5000"
     security_opt:
       - no-new-privileges:true
     environment:

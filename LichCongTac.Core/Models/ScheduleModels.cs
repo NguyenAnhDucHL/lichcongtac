@@ -10,6 +10,7 @@ namespace LichCongTac.Models
         public string? StartTime { get; set; }
         public string? Location { get; set; }
         public string? Content { get; set; }
+        public string? InvitationNumber { get; set; }
         public string? Presider { get; set; }
         public string? PreparingUnit { get; set; }
         public string? Participants { get; set; }
@@ -31,6 +32,7 @@ namespace LichCongTac.Models
         public string? StartTime { get; set; }
         public string? Location { get; set; }
         public string? Content { get; set; }
+        public string? InvitationNumber { get; set; }
         public string? Presider { get; set; }
         public string? PreparingUnit { get; set; }
         public string? Participants { get; set; }

@@ -70,3 +70,105 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/index.html` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(schedules): fetch users for participants and update title"`
+### [2026-07-31 17:23] Fix missing columns in Users table
+- **Mô tả**: Sửa lỗi 500 khi đăng nhập do thiếu các cột trong bảng `Users` theo chuẩn Identity (`FailedLoginCount`, `LockoutUntil`, `NormalizedUserName`, `LockoutEnabled`).
+- **Tệp thay đổi**:
+  - `data_dump/documents.db` (Sửa đổi schema)
+- **Lệnh git commit**: `git commit -m "fix(db): bổ sung các cột thiếu trong bảng Users cho Identity"`
+### [2026-07-31 17:25] Fix login redirect
+- **Mô tả**: Sửa lỗi trang đăng nhập chuyển hướng về `/` (trang dashboard hệ thống cũ) thay vì vào thẳng trang admin Quản trị Lịch Công Tác.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi `window.location.href`)
+- **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi chuyển hướng sau khi đăng nhập thành công về đúng trang quản trị lịch"`
+
+### [2026-07-31 17:35] Fix Service Worker Caching Issue
+- **Mô tả**: Thay đổi port của container backend từ 59607 sang 59608 để vượt qua lớp cache quá mạnh của Service Worker cũ, đảm bảo người dùng luôn tải được ứng dụng Lịch Công Tác mới thay vì Hệ Thống Điều Phối Công Văn cũ. Đồng thời xóa file `sw.js` và cập nhật `vite.config.js`.
+- **Tệp thay đổi**:
+  - `docker-compose.yml` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/vite.config.js` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/index.html` (Sửa đổi)
+  - `LichCongTac.Api/wwwroot/sw.js` (Xóa)
+- **Lệnh git commit**: `git commit -m "fix(infra): change backend port to bypass service worker cache"`
+
+### [2026-07-31 17:44] Fix Home Page Schedule Display
+- **Mô tả**: Sửa lỗi URL `/api/meetings/public-schedule` (không tồn tại) thành `/api/schedules/public-schedule`. Bổ sung logic nhóm các sự kiện lịch công tác theo ngày (`date`) và định dạng lại cấu trúc dữ liệu (`dayLabel`, `items`) để hiển thị chính xác lên giao diện màn hình Trang chủ (WorkSchedule).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): correct api endpoint and add grouping logic for schedules on homepage"`
+
+### [2026-07-31 17:49] Fix Auth Guard - Không cần login lại mỗi lần click Quản trị
+- **Mô tả**: Thêm component `RequireAuth` vào router để kiểm tra `auth_token` trong localStorage trước khi render các trang admin. Nếu có token → vào thẳng trang quản trị. Nếu không có → redirect về /login. Nếu đang ở trang /login nhưng đã có token → tự chuyển vào /manager/schedules, không hiển thị form login nữa.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): add RequireAuth guard to prevent redirect to login when token exists"`
+
+### [2026-07-31 18:02] Fix Logout Button - Nút Đăng xuất hoạt động
+- **Mô tả**: Nút ĐĂNG XUẤT trên nav chỉ là href="#" không có action. Thêm hàm handleLogout() xóa auth_token/user_name/user_role khỏi localStorage và redirect về trang login. Cập nhật render nav để hỗ trợ item dạng button (onClick) thay vì chỉ hỗ trợ anchor (href).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): implement logout handler to clear token and redirect to login"`
+
+### [2026-07-31 18:06] Thêm trang Đổi Mật Khẩu
+- **Mô tả**: Tạo mới trang AdminChangePassword với giao diện card, thanh đánh giá độ mạnh mật khẩu realtime (5 tiêu chí), kiểm tra xác nhận mật khẩu khớp, và tự động đăng xuất sau 3 giây khi đổi thành công. Kết nối với endpoint `/api/auth/change-password` đã có sẵn. Cập nhật router trong main.jsx và wire nút ĐỔI MẬT KHẨU trong AdminSchedules và AdminAccounts.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminChangePassword.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(auth): add change password page with strength indicator and auto logout"`
+
+### [2026-08-01 00:04] Replace textarea with JoditEditor for rich text schedule content
+- **Mô tả**: Thay thế textarea đơn giản ở trường Nội dung chi tiết trong Quản trị Lịch thành trình soạn thảo Jodit (Jodit React). Giao diện Editor cung cấp đầy đủ chức năng giống hệt hệ thống cũ (CKEditor) bao gồm bôi đậm, in nghiêng, đổi font, đổi size, đổi màu chữ.
+Đồng thời, cập nhật hiển thị ở trang WorkSchedule sử dụng `dangerouslySetInnerHTML` kết hợp class `prose` (Tailwind Typography) để render các thẻ HTML an toàn và giữ được định dạng đã tạo ở trang quản trị.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/package.json` (Sửa đổi - thêm jodit, jodit-react, @tailwindcss/typography)
+- **Lệnh git commit**: `git commit -m "feat(schedules): integrate jodit-react editor and tailwind typography for rich text content"`
+
+### [2026-08-01 00:12] Thêm trường Giấy mời số vào Quản trị Lịch
+- **Mô tả**: Thêm mới cột `InvitationNumber` vào bảng `Schedules` trong SQLite để lưu số giấy mời. Cập nhật các DTO và Model tương ứng ở .NET Core backend. Ở frontend, thêm ô nhập "Giấy mời số" (ngay dưới Tiêu đề) trên trang Quản trị Lịch và hiển thị số giấy mời lên trước Tiêu đề trên trang chủ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Models/ScheduleModels.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/ScheduleRepository.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(schedules): add InvitationNumber field to schedules and display on UI"`
+
+### [2026-08-01 00:15] Fix lỗi đổi mật khẩu
+- **Mô tả**: Sửa lỗi API `/api/auth/change-password` luôn báo "Không thể đổi mật khẩu". Lỗi do `ChangePasswordRequest` thiếu trường `CurrentPassword` và gọi `RemovePasswordAsync` trực tiếp lên tài khoản. Cập nhật API để kiểm tra mật khẩu hiện tại bằng `CheckPasswordAsync` và thực hiện đổi bằng `GeneratePasswordResetTokenAsync` + `ResetPasswordAsync` để tương thích an toàn với cả hash BCrypt/PlainText cũ và PBKDF2 mới.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): fix change password api to verify current password and handle legacy hashes"`
+
+### [2026-08-01 00:22] Bổ sung chức năng Sửa/Xóa cho Quản trị Lịch
+- **Mô tả**: Khi click vào nút "Sửa" ở danh sách lịch làm việc, thông tin lịch sẽ được đưa lên form nhập ở phía trên, tự động cuộn trang lên trên cùng, nút bấm chuyển thành "Cập nhật" và có thêm nút "Quay lại" để hủy. Khi bấm cập nhật sẽ gọi API `PUT /api/schedules/{id}` để cập nhật thay vì tạo mới. Ngoài ra đã bổ sung chức năng Xóa gọi API `DELETE /api/schedules/{id}` khi click vào "Xóa" dưới danh sách lịch.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(schedules): implement edit and delete functionality on admin schedules table"`
+
+### [2026-08-01 00:35] Bổ sung Quản trị Phòng ban và Nhân viên (Dropdown menu)
+- **Mô tả**:
+  - Tạo `AdminHeader` component để tái sử dụng header và thay đổi menu "QUẢN TRỊ" thành dạng dropdown (tài khoản, phòng ban, nhân viên).
+  - Bổ sung `DepartmentRepository` và `DepartmentsController` để xử lý CRUD phòng ban.
+  - Cập nhật `UserRepository` và `UsersController` thêm trường `ZaloId` và `NotificationPreference` cho Quản trị nhân viên.
+  - Thêm trang `AdminDepartments.jsx` và `AdminEmployees.jsx` theo đúng giao diện ảnh 3 và ảnh 4.
+  - Cập nhật router trong `main.jsx` và áp dụng `AdminHeader` cho các trang quản trị.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Interfaces/IDepartmentRepository.cs` (Mới)
+  - `LichCongTac.Core/Data/Repositories/DepartmentRepository.cs` (Mới)
+  - `LichCongTac.Api/Controllers/DepartmentsController.cs` (Mới)
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/UsersController.cs` (Sửa đổi)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminChangePassword.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminDepartments.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminEmployees.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(admin): thêm quản trị phòng ban, nhân viên và menu dropdown"`

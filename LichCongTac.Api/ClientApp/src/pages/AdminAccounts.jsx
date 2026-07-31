@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import AdminHeader from '../components/AdminHeader'
 
 export default function AdminAccounts() {
   const [formData, setFormData] = useState({
@@ -16,14 +17,21 @@ export default function AdminAccounts() {
     { id: 3, fullName: 'test', username: 'test123', department: 'CƠ QUAN', isAdmin: true },
   ]
 
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_name')
+    localStorage.removeItem('user_role')
+    window.location.href = '/campha/manager/login'
+  }
+
   const navItems = [
     { label: 'QUẢN TRỊ', href: '/campha/manager/accounts' },
-    { label: 'LỊCH CÔNG TÁC', href: '#' },
-    { label: 'QUẢN TRỊ LỊCH', href: '#' },
+    { label: 'LỊCH CÔNG TÁC', href: '/campha/' },
+    { label: 'QUẢN TRỊ LỊCH', href: '/campha/manager/schedules' },
     { label: 'THÔNG BÁO', href: '#' },
     { label: 'NGÀY LỄ', href: '#' },
-    { label: 'ĐỔI MẬT KHẨU', href: '#' },
-    { label: 'ĐĂNG XUẤT', href: '#' },
+    { label: 'ĐỔI MẬT KHẨU', href: '/campha/manager/change-password' },
+    { label: 'ĐĂNG XUẤT', href: null, onClick: handleLogout },
   ]
 
   const handleChange = (e) => {
@@ -41,38 +49,7 @@ export default function AdminAccounts() {
 
   return (
     <div className="min-h-screen bg-white font-sans text-[13px] text-gray-800">
-      {/* Header */}
-      <div className="max-w-[1000px] mx-auto bg-white flex justify-start pt-2">
-        <img
-          src="/assets/header-banner.png"
-          alt="Lịch Công Tác"
-          className="h-auto max-h-[90px] object-contain"
-          onError={(e) => {
-            // Fallback text if image doesn't exist
-            e.target.style.display = 'none'
-            e.target.nextElementSibling.style.display = 'block'
-          }}
-        />
-        <div style={{ display: 'none' }} className="py-4">
-          <h1 className="text-xl font-bold text-[#1d5792]">PHẦN MỀM QUẢN LÝ</h1>
-          <h1 className="text-2xl font-bold text-[#c8102e]">LỊCH CÔNG TÁC</h1>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="bg-[#5bc0de]">
-        <div className="max-w-[1000px] mx-auto flex flex-wrap justify-center sm:justify-start">
-          {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="px-6 py-2.5 text-white text-[13px] font-bold uppercase hover:bg-[#46b8da] transition-colors"
-            >
-              {item.label}
-            </a>
-          ))}
-        </div>
-      </nav>
+      <AdminHeader />
 
       {/* Main Content */}
       <main className="max-w-[1000px] mx-auto px-4 py-6">

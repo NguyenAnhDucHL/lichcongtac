@@ -60,6 +60,10 @@ namespace LichCongTac.Core.Data.Repositories
                 FailedLoginCount = reader["FailedLoginCount"] == DBNull.Value ? 0 : Convert.ToInt32(reader["FailedLoginCount"]),
                 LockoutUntil     = ParseNullableDateTime(reader["LockoutUntil"]?.ToString()),
 
+                // --- New fields ---
+                ZaloId                 = HasColumn(reader, "ZaloId") ? reader["ZaloId"]?.ToString() : null,
+                NotificationPreference = HasColumn(reader, "NotificationPreference") ? reader["NotificationPreference"]?.ToString() : null,
+
                 // --- Identity columns mới — dùng HasColumn() đề phòng migration chưa chạy ---
                 SecurityStamp       = HasColumn(reader, "SecurityStamp")
                                         ? (reader["SecurityStamp"]?.ToString() ?? Guid.NewGuid().ToString())
@@ -113,7 +117,7 @@ namespace LichCongTac.Core.Data.Repositories
             string sql = @"
                 SELECT u.Id, u.Username, u.FullName, u.Email, u.PhoneNumber, u.Role,
                        u.DepartmentId, d.Name as DepartmentName, u.SessionId, u.CreatedAt,
-                       u.FailedLoginCount, u.LockoutUntil,
+                       u.FailedLoginCount, u.LockoutUntil, u.ZaloId, u.NotificationPreference,
                        u.SecurityStamp, u.NormalizedUserName, u.LockoutEnabled, u.AccessFailedCount, u.LockoutEnd
                 FROM Users u 
                 LEFT JOIN Departments d ON u.DepartmentId = d.Id";
@@ -131,7 +135,7 @@ namespace LichCongTac.Core.Data.Repositories
             string sql = @"
                 SELECT u.Id, u.Username, u.PasswordHash, u.FullName, u.Email, u.PhoneNumber, u.Role,
                        u.DepartmentId, d.Name as DepartmentName, u.SessionId, u.CreatedAt,
-                       u.FailedLoginCount, u.LockoutUntil,
+                       u.FailedLoginCount, u.LockoutUntil, u.ZaloId, u.NotificationPreference,
                        u.SecurityStamp, u.NormalizedUserName, u.LockoutEnabled, u.AccessFailedCount, u.LockoutEnd
                 FROM Users u 
                 LEFT JOIN Departments d ON u.DepartmentId = d.Id 
@@ -153,7 +157,7 @@ namespace LichCongTac.Core.Data.Repositories
             // Tìm theo NormalizedUserName (in hoa) trước, fallback về Username thường
             string sql = @"
                 SELECT u.Id, u.Username, u.PasswordHash, u.FullName, u.Email, u.PhoneNumber, u.Role,
-                       u.DepartmentId, u.SessionId, u.CreatedAt,
+                       u.DepartmentId, u.SessionId, u.CreatedAt, u.ZaloId, u.NotificationPreference,
                        u.FailedLoginCount, u.LockoutUntil,
                        u.SecurityStamp, u.NormalizedUserName, u.LockoutEnabled, u.AccessFailedCount, u.LockoutEnd
                 FROM Users u 
@@ -279,24 +283,24 @@ namespace LichCongTac.Core.Data.Repositories
 
         public bool CreateUser(User user)
         {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            // Hash mật khẩu nếu chưa hash
+            var passwordToStore = (user.PasswordHash?.StartsWith("$2") == true)
+                ? user.PasswordHash
+                : BCrypt.Net.BCrypt.HashPassword(user.PasswordHash ?? "ChangeMe@123", workFactor: 12);
+
+            // Tạo SecurityStamp ngay lúc tạo user để Identity hoạt động đúng
+            var securityStamp     = Guid.NewGuid().ToString();
+            var normalizedUserName = user.Username.ToUpperInvariant();
+
+            string sql = @"
+                INSERT INTO Users (Username, PasswordHash, FullName, Email, PhoneNumber, Role, DepartmentId, CreatedAt, SecurityStamp, NormalizedUserName, LockoutEnabled, ZaloId, NotificationPreference)
+                VALUES (@u, @p, @f, @e, @pn, @r, @d, @now, @stamp, @norm, 1, @zalo, @notif)";
+            
             try
             {
-                using var connection = new SqliteConnection(_connectionString);
-                connection.Open();
-
-                // Hash mật khẩu nếu chưa hash
-                var passwordToStore = (user.PasswordHash?.StartsWith("$2") == true)
-                    ? user.PasswordHash
-                    : BCrypt.Net.BCrypt.HashPassword(user.PasswordHash ?? "ChangeMe@123", workFactor: 12);
-
-                // Tạo SecurityStamp ngay lúc tạo user để Identity hoạt động đúng
-                var securityStamp     = Guid.NewGuid().ToString();
-                var normalizedUserName = user.Username.ToUpperInvariant();
-
-                string sql = @"
-                    INSERT INTO Users (Username, PasswordHash, FullName, Email, PhoneNumber, Role, DepartmentId, CreatedAt,
-                                       SecurityStamp, NormalizedUserName, LockoutEnabled) 
-                    VALUES (@u, @p, @f, @e, @pn, @r, @d, @now, @stamp, @norm, 1)";
                 using var cmd = new SqliteCommand(sql, connection);
                 cmd.Parameters.AddWithValue("@now",   DateTime.UtcNow.AddHours(7).ToString("yyyy-MM-dd HH:mm:ss"));
                 cmd.Parameters.AddWithValue("@u",     user.Username);
@@ -308,6 +312,8 @@ namespace LichCongTac.Core.Data.Repositories
                 cmd.Parameters.AddWithValue("@d",     (object?)user.DepartmentId ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@stamp", securityStamp);
                 cmd.Parameters.AddWithValue("@norm",  normalizedUserName);
+                cmd.Parameters.AddWithValue("@zalo",  (object?)user.ZaloId ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@notif", (object?)user.NotificationPreference ?? DBNull.Value);
                 cmd.ExecuteNonQuery();
                 return true;
             }
@@ -328,7 +334,9 @@ namespace LichCongTac.Core.Data.Repositories
                     DepartmentId   = @d,
                     SecurityStamp  = @stamp,
                     NormalizedUserName = upper(Username),
-                    PasswordHash   = @ph
+                    PasswordHash   = @ph,
+                    ZaloId         = @zalo,
+                    NotificationPreference = @notif
                 WHERE Id = @id";
 
             using var cmd = new SqliteCommand(sql, connection);
@@ -340,6 +348,8 @@ namespace LichCongTac.Core.Data.Repositories
             // Tạo SecurityStamp mới mỗi khi thông tin user thay đổi (invalidate token cũ)
             cmd.Parameters.AddWithValue("@stamp", Guid.NewGuid().ToString());
             cmd.Parameters.AddWithValue("@ph",    user.PasswordHash ?? "");
+            cmd.Parameters.AddWithValue("@zalo",  (object?)user.ZaloId ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@notif", (object?)user.NotificationPreference ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@id",    user.Id);
             cmd.ExecuteNonQuery();
         }
