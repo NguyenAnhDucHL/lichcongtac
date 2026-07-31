@@ -51,6 +51,7 @@ window.fetch = async (...args) => {
 import WorkSchedule from './pages/WorkSchedule.jsx'
 import AdminLogin from './pages/AdminLogin.jsx'
 import AdminAccounts from './pages/AdminAccounts.jsx'
+import AdminSchedules from './pages/AdminSchedules.jsx'
 import './styles/globals.css'
 
 import { AlertTriangle, RefreshCw } from 'lucide-react'
@@ -105,6 +106,10 @@ function Root() {
 
   if (path === '/campha/manager/accounts' || path === '/campha/manager/accounts/') {
     return <AdminAccounts />
+  }
+
+  if (path === '/campha/manager/schedules' || path === '/campha/manager/schedules/') {
+    return <AdminSchedules />
   }
 
   // Default to Work Schedule for now
