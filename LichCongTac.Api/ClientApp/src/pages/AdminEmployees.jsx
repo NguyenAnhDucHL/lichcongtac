@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react'
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react'
+import { toast } from 'sonner'
+import { ConfirmationModal } from '../components/ui/confirmation-modal'
+
 import AdminHeader from '../components/AdminHeader'
 
 export default function AdminEmployees() {
@@ -15,6 +19,13 @@ export default function AdminEmployees() {
     notificationPreference: '',
   })
   const [editId, setEditId] = useState(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  // States for confirmation modal
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -88,7 +99,7 @@ export default function AdminEmployees() {
     try {
       const url = editId ? `/api/users/${editId}` : `/api/users`
       const method = editId ? 'PUT' : 'POST'
-      
+
       const payload = { ...formData, departmentId: formData.departmentId ? parseInt(formData.departmentId) : null }
       if (!editId) {
         payload.role = formData.role
@@ -111,8 +122,8 @@ export default function AdminEmployees() {
       const res = await fetch(url, {
         method,
         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         },
         body: JSON.stringify(bodyData),
       })
@@ -122,10 +133,10 @@ export default function AdminEmployees() {
         throw new Error(result.message || 'Lỗi khi lưu nhân viên')
       }
 
-      alert(editId ? 'Cập nhật nhân viên thành công!' : 'Thêm nhân viên thành công. Lưu ý: Cần Sửa lại để bổ sung Zalo/Phòng ban!')
+      toast.success(editId ? 'Cập nhật nhân viên thành công!' : 'Thêm nhân viên thành công. Lưu ý: Cần Sửa lại để bổ sung Zalo/Phòng ban!')
       handleReset()
       fetchUsers()
-      
+
     } catch (err) {
       setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
@@ -148,11 +159,17 @@ export default function AdminEmployees() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa nhân viên này?')) return
+  const handleDeleteClick = (id) => {
+    setItemToDelete(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return
+    setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(`/api/users/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
@@ -160,14 +177,18 @@ export default function AdminEmployees() {
       })
 
       if (res.ok) {
-        alert('Xóa nhân viên thành công')
+        toast.success('Xóa nhân viên thành công')
         fetchUsers()
       } else {
         const errData = await res.json()
-        alert(errData.message || 'Lỗi khi xóa nhân viên')
+        toast.error(errData.message || 'Lỗi khi xóa nhân viên')
       }
     } catch (err) {
-      alert('Lỗi kết nối máy chủ')
+      toast.error('Lỗi kết nối máy chủ')
+    } finally {
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -239,14 +260,23 @@ export default function AdminEmployees() {
                   Mật khẩu{!editId && <span className="text-red-500">*</span>}
                 </td>
                 <td className="py-2">
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required={!editId}
-                  />
+                  <div className="relative w-[350px]">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full border border-[#5cb85c] rounded px-2 py-1 pr-8 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                      required={!editId}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </td>
               </tr>
               <tr>
@@ -254,14 +284,23 @@ export default function AdminEmployees() {
                   Nhập lại mật khẩu{!editId && <span className="text-red-500">*</span>}
                 </td>
                 <td className="py-2">
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required={!editId}
-                  />
+                  <div className="relative w-[350px]">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full border border-[#5cb85c] rounded px-2 py-1 pr-8 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                      required={!editId}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </td>
               </tr>
               <tr>
@@ -344,7 +383,7 @@ export default function AdminEmployees() {
                     </button>
                   </td>
                   <td className="border border-gray-200 py-2.5 px-4">
-                    <button onClick={() => handleDelete(user.id)} className="text-[#c8102e] hover:underline bg-transparent border-none cursor-pointer">
+                    <button onClick={() => handleDeleteClick(user.id)} className="text-[#c8102e] hover:underline bg-transparent border-none cursor-pointer">
                       Xóa
                     </button>
                   </td>
@@ -354,6 +393,15 @@ export default function AdminEmployees() {
           </table>
         </div>
       </main>
+
+      <ConfirmationModal
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Xác nhận xóa"
+        description="Bạn có chắc chắn muốn xóa nhân viên này? Thao tác này không thể hoàn tác."
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

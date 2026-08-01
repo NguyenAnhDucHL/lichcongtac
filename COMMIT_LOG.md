@@ -481,3 +481,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(frontend): giới hạn hiển thị lịch ở trang chủ tối đa 7 ngày tới"`
+### [2026-08-01 13:32] Thêm nút hiển thị/ẩn mật khẩu cho các trang quản trị
+- **Mô tả**: Bổ sung icon con mắt (Eye/EyeOff) vào các trường nhập mật khẩu (Mật khẩu và Nhập lại mật khẩu) ở trang Quản trị tài khoản (AdminAccounts) và Quản trị nhân viên (AdminEmployees) để người dùng có thể xem được mật khẩu khi nhập.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminEmployees.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(admin): thêm tính năng hiển thị mật khẩu ở trang quản trị tài khoản và nhân viên"`

@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react'
+import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff } from 'lucide-react'
+import { toast } from 'sonner'
+import { ConfirmationModal } from '../components/ui/confirmation-modal'
+
 import AdminHeader from '../components/AdminHeader'
 
 export default function AdminAccounts() {
@@ -13,6 +17,13 @@ export default function AdminAccounts() {
     isAdmin: false,
   })
   const [editId, setEditId] = useState(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  
+  // States for confirmation modal
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -137,23 +148,36 @@ export default function AdminAccounts() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa tài khoản này không?')) return
+  const handleDeleteClick = (id) => {
+    setItemToDelete(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return
+    setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/users/${id}`, {
+      const res = await fetch(`/api/users/${itemToDelete}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
       })
+
       if (res.ok) {
-        await fetchAccounts()
-        if (editId === id) handleReset()
+        fetchAccounts()
+        if (editId === itemToDelete) handleReset()
       } else {
         const result = await res.json()
-        alert(result.message || 'Xóa thất bại.')
+        toast.error(result.message || 'Xóa thất bại.')
       }
     } catch (err) {
-      alert('Lỗi kết nối máy chủ.')
+      toast.error('Lỗi kết nối máy chủ.')
+    } finally {
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -234,15 +258,24 @@ export default function AdminAccounts() {
                   Mật khẩu{!editId && <span className="text-red-500">*</span>}
                 </td>
                 <td className="py-2">
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required={!editId}
-                    placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
-                  />
+                  <div className="relative w-[350px]">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full border border-[#5cb85c] rounded px-2 py-1 pr-8 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                      required={!editId}
+                      placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </td>
               </tr>
               <tr>
@@ -250,15 +283,24 @@ export default function AdminAccounts() {
                   Nhập lại mật khẩu{!editId && <span className="text-red-500">*</span>}
                 </td>
                 <td className="py-2">
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required={!editId && !!formData.password}
-                    placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
-                  />
+                  <div className="relative w-[350px]">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full border border-[#5cb85c] rounded px-2 py-1 pr-8 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                      required={!editId && !!formData.password}
+                      placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </td>
               </tr>
               <tr>
@@ -332,7 +374,7 @@ export default function AdminAccounts() {
                   </td>
                   <td className="border border-gray-200 py-2.5 px-4">
                     <button 
-                      onClick={() => handleDelete(acc.id)}
+                      onClick={() => handleDeleteClick(acc.id)}
                       className="text-[#337ab7] hover:underline"
                     >
                       Xóa
@@ -351,6 +393,15 @@ export default function AdminAccounts() {
           </table>
         </div>
       </main>
+
+      <ConfirmationModal
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Xác nhận xóa"
+        description="Bạn có chắc chắn muốn xóa tài khoản này không? Thao tác này không thể hoàn tác."
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }
