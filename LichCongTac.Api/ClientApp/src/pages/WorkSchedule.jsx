@@ -143,7 +143,9 @@ export default function WorkSchedule() {
                             {item.invitationNumber && `${item.invitationNumber} `}
                           </span>
                           {item.content && (
-                            <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />
+                            <span>
+                              {item.content.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()}
+                            </span>
                           )}
                         </div>
                       </div>
@@ -177,7 +179,9 @@ export default function WorkSchedule() {
                               {item.invitationNumber && `${item.invitationNumber} `}
                             </span>
                             {item.content && (
-                              <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />
+                              <span>
+                                {item.content.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()}
+                              </span>
                             )}
                           </div>
                         </div>

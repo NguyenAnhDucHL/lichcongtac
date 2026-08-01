@@ -295,3 +295,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(search): thêm trang tìm kiếm lịch công tác với phân trang"`
+
+### [2026-08-01 09:47] Sửa lỗi font xấu do HTML render trong WorkSchedule
+- **Mô tả**: Content lưu trong DB là HTML từ Jodit, khi render với class `prose` bị vỡ layout và font xấu. Sửa bằng cách strip toàn bộ HTML tag thành plain text trước khi hiển thị.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(schedule): strip HTML content thành plain text, bỏ prose class gây font xấu"`
