@@ -243,3 +243,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(schedules): xóa trường Tiêu đề khỏi form và giao diện hiển thị"`
+
+### [2026-08-01 07:49] Gỡ bỏ ô Địa điểm, Chủ trì và bắt buộc nhập Nội dung chi tiết
+- **Mô tả**: Gỡ bỏ trường "Địa điểm" và "Chủ trì" khỏi form nhập liệu và giao diện hiển thị lịch làm việc. Thêm xác thực bắt buộc nhập đối với trường "Nội dung chi tiết" để tránh tạo lịch trống.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(schedules): xóa trường địa điểm và chủ trì, bắt buộc nhập nội dung"`

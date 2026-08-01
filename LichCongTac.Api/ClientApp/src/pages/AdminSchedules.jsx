@@ -128,6 +128,14 @@ export default function AdminSchedules() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+
+    const plainContent = (formData.content || '').replace(/<[^>]*>?/gm, '').trim()
+    if (!plainContent) {
+      setError('Vui lòng nhập Nội dung chi tiết')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+
     setLoading(true)
     setError('')
     try {
@@ -262,7 +270,9 @@ export default function AdminSchedules() {
                 </td>
               </tr>
               <tr>
-                <td className="py-2 font-medium align-top pt-3">Nội dung chi tiết</td>
+                <td className="py-2 font-medium align-top pt-3">
+                  Nội dung chi tiết <span className="text-red-500">*</span>
+                </td>
                 <td className="py-2">
                   <div className="w-[100%] max-w-[800px] border border-[#8cbabf] rounded overflow-hidden">
                     <JoditEditor
@@ -295,31 +305,7 @@ export default function AdminSchedules() {
                 </td>
               </tr>
 
-              <tr>
-                <td className="py-2 font-medium">Địa điểm</td>
-                <td className="py-2">
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                  />
-                </td>
-              </tr>
 
-              <tr>
-                <td className="py-2 font-medium">Chủ trì</td>
-                <td className="py-2">
-                  <input
-                    type="text"
-                    name="presider"
-                    value={formData.presider}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                  />
-                </td>
-              </tr>
 
               <tr>
                 <td className="py-2 font-medium">Hiển thị</td>
@@ -426,10 +412,7 @@ export default function AdminSchedules() {
                       </td>
                       <td className="border border-gray-200 py-2.5 px-4 text-left">
                         <span className="text-red-600 font-bold mr-2">{item.startTime}</span>
-                        <span className="text-gray-800">
-                          {item.location && ` (Tại ${item.location}) `}
                           {item.content && ` ${item.content} `}
-                          {item.presider && ` Dự đồng chí ${item.presider}.`}
                         </span>
                       </td>
                       <td className="border border-gray-200 py-2.5 px-4">

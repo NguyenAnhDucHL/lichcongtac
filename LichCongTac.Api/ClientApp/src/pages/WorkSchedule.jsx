@@ -139,13 +139,11 @@ export default function WorkSchedule() {
                         <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
                           <span>
                             {item.invitationNumber && `${item.invitationNumber} `}
-                            {item.location && `(${item.location}) `}
                           </span>
                           {item.content && (
                             <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />
                           )}
                           <span>
-                            {item.presider && ` Dự Đ/c ${item.presider}.`}
                             {item.preparingUnit && ` /.`}
                           </span>
                         </div>
@@ -178,14 +176,11 @@ export default function WorkSchedule() {
                           <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
                             <span>
                               {item.invitationNumber && `${item.invitationNumber} `}
-                              {item.location && `(${item.location}) `}
-                              {item.title}
                             </span>
                             {item.content && (
                               <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />
                             )}
                             <span>
-                              {item.presider && ` Dự Đ/c ${item.presider}.`}
                               {item.preparingUnit && ` /.`}
                             </span>
                           </div>
