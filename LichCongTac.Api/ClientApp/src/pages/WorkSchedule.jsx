@@ -58,9 +58,9 @@ export default function WorkSchedule() {
 
   const navItems = [
     { label: 'HOME', href: '/' },
-    { label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH', href: '#' },
-    { label: 'CỔNG THÔNG TIN', href: '#' },
-    { label: 'THƯ ĐIỆN TỬ', href: '#' },
+    { label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH', href: 'https://congchuc.quangninh.gov.vn/sso/Login.aspx', target: '_blank' },
+    { label: 'CỔNG THÔNG TIN', href: 'https://quangninh.gov.vn/Trang/Default.aspx', target: '_blank' },
+    { label: 'THƯ ĐIỆN TỬ', href: 'https://mail.quangninh.gov.vn/owa/auth/logon.aspx?replaceCurrent=1&url=https%3a%2f%2fmail.quangninh.gov.vn%2fowa%2f', target: '_blank' },
     { label: 'TÌM KIẾM', href: '#' },
     { label: 'QUẢN TRỊ', href: '/campha/manager/login' },
   ]
@@ -104,6 +104,8 @@ export default function WorkSchedule() {
             <a
               key={idx}
               href={item.href}
+              target={item.target || '_self'}
+              rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
               className="px-6 py-3 text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors"
             >
               {item.label}

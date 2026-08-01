@@ -281,3 +281,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(schedules): thêm phân trang 10 bản ghi/trang cho danh sách lịch quản trị"`
+
+### [2026-08-01 09:42] Gán URL thực cho các nút điều hướng trang chủ
+- **Mô tả**: Cập nhật 3 link điều hướng từ `#` sang URL thực: Quản lý văn bản điều hành → congchuc.quangninh.gov.vn, Cổng thông tin → quangninh.gov.vn, Thư điện tử → mail.quangninh.gov.vn. Các link này mở tab mới.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(nav): gán URL thực cho Quản lý văn bản, Cổng thông tin, Thư điện tử"`
