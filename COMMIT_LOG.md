@@ -230,3 +230,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi không paste được và hiển thị sai định dạng trong jodit editor"`
+
+### [2026-08-01 07:40] Xóa mã cứng ở mục chọn phòng ban trong quản trị lịch
+- **Mô tả**: Sửa lỗi vẫn còn mock data "CƠ QUAN" và "Văn phòng" ở mục "Thuộc Phòng, Ban" trên trang thêm mới/sửa Lịch công tác. Đã tích hợp gọi API `/api/departments` để load danh sách phòng ban thực tế từ cơ sở dữ liệu.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(schedules): xóa mã cứng và tải danh sách phòng ban động khi tạo lịch"`

@@ -22,6 +22,7 @@ export default function AdminSchedules() {
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [departments, setDepartments] = useState([])
 
   const fetchSchedules = async () => {
     try {
@@ -63,9 +64,24 @@ export default function AdminSchedules() {
     }
   }
 
+  const fetchDepartments = async () => {
+    try {
+      const res = await fetch('/api/departments', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+      })
+      if (res.ok) {
+        const json = await res.json()
+        setDepartments(json.data || json || [])
+      }
+    } catch (err) {
+      console.error('Lỗi tải danh sách phòng ban:', err)
+    }
+  }
+
   useEffect(() => {
     fetchSchedules()
     fetchUsers()
+    fetchDepartments()
   }, [])
 
   const handleLogout = () => {
@@ -98,7 +114,7 @@ export default function AdminSchedules() {
     setFormData({
       dateStr: new Date().toISOString().split('T')[0],
       timeStr: '',
-      department: 'CƠ QUAN',
+      department: '',
       title: '',
       invitationNumber: '',
       location: '',
@@ -221,8 +237,12 @@ export default function AdminSchedules() {
                     onChange={handleChange}
                     className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
                   >
-                    <option value="CƠ QUAN">CƠ QUAN</option>
-                    <option value="Văn phòng">Văn phòng</option>
+                    <option value="">-- Chọn phòng ban --</option>
+                    {departments.map((dept) => (
+                      <option key={dept.id} value={dept.name}>
+                        {dept.name}
+                      </option>
+                    ))}
                   </select>
                 </td>
               </tr>
