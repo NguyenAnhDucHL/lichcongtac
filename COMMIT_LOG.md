@@ -451,3 +451,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/hooks/use-mobile.js` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(frontend): sửa lỗi trắng màn hình do crash ở hook useIsMobile trên iOS cũ"`
+### [2026-08-01 13:07] Sửa lỗi không hiển thị Ngày Lễ ở trang chủ (WorkSchedule.jsx)
+- **Mô tả**: Sửa lỗi trang chủ không hiển thị thanh chạy chữ (marquee) ngày lễ. Nguyên nhân là do Global Fetch Interceptor ở file `main.jsx` đã bóc tách lớp bọc ngoài `ApiResponse<T>`, khiến `WorkSchedule.jsx` không nhận được JSON với cấu trúc `json.success` và `json.data` như kỳ vọng. Đã sửa lại code xử lý kết quả API trong `WorkSchedule.jsx` để kiểm tra thẳng trường `json.content`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(frontend): sửa lỗi không hiển thị text ngày lễ do xung đột với global fetch interceptor"`

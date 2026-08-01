@@ -1,10 +1,33 @@
 import React, { useState, useEffect } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Menu } from 'lucide-react'
+
+const formatLocation = (loc) => {
+  if (!loc) return '';
+  let cleanLoc = loc.trim();
+  // Loại bỏ dấu ngoặc đơn bọc ngoài nếu có
+  if (cleanLoc.startsWith('(') && cleanLoc.endsWith(')')) {
+    cleanLoc = cleanLoc.slice(1, -1).trim();
+  }
+  // Loại bỏ chữ "Tại " ở đầu nếu có
+  if (cleanLoc.toLowerCase().startsWith('tại ')) {
+    cleanLoc = cleanLoc.substring(4).trim();
+  }
+  // Thử loại bỏ ngoặc đơn một lần nữa đề phòng trường hợp (Tại (Phòng...))
+  if (cleanLoc.startsWith('(') && cleanLoc.endsWith(')')) {
+    cleanLoc = cleanLoc.slice(1, -1).trim();
+  }
+  if (cleanLoc.toLowerCase().startsWith('tại ')) {
+    cleanLoc = cleanLoc.substring(4).trim();
+  }
+  return cleanLoc;
+};
 
 export default function WorkSchedule() {
   const [scheduleData, setScheduleData] = useState([])
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [todayHoliday, setTodayHoliday] = useState(null)
 
   useEffect(() => {
     fetch('/api/schedules/public-schedule')
@@ -60,10 +83,22 @@ export default function WorkSchedule() {
     fetch('/api/notifications/visible')
       .then(res => res.json())
       .then(json => {
-         if (Array.isArray(json)) setNotifications(json)
-         else if (json.data) setNotifications(json.data)
+        if (Array.isArray(json)) setNotifications(json)
+        else if (json.data) setNotifications(json.data)
       })
       .catch(err => console.error('Lỗi tải thông báo:', err))
+
+    // Fetch today's holiday
+    fetch('/api/holidays/today')
+      .then(res => res.json())
+      .then(json => {
+        if (json && json.content) {
+          setTodayHoliday(json)
+        } else if (json.success && json.data) {
+          setTodayHoliday(json.data)
+        }
+      })
+      .catch(err => console.error('Lỗi tải ngày lễ:', err))
   }, [])
 
   const navItems = [
@@ -108,21 +143,42 @@ export default function WorkSchedule() {
       </div>
 
       {/* Navigation */}
-      <nav className="bg-[#1d5792] shadow-md">
-        <div className="max-w-6xl mx-auto flex flex-wrap">
-          {navItems.map((item, idx) => (
-            <a
-              key={idx}
-              href={item.href}
-              target={item.target || '_self'}
-              rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-              className="px-6 py-3 text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors"
-            >
-              {item.label}
-            </a>
-          ))}
+      <nav className="bg-[#1d5792] shadow-md relative z-20">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center">
+          {/* Mobile Menu Toggle */}
+          <div
+            className="md:hidden flex justify-between items-center px-4 py-3 cursor-pointer"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <span className="text-white font-serif font-bold uppercase text-base tracking-wide">MENU</span>
+            <Menu className="text-white w-7 h-7" />
+          </div>
+
+          {/* Nav Items */}
+          <div className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row w-full`}>
+            {navItems.map((item, idx) => (
+              <a
+                key={idx}
+                href={item.href}
+                target={item.target || '_self'}
+                rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors`}
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
         </div>
       </nav>
+
+      {/* Holiday Marquee */}
+      {todayHoliday && (
+        <div className="bg-[#fcf8e3] text-[#c8102e] py-1.5 border-b border-[#faebcc] overflow-hidden whitespace-nowrap relative">
+          <div className="animate-marquee text-[13px] font-semibold tracking-wide">
+            ⚛ {todayHoliday.content} ⚛
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-6">
@@ -151,15 +207,11 @@ export default function WorkSchedule() {
                         <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
                           <span>
                             {item.invitationNumber && `${item.invitationNumber} `}
+                            {item.location && <span className="text-[#1d5792] font-semibold">(Tại {formatLocation(item.location)}) </span>}
                           </span>
                           {item.content && (
                             <span>
                               {item.content.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()}
-                            </span>
-                          )}
-                          {item.location && (
-                            <span className="italic text-gray-600 block mt-0.5">
-                              - Địa điểm: {item.location}
                             </span>
                           )}
                         </div>
@@ -206,7 +258,7 @@ export default function WorkSchedule() {
                           <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
                             <span>
                               {item.invitationNumber && `${item.invitationNumber} `}
-                              {item.location && `(Tại ${item.location}) `}
+                              {item.location && <span className="text-[#1d5792] font-semibold">(Tại {formatLocation(item.location)}) </span>}
                             </span>
                             {item.content && (
                               <span>
