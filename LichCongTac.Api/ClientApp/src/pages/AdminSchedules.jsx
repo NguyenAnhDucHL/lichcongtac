@@ -452,7 +452,7 @@ export default function AdminSchedules() {
                         <td className="border border-gray-200 py-2.5 px-4 text-left">
                           <span className="text-red-600 font-bold mr-2">{item.startTime}</span>
                           <span className="text-gray-800">
-                            {item.content && ` ${item.content} `}
+                            {item.content && ` ${item.content.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()} `}
                           </span>
                         </td>
                         <td className="border border-gray-200 py-2.5 px-4">
@@ -531,7 +531,7 @@ export default function AdminSchedules() {
         </div>
 
         {/* Pagination Controls */}
-        {schedules.length > PAGE_SIZE && (
+        {schedules.length > 0 && (
           <div className="flex items-center justify-center gap-1 mt-4">
             <button
               onClick={() => setCurrentPage(1)}

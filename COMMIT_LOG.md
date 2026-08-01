@@ -321,3 +321,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(schedules): thêm field nhập địa điểm vào form quản trị và hiển thị ra UI"`
+
+### [2026-08-01 10:06] Sửa lỗi hiển thị HTML thô và thanh phân trang ở trang Quản trị lịch
+- **Mô tả**: 
+  - Cột Nội dung ở danh sách Quản trị lịch đang hiển thị mã HTML thô (do lưu trữ từ Jodit editor), đã sửa để loại bỏ HTML tags giúp hiển thị text thuần sạch sẽ.
+  - Luôn hiển thị thanh phân trang kể cả khi tổng số bản ghi nhỏ hơn `PAGE_SIZE` (10) để người dùng biết chức năng phân trang đang hoạt động.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(schedules): strip HTML ở list quản trị và luôn hiện phân trang"`
