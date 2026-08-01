@@ -61,7 +61,7 @@ export default function WorkSchedule() {
     { label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH', href: 'https://congchuc.quangninh.gov.vn/sso/Login.aspx', target: '_blank' },
     { label: 'CỔNG THÔNG TIN', href: 'https://quangninh.gov.vn/Trang/Default.aspx', target: '_blank' },
     { label: 'THƯ ĐIỆN TỬ', href: 'https://mail.quangninh.gov.vn/owa/auth/logon.aspx?replaceCurrent=1&url=https%3a%2f%2fmail.quangninh.gov.vn%2fowa%2f', target: '_blank' },
-    { label: 'TÌM KIẾM', href: '#' },
+    { label: 'TÌM KIẾM', href: '/campha/search' },
     { label: 'QUẢN TRỊ', href: '/campha/manager/login' },
   ]
 

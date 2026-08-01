@@ -287,3 +287,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(nav): gán URL thực cho Quản lý văn bản, Cổng thông tin, Thư điện tử"`
+
+### [2026-08-01 09:46] Thêm trang Tìm kiếm lịch công tác
+- **Mô tả**: Tạo trang SearchSchedule.jsx với form tìm theo thời gian bắt đầu/kết thúc và nội dung. Kết quả hiển thị dạng bảng (STT, Ngày, Nội dung, Phòng ban) có phân trang kiểu 1|2|...|Next. Thêm route /campha/search vào main.jsx. Cập nhật link TÌM KIẾM ở WorkSchedule.jsx.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(search): thêm trang tìm kiếm lịch công tác với phân trang"`

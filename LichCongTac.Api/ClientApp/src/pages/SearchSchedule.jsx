@@ -1,0 +1,291 @@
+import { useState } from 'react'
+
+const PAGE_SIZE = 10
+
+const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
+
+function formatDateDisplay(dateString) {
+  if (!dateString) return { dayName: '', date: '' }
+  try {
+    const d = new Date(dateString)
+    const dayName = DAYS[d.getDay()]
+    const dd = String(d.getDate()).padStart(2, '0')
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const yyyy = d.getFullYear()
+    return { dayName, date: `${dd}/${mm}/${yyyy}` }
+  } catch {
+    return { dayName: '', date: dateString }
+  }
+}
+
+const navItems = [
+  { label: 'HOME', href: '/campha/' },
+  { label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH', href: 'https://congchuc.quangninh.gov.vn/sso/Login.aspx', target: '_blank' },
+  { label: 'CỔNG THÔNG TIN', href: 'https://quangninh.gov.vn/Trang/Default.aspx', target: '_blank' },
+  { label: 'THƯ ĐIỆN TỬ', href: 'https://mail.quangninh.gov.vn/owa/auth/logon.aspx?replaceCurrent=1&url=https%3a%2f%2fmail.quangninh.gov.vn%2fowa%2f', target: '_blank' },
+  { label: 'TÌM KIẾM', href: '/campha/search' },
+  { label: 'QUẢN TRỊ', href: '/campha/manager/login' },
+]
+
+export default function SearchSchedule() {
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [keyword, setKeyword] = useState('')
+  const [results, setResults] = useState([])
+  const [searched, setSearched] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const handleSearch = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setCurrentPage(1)
+    try {
+      const params = new URLSearchParams()
+      if (startDate) params.append('startDate', startDate)
+      if (endDate) params.append('endDate', endDate)
+
+      const url = `/api/schedules/public-schedule${params.toString() ? '?' + params.toString() : ''}`
+      const res = await fetch(url)
+      const json = await res.json()
+
+      let data = []
+      if (Array.isArray(json)) data = json
+      else if (json.data) data = json.data
+      else if (Array.isArray(json)) data = json
+
+      // Filter by keyword on frontend
+      if (keyword.trim()) {
+        const kw = keyword.trim().toLowerCase()
+        data = data.filter(
+          (item) =>
+            (item.content && item.content.toLowerCase().includes(kw)) ||
+            (item.title && item.title.toLowerCase().includes(kw)) ||
+            (item.invitationNumber && item.invitationNumber.toLowerCase().includes(kw))
+        )
+      }
+
+      // Sort by date descending
+      data.sort((a, b) => {
+        const da = (a.date || '').split('T')[0]
+        const db = (b.date || '').split('T')[0]
+        if (db > da) return 1
+        if (db < da) return -1
+        return (b.startTime || '').localeCompare(a.startTime || '')
+      })
+
+      setResults(data)
+      setSearched(true)
+    } catch (err) {
+      setResults([])
+      setSearched(true)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE))
+  const paginated = results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1)
+    .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+    .reduce((acc, p, idx, arr) => {
+      if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...')
+      acc.push(p)
+      return acc
+    }, [])
+
+  return (
+    <div className="min-h-screen bg-white font-sans text-sm text-gray-800">
+      {/* Header */}
+      <div className="max-w-6xl mx-auto bg-white relative flex flex-col justify-center min-h-[86px] overflow-hidden">
+        <div className="absolute inset-0 z-0 flex justify-start">
+          <img
+            src="/assets/header-banner.png"
+            alt="Lịch Công Tác UBND Phường Cẩm Phả"
+            className="h-full w-auto max-h-[86px] object-contain"
+            onError={(e) => { e.target.style.display = 'none' }}
+          />
+        </div>
+        <div className="relative z-10 pl-6 py-2">
+          <h1 className="text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">LỊCH CÔNG TÁC</h1>
+          <h1 className="text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">UBND PHƯỜNG CẨM PHẢ</h1>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="bg-[#1d5792] shadow-md">
+        <div className="max-w-6xl mx-auto flex flex-wrap">
+          {navItems.map((item, idx) => (
+            <a
+              key={idx}
+              href={item.href}
+              target={item.target || '_self'}
+              rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+              className={`px-6 py-3 text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors ${item.href === '/campha/search' ? 'bg-[#154374]' : ''}`}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-4 py-6">
+        {/* Search box */}
+        <div className="bg-[#e8f0f7] border border-[#c0d4e8] p-6 mb-6">
+          <h2 className="text-[#1d5792] font-bold text-base mb-4">Tìm kiếm</h2>
+          <form onSubmit={handleSearch}>
+            <table className="w-full max-w-[550px]">
+              <tbody>
+                <tr>
+                  <td className="py-2 pr-4 w-[160px] text-gray-700 font-medium">Thời gian bắt đầu</td>
+                  <td className="py-2">
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="border border-gray-300 px-2 py-1 rounded text-gray-700 text-sm w-[200px] outline-none focus:border-[#1d5792]"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4 text-gray-700 font-medium">Thời gian kết thúc</td>
+                  <td className="py-2">
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="border border-gray-300 px-2 py-1 rounded text-gray-700 text-sm w-[200px] outline-none focus:border-[#1d5792]"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4 text-gray-700 font-medium align-top pt-3">Nội dung</td>
+                  <td className="py-2">
+                    <textarea
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      rows={3}
+                      className="border border-gray-300 px-2 py-1 rounded text-gray-700 text-sm w-[300px] outline-none focus:border-[#1d5792] resize-y"
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td />
+                  <td className="py-2">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-1.5 rounded text-sm font-medium transition-colors disabled:opacity-50"
+                    >
+                      {loading ? 'Đang tìm...' : 'Tìm kiếm'}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+
+        {/* Results */}
+        {searched && (
+          <>
+            <div className="text-gray-500 text-xs mb-2">
+              Danh sách lịch làm việc {results.length > 0 ? `(${results.length} kết quả)` : ''}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse border border-gray-300 text-[13px]">
+                <thead>
+                  <tr className="bg-[#fce8d5]">
+                    <th className="border border-gray-300 py-2 px-3 font-bold w-12 text-center">STT</th>
+                    <th className="border border-gray-300 py-2 px-3 font-bold w-28 text-center">Ngày</th>
+                    <th className="border border-gray-300 py-2 px-3 font-bold text-center">Nội dung</th>
+                    <th className="border border-gray-300 py-2 px-3 font-bold w-28 text-center">Phòng, ban</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.length > 0 ? (
+                    paginated.map((item, index) => {
+                      const globalIndex = (currentPage - 1) * PAGE_SIZE + index + 1
+                      const dateInfo = formatDateDisplay(item.date)
+                      return (
+                        <tr key={item.id} className="hover:bg-gray-50">
+                          <td className="border border-gray-300 py-2.5 px-3 text-center font-bold">{globalIndex}</td>
+                          <td className="border border-gray-300 py-2.5 px-3 text-center leading-tight">
+                            <div>{dateInfo.dayName}</div>
+                            <div className="text-[#1d5792] font-bold">{dateInfo.date}</div>
+                          </td>
+                          <td className="border border-gray-300 py-2.5 px-3">
+                            <span className="text-[#c8102e] font-bold mr-2">{item.startTime}</span>
+                            {item.invitationNumber && (
+                              <span className="mr-1">{item.invitationNumber}</span>
+                            )}
+                            {item.content && (
+                              <span dangerouslySetInnerHTML={{
+                                __html: item.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+                              }} />
+                            )}
+                          </td>
+                          <td className="border border-gray-300 py-2.5 px-3 text-center">
+                            {item.preparingUnit || 'Văn phòng'}
+                          </td>
+                        </tr>
+                      )
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="border border-gray-300 py-6 text-center text-gray-500 italic">
+                        Không tìm thấy lịch công tác phù hợp.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {results.length > PAGE_SIZE && (
+              <div className="flex items-center justify-center gap-0.5 mt-4 text-xs flex-wrap">
+                {currentPage > 1 && (
+                  <button
+                    onClick={() => setCurrentPage((p) => p - 1)}
+                    className="px-1.5 text-[#1d5792] hover:underline"
+                  >
+                    Previous
+                  </button>
+                )}
+                {pageNumbers.map((p, idx) =>
+                  p === '...' ? (
+                    <span key={`e-${idx}`} className="px-1 text-gray-500">|</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setCurrentPage(p)}
+                      className={`px-1.5 ${currentPage === p ? 'font-bold text-gray-800' : 'text-[#1d5792] hover:underline'}`}
+                    >
+                      {currentPage === p ? p : <span>{p}</span>}
+                    </button>
+                  )
+                )}
+                {currentPage < totalPages && (
+                  <button
+                    onClick={() => setCurrentPage((p) => p + 1)}
+                    className="px-1.5 text-[#1d5792] hover:underline"
+                  >
+                    Next
+                  </button>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs mt-8">
+        Bản quyền thuộc về LichCongTac.Com
+      </footer>
+    </div>
+  )
+}

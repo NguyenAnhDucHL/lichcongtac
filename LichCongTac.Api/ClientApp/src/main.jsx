@@ -64,6 +64,7 @@ import AdminSchedules from './pages/AdminSchedules.jsx'
 import AdminChangePassword from './pages/AdminChangePassword.jsx'
 import AdminDepartments from './pages/AdminDepartments.jsx'
 import AdminEmployees from './pages/AdminEmployees.jsx'
+import SearchSchedule from './pages/SearchSchedule.jsx'
 import './styles/globals.css'
 
 import { AlertTriangle, RefreshCw } from 'lucide-react'
@@ -149,6 +150,10 @@ function Root() {
 
   if (path === '/campha/manager/employees' || path === '/campha/manager/employees/') {
     return <RequireAuth><AdminEmployees /></RequireAuth>
+  }
+
+  if (path === '/campha/search' || path === '/campha/search/') {
+    return <SearchSchedule />
   }
 
   // Default to Work Schedule
