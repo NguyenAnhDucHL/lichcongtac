@@ -329,3 +329,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(schedules): strip HTML ở list quản trị và luôn hiện phân trang"`
+
+### [2026-08-01 10:12] Cập nhật form địa điểm và đổi màu tab active
+- **Mô tả**: 
+  - Trong form Quản trị lịch: Thay input "Địa điểm" thành giao diện chọn dạng combo box (chọn dropdown hoặc tự gõ) với list có sẵn: "Hội trường A UBND phường", "Phòng họp tầng 3...", "Phòng họp tầng 4...". Giống như phần chọn Phòng, Ban.
+  - Ở thanh menu Quản trị: Đổi màu highlight cho tab đang active sang xanh đậm (`#1d5792`) để nổi bật và dễ nhìn hơn, khắc phục tình trạng khó nhận biết do màu trước đó nhạt (`#31b0d5`).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(admin): combo box cho địa điểm và đổi màu tab active đậm hơn"`

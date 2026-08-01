@@ -38,7 +38,7 @@ export default function AdminHeader() {
     { label: 'ĐĂNG XUẤT', href: null, onClick: handleLogout },
   ]
 
-  const activeClass = 'bg-[#31b0d5] border-b-2 border-white'
+  const activeClass = 'bg-[#1d5792] border-b-2 border-white text-white'
   const baseClass = 'px-6 py-2.5 text-white text-[13px] font-bold uppercase hover:bg-[#46b8da] transition-colors'
 
   return (

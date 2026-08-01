@@ -26,6 +26,12 @@ export default function AdminSchedules() {
   const [currentPage, setCurrentPage] = useState(1)
   const PAGE_SIZE = 10
 
+  const LOCATIONS = [
+    'Hội trường A UBND phường',
+    'Phòng họp tầng 3 UBND phường',
+    'Phòng họp tầng 4 UBND phường'
+  ]
+
   const fetchSchedules = async () => {
     try {
       const res = await fetch('/api/schedules', {
@@ -292,14 +298,29 @@ export default function AdminSchedules() {
               <tr>
                 <td className="py-2 font-medium">Địa điểm</td>
                 <td className="py-2">
-                  <input
-                    type="text"
+                  <select
                     name="location"
-                    value={formData.location}
+                    value={LOCATIONS.includes(formData.location) ? formData.location : ''}
                     onChange={handleChange}
-                    placeholder="VD: Phòng họp số 1"
-                    className="w-full border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
-                  />
+                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
+                  >
+                    <option value="">-- Chọn địa điểm --</option>
+                    {LOCATIONS.map((loc, idx) => (
+                      <option key={idx} value={loc}>
+                        {loc}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <span className="text-xs text-gray-500 italic">hoặc nhập địa điểm khác:</span>
+                    <input
+                      type="text"
+                      placeholder="VD: Phòng họp số 1"
+                      value={LOCATIONS.includes(formData.location) || formData.location === '' ? '' : formData.location}
+                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                      className="w-[260px] border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
+                    />
+                  </div>
                 </td>
               </tr>
               <tr>
