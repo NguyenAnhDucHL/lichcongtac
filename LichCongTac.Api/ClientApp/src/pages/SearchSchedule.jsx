@@ -107,7 +107,7 @@ export default function SearchSchedule() {
             onError={(e) => { e.target.style.display = 'none' }}
           />
         </div>
-        <div className="relative z-10 pl-6 py-2">
+        <div className="relative z-10 pl-[130px] py-2">
           <h1 className="text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">LỊCH CÔNG TÁC</h1>
           <h1 className="text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">UBND PHƯỜNG CẨM PHẢ</h1>
         </div>

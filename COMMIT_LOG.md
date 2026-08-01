@@ -348,3 +348,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): cập nhật ảnh banner header mới"`
+
+### [2026-08-01 10:19] Căn lề tiêu đề tránh đè lên logo
+- **Mô tả**: Đã thêm khoảng trống thụt lề bên trái (`pl-[130px]`) cho khối văn bản chứa tiêu đề "LỊCH CÔNG TÁC UBND PHƯỜNG CẨM PHẢ" ở thanh banner header để đẩy khối chữ sang bên phải, tránh tình trạng bị đè lên hình ảnh logo tròn mới cập nhật.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): thụt lề title header để không đè lên logo"`
