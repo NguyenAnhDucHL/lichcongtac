@@ -275,3 +275,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(schedules): remove stray slash at the end of schedule items"`
+
+### [2026-08-01 09:39] Thêm phân trang cho danh sách lịch ở trang Quản trị lịch
+- **Mô tả**: Thêm pagination 10 bản ghi/trang vào danh sách lịch trong AdminSchedules. Hiển thị tổng số bản ghi, số trang hiện tại, nút điều hướng « ‹ số trang › ».
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(schedules): thêm phân trang 10 bản ghi/trang cho danh sách lịch quản trị"`

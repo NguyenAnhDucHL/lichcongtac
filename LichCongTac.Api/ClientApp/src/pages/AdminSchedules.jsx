@@ -23,6 +23,8 @@ export default function AdminSchedules() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [departments, setDepartments] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const PAGE_SIZE = 10
 
   const fetchSchedules = async () => {
     try {
@@ -393,7 +395,10 @@ export default function AdminSchedules() {
           </table>
         </form>
 
-        <div className="text-gray-500 mb-2 text-[13px]">Danh sách lịch làm việc</div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-gray-500 text-[13px]">Danh sách lịch làm việc ({schedules.length} bản ghi)</span>
+          <span className="text-gray-400 text-xs">Trang {currentPage}/{Math.max(1, Math.ceil(schedules.length / PAGE_SIZE))}</span>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-200 text-center">
             <thead>
@@ -409,85 +414,88 @@ export default function AdminSchedules() {
             </thead>
             <tbody>
               {schedules.length > 0 ? (
-                schedules.map((item, index) => {
-                  const dateInfo = formatDateDisplay(item.date)
-                  return (
-                    <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="border border-gray-200 py-2.5 px-4 font-bold">{index + 1}</td>
-                      <td className="border border-gray-200 py-2.5 px-4 leading-tight">
-                        <div>{dateInfo.dayName}</div>
-                        <div className="text-blue-700 font-bold">{dateInfo.date}</div>
-                      </td>
-                      <td className="border border-gray-200 py-2.5 px-4 text-left">
-                        <span className="text-red-600 font-bold mr-2">{item.startTime}</span>
-                        <span className="text-gray-800">
-                          {item.content && ` ${item.content} `}
-                        </span>
-                      </td>
-                      <td className="border border-gray-200 py-2.5 px-4">
-                        {item.preparingUnit || 'CƠ QUAN'}
-                      </td>
-                      <td className="border border-gray-200 py-2.5 px-4">
-                        {item.isPublic ? 'Có' : 'Không'}
-                      </td>
-                      <td className="border border-gray-200 py-2.5 px-4">
-                        <a
-                          href="#"
-                          className="text-[#337ab7] hover:underline"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            setEditId(item.id)
-                            setFormData({
-                              dateStr: item.date ? item.date.split('T')[0] : new Date().toISOString().split('T')[0],
-                              timeStr: item.startTime || '',
-                              department: item.preparingUnit || 'CƠ QUAN',
-                              title: item.title || '',
-                              invitationNumber: item.invitationNumber || '',
-                              location: item.location || '',
-                              presider: item.presider || '',
-                              content: item.content || '',
-                              isPublic: item.isPublic === 1 || item.isPublic === true,
-                              participants: item.participants || '',
-                            })
-                            const parts = item.participants ? item.participants.split(',').map(s => s.trim()).filter(s => s) : []
-                            setSelectedParticipants(parts)
-                            window.scrollTo({ top: 0, behavior: 'smooth' })
-                          }}
-                        >
-                          Sửa
-                        </a>
-                      </td>
-                      <td className="border border-gray-200 py-2.5 px-4">
-                        <a
-                          href="#"
-                          className="text-[#337ab7] hover:underline"
-                          onClick={async (e) => {
-                            e.preventDefault()
-                            if (window.confirm('Bạn có chắc muốn xóa?')) {
-                              try {
-                                const res = await fetch(`/api/schedules/${item.id}`, {
-                                  method: 'DELETE',
-                                  headers: {
-                                    Authorization: `Bearer ${localStorage.getItem('auth_token')}`
+                schedules
+                  .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+                  .map((item, index) => {
+                    const globalIndex = (currentPage - 1) * PAGE_SIZE + index + 1
+                    const dateInfo = formatDateDisplay(item.date)
+                    return (
+                      <tr key={item.id} className="hover:bg-gray-50">
+                        <td className="border border-gray-200 py-2.5 px-4 font-bold">{globalIndex}</td>
+                        <td className="border border-gray-200 py-2.5 px-4 leading-tight">
+                          <div>{dateInfo.dayName}</div>
+                          <div className="text-blue-700 font-bold">{dateInfo.date}</div>
+                        </td>
+                        <td className="border border-gray-200 py-2.5 px-4 text-left">
+                          <span className="text-red-600 font-bold mr-2">{item.startTime}</span>
+                          <span className="text-gray-800">
+                            {item.content && ` ${item.content} `}
+                          </span>
+                        </td>
+                        <td className="border border-gray-200 py-2.5 px-4">
+                          {item.preparingUnit || 'CƠ QUAN'}
+                        </td>
+                        <td className="border border-gray-200 py-2.5 px-4">
+                          {item.isPublic ? 'Có' : 'Không'}
+                        </td>
+                        <td className="border border-gray-200 py-2.5 px-4">
+                          <a
+                            href="#"
+                            className="text-[#337ab7] hover:underline"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              setEditId(item.id)
+                              setFormData({
+                                dateStr: item.date ? item.date.split('T')[0] : new Date().toISOString().split('T')[0],
+                                timeStr: item.startTime || '',
+                                department: item.preparingUnit || 'CƠ QUAN',
+                                title: item.title || '',
+                                invitationNumber: item.invitationNumber || '',
+                                location: item.location || '',
+                                presider: item.presider || '',
+                                content: item.content || '',
+                                isPublic: item.isPublic === 1 || item.isPublic === true,
+                                participants: item.participants || '',
+                              })
+                              const parts = item.participants ? item.participants.split(',').map(s => s.trim()).filter(s => s) : []
+                              setSelectedParticipants(parts)
+                              window.scrollTo({ top: 0, behavior: 'smooth' })
+                            }}
+                          >
+                            Sửa
+                          </a>
+                        </td>
+                        <td className="border border-gray-200 py-2.5 px-4">
+                          <a
+                            href="#"
+                            className="text-[#337ab7] hover:underline"
+                            onClick={async (e) => {
+                              e.preventDefault()
+                              if (window.confirm('Bạn có chắc muốn xóa?')) {
+                                try {
+                                  const res = await fetch(`/api/schedules/${item.id}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                      Authorization: `Bearer ${localStorage.getItem('auth_token')}`
+                                    }
+                                  })
+                                  if (res.ok) {
+                                    fetchSchedules()
+                                  } else {
+                                    alert('Xóa thất bại')
                                   }
-                                })
-                                if (res.ok) {
-                                  fetchSchedules()
-                                } else {
-                                  alert('Xóa thất bại')
+                                } catch (e) {
+                                  alert('Lỗi kết nối')
                                 }
-                              } catch (e) {
-                                alert('Lỗi kết nối')
                               }
-                            }
-                          }}
-                        >
-                          Xóa
-                        </a>
-                      </td>
-                    </tr>
-                  )
-                })
+                            }}
+                          >
+                            Xóa
+                          </a>
+                        </td>
+                      </tr>
+                    )
+                  })
               ) : (
                 <tr>
                   <td colSpan="7" className="border border-gray-200 py-4 text-gray-500">
@@ -498,6 +506,64 @@ export default function AdminSchedules() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        {schedules.length > PAGE_SIZE && (
+          <div className="flex items-center justify-center gap-1 mt-4">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              «
+            </button>
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              ‹
+            </button>
+            {Array.from({ length: Math.ceil(schedules.length / PAGE_SIZE) }, (_, i) => i + 1)
+              .filter((p) => p === 1 || p === Math.ceil(schedules.length / PAGE_SIZE) || Math.abs(p - currentPage) <= 2)
+              .reduce((acc, p, idx, arr) => {
+                if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...')
+                acc.push(p)
+                return acc
+              }, [])
+              .map((p, idx) =>
+                p === '...' ? (
+                  <span key={`ellipsis-${idx}`} className="px-2 py-1 text-xs text-gray-400">…</span>
+                ) : (
+                  <button
+                    key={p}
+                    onClick={() => setCurrentPage(p)}
+                    className={`px-3 py-1 text-xs border rounded ${
+                      currentPage === p
+                        ? 'bg-[#337ab7] text-white border-[#337ab7]'
+                        : 'border-gray-300 hover:bg-gray-100'
+                    }`}
+                  >
+                    {p}
+                  </button>
+                )
+              )}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(Math.ceil(schedules.length / PAGE_SIZE), p + 1))}
+              disabled={currentPage === Math.ceil(schedules.length / PAGE_SIZE)}
+              className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              ›
+            </button>
+            <button
+              onClick={() => setCurrentPage(Math.ceil(schedules.length / PAGE_SIZE))}
+              disabled={currentPage === Math.ceil(schedules.length / PAGE_SIZE)}
+              className="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              »
+            </button>
+          </div>
+        )}
       </main>
     </div>
   )
