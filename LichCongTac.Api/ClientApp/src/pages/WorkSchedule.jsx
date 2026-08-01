@@ -69,7 +69,13 @@ export default function WorkSchedule() {
             originalDate: dateStr,
             items: grouped[dateStr].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''))
           };
-        }).filter(d => d.originalDate >= todayFormatted);
+        }).filter(d => {
+          if (d.originalDate < todayFormatted) return false;
+          const maxDate = new Date();
+          maxDate.setDate(maxDate.getDate() + 7);
+          const maxFormatted = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`;
+          return d.originalDate <= maxFormatted;
+        });
 
         setScheduleData(transformedData)
         setLoading(false)

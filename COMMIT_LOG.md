@@ -476,3 +476,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(frontend): sửa lỗi không hiển thị ngày lễ ở trang tìm kiếm"`
+### [2026-08-01 13:28] Giới hạn hiển thị lịch công tác trong 7 ngày tới (WorkSchedule.jsx)
+- **Mô tả**: Thay đổi logic lọc lịch sắp tới ở trang chủ. Chỉ hiển thị các lịch nằm trong khoảng thời gian từ ngày mai đến tối đa 7 ngày tính từ hôm nay để tránh giao diện bị kéo dài quá mức.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(frontend): giới hạn hiển thị lịch ở trang chủ tối đa 7 ngày tới"`
