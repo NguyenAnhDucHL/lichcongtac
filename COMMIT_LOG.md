@@ -256,3 +256,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(schedules): sửa lỗi cú pháp JSX do thiếu thẻ mở span"`
+
+### [2026-08-01 07:57] Sửa lỗi lưu lịch do Title bị validate ở backend
+- **Mô tả**: Sửa lỗi báo "Lỗi khi lưu lịch" khi người dùng thêm mới lịch, do backend C# `[Required]` không chấp nhận chuỗi chỉ có khoảng trắng (`" "`) cho `Title`. Đã thay đổi thành lấy 50 ký tự đầu của `Content` hoặc chuỗi mặc định.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(schedules): sửa lỗi lưu lịch do required title validation"`

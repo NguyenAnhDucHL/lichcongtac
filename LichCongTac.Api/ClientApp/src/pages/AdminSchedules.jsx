@@ -140,7 +140,7 @@ export default function AdminSchedules() {
     setError('')
     try {
       const payload = {
-        title: formData.title || ' ',
+        title: plainContent.substring(0, 50) || 'Lịch công tác',
         invitationNumber: formData.invitationNumber,
         date: formData.dateStr,
         startTime: formData.timeStr,
