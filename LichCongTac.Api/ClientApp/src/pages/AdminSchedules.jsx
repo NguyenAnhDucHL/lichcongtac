@@ -257,8 +257,12 @@ export default function AdminSchedules() {
                 <td className="py-2">
                   <select
                     name="department"
-                    value={formData.department}
-                    onChange={handleChange}
+                    value={
+                      !formData.department
+                        ? ""
+                        : (departments.some(d => d.name === formData.department) ? formData.department : "Khác")
+                    }
+                    onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
                     className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
                   >
                     <option value="">-- Chọn phòng ban --</option>
@@ -267,17 +271,21 @@ export default function AdminSchedules() {
                         {dept.name}
                       </option>
                     ))}
+                    <option value="Khác">-- Nhập phòng ban khác --</option>
                   </select>
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <span className="text-xs text-gray-500 italic">hoặc nhập tên đơn vị khác:</span>
-                    <input
-                      type="text"
-                      placeholder="VD: Công an phường, Quân sự, ..."
-                      value={departments.some(d => d.name === formData.department) || formData.department === '' ? '' : formData.department}
-                      onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
-                      className="w-[260px] border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
-                    />
-                  </div>
+                  {(!departments.some(d => d.name === formData.department) && !!formData.department) && (
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <span className="text-xs text-gray-500 italic">hoặc nhập tên đơn vị khác:</span>
+                      <input
+                        type="text"
+                        placeholder="VD: Công an phường, Quân sự, ..."
+                        value={formData.department === 'Khác' ? '' : formData.department}
+                        onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+                        className="w-[260px] border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
+                        autoFocus
+                      />
+                    </div>
+                  )}
                 </td>
               </tr>
 
@@ -300,8 +308,12 @@ export default function AdminSchedules() {
                 <td className="py-2">
                   <select
                     name="location"
-                    value={LOCATIONS.includes(formData.location) ? formData.location : ''}
-                    onChange={handleChange}
+                    value={
+                      !formData.location
+                        ? ""
+                        : (LOCATIONS.includes(formData.location) ? formData.location : "Khác")
+                    }
+                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                     className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
                   >
                     <option value="">-- Chọn địa điểm --</option>
@@ -310,17 +322,21 @@ export default function AdminSchedules() {
                         {loc}
                       </option>
                     ))}
+                    <option value="Khác">-- Nhập địa điểm khác --</option>
                   </select>
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <span className="text-xs text-gray-500 italic">hoặc nhập địa điểm khác:</span>
-                    <input
-                      type="text"
-                      placeholder="VD: Phòng họp số 1"
-                      value={LOCATIONS.includes(formData.location) || formData.location === '' ? '' : formData.location}
-                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                      className="w-[260px] border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
-                    />
-                  </div>
+                  {(!LOCATIONS.includes(formData.location) && !!formData.location) && (
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <span className="text-xs text-gray-500 italic">hoặc nhập địa điểm khác:</span>
+                      <input
+                        type="text"
+                        placeholder="VD: Phòng họp số 1"
+                        value={formData.location === 'Khác' ? '' : formData.location}
+                        onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                        className="w-[260px] border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
+                        autoFocus
+                      />
+                    </div>
+                  )}
                 </td>
               </tr>
               <tr>

@@ -61,3 +61,5 @@ Các module chuẩn bị phát triển:
 - API Thêm/Sửa/Xóa lịch trong `SchedulesController`.
 - Giao diện Admin quản lý Lịch (`Admin/Schedules.jsx`).
 - Giao diện Công khai hiển thị Lịch (`WorkSchedule.jsx` đọc từ DB thật).
+
+- **Quản lý Thông báo**: CRUD (Thêm, Sửa, Xóa, Bật/Tắt hiển thị) sử dụng Rich Text Editor (Jodit). Thông báo được hiển thị bên dưới Lịch Công tác hàng ngày trên trang chủ, ngăn cách bởi một đường kẻ viền.

@@ -376,3 +376,29 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): gộp địa điểm vào cùng dòng số giấy mời theo định dạng mới"`
+
+### [2026-08-01 10:38] Cải thiện UX nhập liệu phòng ban và địa điểm tùy chọn
+- **Mô tả**: Thêm lựa chọn "Khác" vào dropdown Phòng ban và Địa điểm. Ô nhập liệu văn bản chỉ xuất hiện khi người dùng chọn tùy chọn này, giúp giao diện gọn gàng và tránh nhầm lẫn.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(admin): hide custom input for department and location unless other is selected"`
+
+### [2026-08-01 10:45] Bổ sung tính năng Thông báo
+- **Mô tả**: Thiết lập toàn bộ tính năng quản trị thông báo bao gồm backend API, database table và giao diện quản trị (AdminNotifications). Đồng thời tích hợp hiển thị danh sách thông báo ra ngoài trang chủ WorkSchedule với đường phân cách.
+- **Tệp thay đổi**:
+  - `data_dump/documents.db` (Thêm bảng Notifications)
+  - `LichCongTac.Core/Models/Notification.cs` (Mới)
+  - `LichCongTac.Core/Data/Repositories/NotificationRepository.cs` (Mới)
+  - `LichCongTac.Api/Controllers/NotificationsController.cs` (Mới)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminNotifications.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(notifications): add notification management and display on homepage"`
+
+### [2026-08-01 10:47] Sửa lỗi hiển thị UI dropdown tuỳ chọn
+- **Mô tả**: Sửa lỗi ô nhập liệu địa điểm và phòng ban vẫn hiển thị khi form vừa được reset (do null/undefined) và sửa lỗi dropdown không reset về mặc định khi xóa trắng ô nhập liệu.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): correct custom input visibility for empty/null states"

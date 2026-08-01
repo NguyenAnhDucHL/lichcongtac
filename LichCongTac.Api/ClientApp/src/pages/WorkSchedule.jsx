@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react'
 
 export default function WorkSchedule() {
   const [scheduleData, setScheduleData] = useState([])
+  const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -54,6 +55,15 @@ export default function WorkSchedule() {
         console.error('Lỗi tải dữ liệu lịch:', err)
         setLoading(false)
       })
+
+    // Fetch notifications
+    fetch('/api/notifications/visible')
+      .then(res => res.json())
+      .then(json => {
+         if (Array.isArray(json)) setNotifications(json)
+         else if (json.data) setNotifications(json.data)
+      })
+      .catch(err => console.error('Lỗi tải thông báo:', err))
   }, [])
 
   const navItems = [
@@ -160,6 +170,20 @@ export default function WorkSchedule() {
                   <p className="text-center text-gray-500 italic py-4">Không có lịch công tác</p>
                 )}
               </div>
+
+              {/* Notifications */}
+              {notifications.length > 0 && (
+                <div className="mb-4">
+                  <hr className="border-gray-200 my-4" />
+                  <div className="space-y-3">
+                    {notifications.map((notif, idx) => (
+                      <div key={notif.id || idx} className="text-gray-800 text-[14px] leading-relaxed break-words content-render">
+                        <div dangerouslySetInnerHTML={{ __html: notif.content }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Light blue/gray filler box mimicking screenshot */}
               <div className="bg-[#f0f4f8] flex-grow mt-4 rounded-sm min-h-[300px]" />

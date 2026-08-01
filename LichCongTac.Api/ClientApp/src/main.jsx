@@ -64,6 +64,7 @@ import AdminSchedules from './pages/AdminSchedules.jsx'
 import AdminChangePassword from './pages/AdminChangePassword.jsx'
 import AdminDepartments from './pages/AdminDepartments.jsx'
 import AdminEmployees from './pages/AdminEmployees.jsx'
+import AdminNotifications from './pages/AdminNotifications.jsx'
 import SearchSchedule from './pages/SearchSchedule.jsx'
 import './styles/globals.css'
 
@@ -150,6 +151,10 @@ function Root() {
 
   if (path === '/campha/manager/employees' || path === '/campha/manager/employees/') {
     return <RequireAuth><AdminEmployees /></RequireAuth>
+  }
+
+  if (path === '/campha/manager/notifications' || path === '/campha/manager/notifications/') {
+    return <RequireAuth><AdminNotifications /></RequireAuth>
   }
 
   if (path === '/campha/search' || path === '/campha/search/') {
