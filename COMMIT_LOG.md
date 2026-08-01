@@ -402,3 +402,52 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(ui): correct custom input visibility for empty/null states"
+
+### [2026-08-01 11:06] Cập nhật định dạng hiển thị địa điểm trong Lịch công tác
+- **Mô tả**: Loại bỏ chữ "Tại" và dấu ngoặc lặp thừa khi hiển thị địa điểm ở trang ngoài, đồng thời đổi màu địa điểm sang xanh lam nổi bật nhưng không in đậm để dễ nhìn hơn.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(docs): format location display to prevent duplicate prefix"`
+
+### [2026-08-01 12:35] Thêm tính năng Quản lý Ngày lễ
+- **Mô tả**: Bổ sung bảng Holidays để quản lý các ngày lễ. Hiển thị thông báo dạng chữ chạy (marquee) dưới thanh menu trang chủ (WorkSchedule, SearchSchedule) nếu hôm nay là ngày lễ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Models/Holiday.cs` (Mới)
+  - `LichCongTac.Core/Data/Repositories/HolidayRepository.cs` (Mới)
+  - `LichCongTac.Api/Controllers/HolidaysController.cs` (Mới)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(admin): thêm tính năng quản lý ngày lễ và hiển thị marquee trên trang chủ"`
+
+### [2026-08-01 12:41] Fix lỗi kết nối DB của chức năng Quản lý Ngày lễ
+- **Mô tả**: Sửa lỗi `no such table: Holidays` (500 Internal Server Error) do `HolidayRepository` kết nối sai DB khi lấy chuỗi kết nối trống từ `appsettings.json`. Đã đổi sang dùng chung hàm lấy biến môi trường `DB_PATH` giống với `DatabaseService`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/HolidayRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(db): sửa lỗi HolidayRepository không lấy đúng đường dẫn DB_PATH"`
+
+### [2026-08-01 12:57] Dọn dẹp mã nguồn rác (Master Cleanup)
+- **Mô tả**: Gỡ bỏ hàng loạt các module và đoạn code thừa từ hệ thống Quản lý Công văn cũ để tối ưu hệ thống Lịch công tác hiện tại.
+- **Tệp thay đổi**:
+  - `tests/` và các file rác trong `LichCongTac.Tests/` (Xóa)
+  - `LichCongTac.Core/Services/EmailService.cs` (Xóa)
+  - `LichCongTac.Core/Hubs/NotificationHub.cs` (Xóa)
+  - `LichCongTac.Core/Services/Security/` (Xóa toàn bộ thư mục)
+  - `LichCongTac.Core/Data/Repositories/AuditLogRepository.cs` và `SettingRepository.cs` (Xóa)
+  - `LichCongTac.Api/ClientApp/src/components/settings/` (Xóa)
+  - `LichCongTac.Api/ClientApp/src/lib/signalr.js` (Xóa)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi: Bỏ đăng ký các service bị xóa và SignalR)
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: Bỏ ghi AuditLog và Kick SignalR)
+  - `LichCongTac.Api/Controllers/AdminController.cs` (Sửa đổi: Xóa endpoint audit-logs)
+  - `LichCongTac.Core/Data/DatabaseService.cs` (Sửa đổi: Không tạo bảng AppSettings, AuditLogs)
+  - `data_dump/documents.db` (Sửa đổi: DROP TABLE AppSettings, AuditLogs)
+- **Lệnh git commit**: `git commit -m "refactor(api): dọn dẹp hàng loạt module rác từ hệ thống cũ (AuditLog, Setting, Security, Email, SignalR, Tests)"`
+### [2026-08-01 13:00] Sửa lỗi trắng màn hình (crash) trên thiết bị di động (đặc biệt là trình duyệt/iOS cũ)
+- **Mô tả**: Khắc phục lỗi crash ở Frontend khi render trên thiết bị di động cũ (như iPhone 8 iOS <= 13). Nguyên nhân là hàm `mql.addEventListener` không được hỗ trợ trong các bản cũ của `window.matchMedia()`, thay vào đó cần dùng `mql.addListener`. Đã thêm fallback trong file hook `use-mobile.js` để tránh sập app. 
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/hooks/use-mobile.js` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(frontend): sửa lỗi trắng màn hình do crash ở hook useIsMobile trên iOS cũ"`
