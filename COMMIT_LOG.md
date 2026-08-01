@@ -250,3 +250,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(schedules): xóa trường địa điểm và chủ trì, bắt buộc nhập nội dung"`
+
+### [2026-08-01 07:50] Fix JSX syntax error in AdminSchedules.jsx
+- **Mô tả**: Sửa lỗi cú pháp JSX (thiếu thẻ mở `<span>`) trong AdminSchedules.jsx do quá trình gỡ bỏ trường địa điểm và chủ trì gây ra, khiến build React thất bại.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(schedules): sửa lỗi cú pháp JSX do thiếu thẻ mở span"`

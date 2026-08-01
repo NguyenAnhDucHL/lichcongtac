@@ -412,6 +412,7 @@ export default function AdminSchedules() {
                       </td>
                       <td className="border border-gray-200 py-2.5 px-4 text-left">
                         <span className="text-red-600 font-bold mr-2">{item.startTime}</span>
+                        <span className="text-gray-800">
                           {item.content && ` ${item.content} `}
                         </span>
                       </td>
