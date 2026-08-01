@@ -267,6 +267,9 @@ export default function AdminSchedules() {
                         placeholder: '• Nội dung: ...\n• Thành phần: ...\n• Địa điểm: ...',
                         height: 300,
                         language: 'vi',
+                        askBeforePasteHTML: false,
+                        askBeforePasteFromWord: false,
+                        defaultActionOnPaste: 'insert_as_html',
                         toolbarButtonSize: 'small',
                         buttons: [
                           'source', '|',

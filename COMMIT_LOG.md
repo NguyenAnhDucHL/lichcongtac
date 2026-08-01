@@ -221,3 +221,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(ui): thêm tiêu đề dạng text hiển thị đè lên banner cho giống thiết kế"`
+
+### [2026-08-01 07:38] Khắc phục lỗi Jodit Editor (Không paste được & mất định dạng chữ)
+- **Mô tả**: 
+  - Vô hiệu hóa hộp thoại hỏi trước khi dán (askBeforePaste) mặc định của Jodit khiến người dùng không thể paste text từ nguồn khác vào.
+  - Bổ sung CSS bù trừ cho các tag `b`, `i`, `strong`, `ul`, `ol` bên trong class `.jodit-wysiwyg` vì TailwindCSS trước đó tự động xóa sạch các định dạng này. Giờ đây có thể bôi đậm, in nghiêng, đổi font size bình thường mà không cần thay editor khác.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi không paste được và hiển thị sai định dạng trong jodit editor"`
