@@ -143,9 +143,6 @@ export default function WorkSchedule() {
                           {item.content && (
                             <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />
                           )}
-                          <span>
-                            {item.preparingUnit && ` /.`}
-                          </span>
                         </div>
                       </div>
                     ))}
@@ -180,9 +177,6 @@ export default function WorkSchedule() {
                             {item.content && (
                               <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />
                             )}
-                            <span>
-                              {item.preparingUnit && ` /.`}
-                            </span>
                           </div>
                         </div>
                       ))}

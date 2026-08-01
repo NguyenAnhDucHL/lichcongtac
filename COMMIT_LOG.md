@@ -269,3 +269,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(schedules): parse detailed validation error messages from backend"`
+
+### [2026-08-01 08:09] Fix stray slash in WorkSchedule
+- **Mô tả**: Gỡ bỏ chuỗi `/.` thừa xuất hiện ở cuối mỗi lịch công tác (do trước đây dự định nối với đơn vị chuẩn bị nhưng logic bị sai và giờ đã gộp hết vào nội dung).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(schedules): remove stray slash at the end of schedule items"`
