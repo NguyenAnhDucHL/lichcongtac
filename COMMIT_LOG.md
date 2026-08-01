@@ -363,3 +363,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): đổi tên bản quyền thành UBND phường Cẩm Phả"`
+
+### [2026-08-01 10:24] Cập nhật danh sách địa điểm theo format mới
+- **Mô tả**: Thay đổi định dạng tên các địa điểm mặc định trong form tạo/sửa lịch công tác (ví dụ: "Hội trường A UBND phường" thành "Hội trường A - Trụ sở HĐND và UBND phường").
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(docs): cập nhật format tên địa điểm họp"`

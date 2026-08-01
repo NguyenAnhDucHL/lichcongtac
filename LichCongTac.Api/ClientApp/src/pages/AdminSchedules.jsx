@@ -27,9 +27,9 @@ export default function AdminSchedules() {
   const PAGE_SIZE = 10
 
   const LOCATIONS = [
-    'Hội trường A UBND phường',
-    'Phòng họp tầng 3 UBND phường',
-    'Phòng họp tầng 4 UBND phường'
+    'Hội trường A - Trụ sở HĐND và UBND phường',
+    'Phòng họp tầng 3 - Trụ sở HĐND và UBND phường',
+    'Phòng họp tầng 4 - Trụ sở HĐND và UBND phường'
   ]
 
   const fetchSchedules = async () => {
