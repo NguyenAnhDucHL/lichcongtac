@@ -338,3 +338,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(admin): combo box cho địa điểm và đổi màu tab active đậm hơn"`
+
+### [2026-08-01 10:15] Cập nhật ảnh banner website
+- **Mô tả**: Thay thế ảnh banner cũ (`header-banner.png`) bằng ảnh banner mới (`avatar.jpg` đổi tên thành `header-banner.jpg`) cho đồng bộ thiết kế ở các trang Chủ, Tìm kiếm và Quản trị.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/public/assets/header-banner.jpg` (Mới)
+  - `LichCongTac.Api/ClientApp/public/assets/header-banner.png` (Xóa)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): cập nhật ảnh banner header mới"`

@@ -85,7 +85,7 @@ export default function WorkSchedule() {
       <div className="max-w-6xl mx-auto bg-white relative flex flex-col justify-center min-h-[86px] overflow-hidden">
         <div className="absolute inset-0 z-0 flex justify-start">
           <img
-            src="/assets/header-banner.png"
+            src="/assets/header-banner.jpg"
             alt="Lịch Công Tác UBND Phường Cẩm Phả"
             className="h-full w-auto max-h-[86px] object-contain"
             onError={(e) => { e.target.style.display = 'none' }}
