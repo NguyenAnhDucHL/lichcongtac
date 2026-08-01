@@ -143,33 +143,35 @@ export default function WorkSchedule() {
       </div>
 
       {/* Navigation */}
-      <nav className="bg-[#1d5792] shadow-md relative z-20">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center">
-          {/* Mobile Menu Toggle */}
-          <div
-            className="md:hidden flex justify-between items-center px-4 py-3 cursor-pointer"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <span className="text-white font-serif font-bold uppercase text-base tracking-wide">MENU</span>
-            <Menu className="text-white w-7 h-7" />
-          </div>
+      <div className="max-w-6xl mx-auto">
+        <nav className="bg-[#1d5792] shadow-md relative z-20">
+          <div className="flex flex-col md:flex-row md:items-center">
+            {/* Mobile Menu Toggle */}
+            <div
+              className="md:hidden flex justify-between items-center px-4 py-3 cursor-pointer"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <span className="text-white font-serif font-bold uppercase text-base tracking-wide">MENU</span>
+              <Menu className="text-white w-7 h-7" />
+            </div>
 
-          {/* Nav Items */}
-          <div className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row w-full`}>
-            {navItems.map((item, idx) => (
-              <a
-                key={idx}
-                href={item.href}
-                target={item.target || '_self'}
-                rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors`}
-              >
-                {item.label}
-              </a>
-            ))}
+            {/* Nav Items */}
+            <div className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row w-full`}>
+              {navItems.map((item, idx) => (
+                <a
+                  key={idx}
+                  href={item.href}
+                  target={item.target || '_self'}
+                  rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                  className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors`}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
 
       {/* Holiday Marquee */}
       {todayHoliday && (
@@ -282,9 +284,11 @@ export default function WorkSchedule() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs mt-8">
-        Bản quyền thuộc về UBND phường Cẩm Phả
-      </footer>
+      <div className="max-w-6xl mx-auto">
+        <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs mt-8">
+          Bản quyền thuộc về UBND phường Cẩm Phả
+        </footer>
+      </div>
     </div>
   )
 }

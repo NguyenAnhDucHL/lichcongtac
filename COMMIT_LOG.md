@@ -461,3 +461,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(frontend): giới hạn chiều rộng thanh ngày lễ và fix chiều chạy chữ"`
+### [2026-08-01 13:17] Thu gọn thanh Navigation Bar (WorkSchedule.jsx)
+- **Mô tả**: Thu hẹp thanh điều hướng màu xanh (Navigation Bar) để nó có cùng kích thước (`max-w-6xl`) với header, phần nội dung chính và thanh chạy ngày lễ, khắc phục hiện tượng thanh ngang bị tràn sang hai bên và giúp giao diện cân xứng giống hệt hệ thống cũ (ảnh 1).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(frontend): thu gọn chiều rộng thanh điều hướng để đồng nhất giao diện"`
