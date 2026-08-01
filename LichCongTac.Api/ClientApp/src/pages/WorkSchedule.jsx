@@ -173,9 +173,11 @@ export default function WorkSchedule() {
 
       {/* Holiday Marquee */}
       {todayHoliday && (
-        <div className="bg-[#fcf8e3] text-[#c8102e] py-1.5 border-b border-[#faebcc] overflow-hidden whitespace-nowrap relative">
-          <div className="animate-marquee text-[13px] font-semibold tracking-wide">
-            ⚛ {todayHoliday.content} ⚛
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-[#fcf8e3] text-[#c8102e] py-1.5 border-b border-[#faebcc] overflow-hidden whitespace-nowrap relative">
+            <marquee scrollamount="6" className="text-[13px] font-semibold tracking-wide">
+              ⚛ {todayHoliday.content} ⚛
+            </marquee>
           </div>
         </div>
       )}

@@ -456,3 +456,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(frontend): sửa lỗi không hiển thị text ngày lễ do xung đột với global fetch interceptor"`
+### [2026-08-01 13:16] Tinh chỉnh lại giao diện hiển thị thanh thông báo ngày lễ (WorkSchedule.jsx)
+- **Mô tả**: Giới hạn chiều rộng của thanh chạy chữ ngày lễ vừa đúng bằng với chiều rộng của phần content/header (`max-w-6xl mx-auto`) để không bị tràn ra hai bên. Đồng thời sử dụng thẻ `<marquee>` HTML tiêu chuẩn thay cho CSS Animation để đảm bảo chữ chạy chuẩn từ phải sang trái (RTL) giống hệt hệ thống cũ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(frontend): giới hạn chiều rộng thanh ngày lễ và fix chiều chạy chữ"`
