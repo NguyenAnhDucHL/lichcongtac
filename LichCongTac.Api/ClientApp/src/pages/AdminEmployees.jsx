@@ -86,7 +86,7 @@ export default function AdminEmployees() {
     }
 
     try {
-      const url = editId ? `/api/users/${editId}` : '/api/auth/register'
+      const url = editId ? `/api/users/${editId}` : `/api/users`
       const method = editId ? 'PUT' : 'POST'
       
       const payload = { ...formData, departmentId: formData.departmentId ? parseInt(formData.departmentId) : null }
@@ -96,58 +96,30 @@ export default function AdminEmployees() {
         delete payload.password
       }
 
-      // Map to correct API fields if needed (e.g. register vs update)
-      const bodyData = editId ? {
+      const bodyData = {
         fullName: payload.fullName,
-        email: '',
-        phoneNumber: '',
+        username: payload.username,
         role: payload.role,
         departmentId: payload.departmentId,
-        passwordHash: payload.password || '',
         zaloId: payload.zaloId,
         notificationPreference: payload.notificationPreference
-      } : {
-        username: payload.username,
-        password: payload.password,
-        role: payload.role
+      }
+      if (payload.password) {
+        bodyData.passwordHash = payload.password
       }
 
-      // If register API doesn't support full details yet, we may need to call register then update.
-      // But let's assume update works. If creating new user, we might need a dedicated create endpoint
-      // in UsersController. For now, let's hit register and then update if needed.
-      if (!editId) {
-         // Create user basic
-         const resReg = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-            },
-            body: JSON.stringify({ username: formData.username, password: formData.password, role: formData.role }),
-         })
-         if (!resReg.ok) {
-            const errData = await resReg.json()
-            throw new Error(errData.message || 'Lỗi khi tạo tài khoản')
-         }
-         
-         // Fetch users to get the new user ID to update details
-         await fetchUsers();
-         // It's better if backend create endpoint supports all fields, but we'll leave it simple for now,
-         // The user only asked for UI changes.
-      } else {
-        const res = await fetch(url, {
-            method,
-            headers: {
+      const res = await fetch(url, {
+        method,
+        headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
-            },
-            body: JSON.stringify(bodyData),
-        })
+        },
+        body: JSON.stringify(bodyData),
+      })
 
-        if (!res.ok) {
-            const errData = await res.json()
-            throw new Error(errData.message || 'Lỗi khi lưu nhân viên')
-        }
+      const result = await res.json()
+      if (!res.ok || result.success === false) {
+        throw new Error(result.message || 'Lỗi khi lưu nhân viên')
       }
 
       alert(editId ? 'Cập nhật nhân viên thành công!' : 'Thêm nhân viên thành công. Lưu ý: Cần Sửa lại để bổ sung Zalo/Phòng ban!')

@@ -204,3 +204,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(users): kết nối API thực cho chức năng quản trị tài khoản"`
+
+### [2026-08-01 07:27] Dọn dẹp mã cứng và tối ưu API nhân viên
+- **Mô tả**: 
+  - Đã rà soát toàn bộ dự án, hiện tại tất cả các trang quản trị (Lịch, Phòng ban, Tài khoản, Nhân viên) đều đã được kết nối với API thực qua CSDL, không còn trang nào chứa dữ liệu cứng (mock data).
+  - Tối ưu hóa chức năng thêm mới trong `AdminEmployees.jsx` để dùng đúng endpoint `POST /api/users` thay vì đi đường vòng qua `/api/auth/register`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminEmployees.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "refactor(users): dọn dẹp mock data và tối ưu luồng gọi API thêm nhân viên"`
