@@ -178,3 +178,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi dropdown menu quản trị ẩn đột ngột khi hover"`
+
+### [2026-08-01 07:07] Fix lỗi không tự động đăng xuất khi hết hạn token (401)
+- **Mô tả**: 
+  - Hệ thống gặp lỗi 401 (Unauthorized) nhưng không tự redirect về trang Đăng nhập do sự kiện `auth:unauthorized` chưa được ai lắng nghe. Điều này khiến các hàm `fetch` ném ra lỗi JSON Parsing và hiển thị "Lỗi kết nối máy chủ".
+  - Thêm Global Event Listener trong `main.jsx` để tự động xóa token và chuyển hướng về trang `/campha/manager/login` khi có mã lỗi 401.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): thêm listener xử lý lỗi 401 để tự động đăng xuất"`

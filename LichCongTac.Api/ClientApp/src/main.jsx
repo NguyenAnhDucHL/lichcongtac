@@ -48,6 +48,15 @@ window.fetch = async (...args) => {
   return response
 }
 
+document.addEventListener('auth:unauthorized', () => {
+  localStorage.removeItem('auth_token')
+  localStorage.removeItem('user_name')
+  localStorage.removeItem('user_role')
+  localStorage.removeItem('user_fullname')
+  window.location.replace('/campha/manager/login')
+})
+
+
 import WorkSchedule from './pages/WorkSchedule.jsx'
 import AdminLogin from './pages/AdminLogin.jsx'
 import AdminAccounts from './pages/AdminAccounts.jsx'
