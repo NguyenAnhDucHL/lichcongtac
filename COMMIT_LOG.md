@@ -301,3 +301,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(schedule): strip HTML content thành plain text, bỏ prose class gây font xấu"`
+
+### [2026-08-01 09:50] Thêm ô nhập tự do tên đơn vị bên cạnh dropdown phòng ban
+- **Mô tả**: Thêm input text bên dưới dropdown "Thuộc Phòng, Ban" để nhập tên đơn vị ngoài danh sách (VD: Công an phường, Quân sự). Khi chọn từ dropdown thì input trống; khi gõ vào input thì ghi đè giá trị phòng ban.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(schedules): thêm ô nhập tên đơn vị tự do bên cạnh dropdown phòng ban"`

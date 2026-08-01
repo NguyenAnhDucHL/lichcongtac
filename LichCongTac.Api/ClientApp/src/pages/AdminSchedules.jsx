@@ -262,6 +262,16 @@ export default function AdminSchedules() {
                       </option>
                     ))}
                   </select>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <span className="text-xs text-gray-500 italic">hoặc nhập tên đơn vị khác:</span>
+                    <input
+                      type="text"
+                      placeholder="VD: Công an phường, Quân sự, ..."
+                      value={departments.some(d => d.name === formData.department) || formData.department === '' ? '' : formData.department}
+                      onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+                      className="w-[260px] border border-gray-300 rounded px-2 py-1 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
+                    />
+                  </div>
                 </td>
               </tr>
 
