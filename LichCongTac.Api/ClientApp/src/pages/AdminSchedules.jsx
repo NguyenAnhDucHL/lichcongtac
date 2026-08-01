@@ -548,11 +548,10 @@ export default function AdminSchedules() {
                   <button
                     key={p}
                     onClick={() => setCurrentPage(p)}
-                    className={`px-3 py-1 text-xs border rounded ${
-                      currentPage === p
-                        ? 'bg-[#337ab7] text-white border-[#337ab7]'
-                        : 'border-gray-300 hover:bg-gray-100'
-                    }`}
+                    className={`px-3 py-1 text-xs border rounded ${currentPage === p
+                      ? 'bg-[#337ab7] text-white border-[#337ab7]'
+                      : 'border-gray-300 hover:bg-gray-100'
+                      }`}
                   >
                     {p}
                   </button>

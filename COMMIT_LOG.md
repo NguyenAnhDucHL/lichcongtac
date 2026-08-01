@@ -307,3 +307,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(schedules): thêm ô nhập tên đơn vị tự do bên cạnh dropdown phòng ban"`
+
+### [2026-08-01 09:58] Thêm active tab highlight vào AdminHeader
+- **Mô tả**: Tab đang được truy cập sẽ được tô đậm nền tối hơn + gạch chân trắng để người dùng biết mình đang ở trang nào. Logic dựa trên window.location.pathname.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(nav): highlight tab active trong AdminHeader theo pathname"`
