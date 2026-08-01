@@ -212,3 +212,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminEmployees.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "refactor(users): dọn dẹp mock data và tối ưu luồng gọi API thêm nhân viên"`
+
+### [2026-08-01 07:33] Thêm text hiển thị ở đầu menu (Header banner)
+- **Mô tả**: 
+  - Thêm cụm từ "LỊCH CÔNG TÁC" và "UBND PHƯỜNG CẨM PHẢ" đè lên trên banner ảnh tại vị trí đầu trang.
+  - Cập nhật đồng bộ cho cả trang public (WorkSchedule) và các trang quản trị (AdminHeader).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(ui): thêm tiêu đề dạng text hiển thị đè lên banner cho giống thiết kế"`

@@ -82,12 +82,19 @@ export default function WorkSchedule() {
   return (
     <div className="min-h-screen bg-white font-sans text-sm text-gray-800">
       {/* Header Image */}
-      <div className="max-w-6xl mx-auto bg-white flex justify-start">
-        <img
-          src="/assets/header-banner.png"
-          alt="Lịch Công Tác UBND Phường Cẩm Phả"
-          className="h-auto max-h-[86px] object-contain"
-        />
+      <div className="max-w-6xl mx-auto bg-white relative flex flex-col justify-center min-h-[86px] overflow-hidden">
+        <div className="absolute inset-0 z-0 flex justify-start">
+          <img
+            src="/assets/header-banner.png"
+            alt="Lịch Công Tác UBND Phường Cẩm Phả"
+            className="h-full w-auto max-h-[86px] object-contain"
+            onError={(e) => { e.target.style.display = 'none' }}
+          />
+        </div>
+        <div className="relative z-10 pl-6 py-2">
+          <h1 className="text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">LỊCH CÔNG TÁC</h1>
+          <h1 className="text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">UBND PHƯỜNG CẨM PHẢ</h1>
+        </div>
       </div>
 
       {/* Navigation */}

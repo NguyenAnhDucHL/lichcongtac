@@ -30,19 +30,20 @@ export default function AdminHeader() {
   return (
     <>
       {/* Header */}
-      <div className="max-w-[1000px] mx-auto bg-white flex justify-start pt-2">
-        <img
-          src="/assets/header-banner.png"
-          alt="Lịch Công Tác"
-          className="h-auto max-h-[90px] object-contain"
-          onError={(e) => {
-            e.target.style.display = 'none'
-            e.target.nextElementSibling.style.display = 'block'
-          }}
-        />
-        <div style={{ display: 'none' }} className="py-4">
-          <h1 className="text-xl font-bold text-[#1d5792]">PHẦN MỀM QUẢN LÝ</h1>
-          <h1 className="text-2xl font-bold text-[#c8102e]">LỊCH CÔNG TÁC</h1>
+      <div className="max-w-[1000px] mx-auto bg-white relative flex flex-col justify-center min-h-[90px] overflow-hidden">
+        {/* Background Banner */}
+        <div className="absolute inset-0 z-0 flex justify-start">
+          <img
+            src="/assets/header-banner.png"
+            alt="Lịch Công Tác"
+            className="h-full w-auto max-h-[90px] object-contain"
+            onError={(e) => { e.target.style.display = 'none' }}
+          />
+        </div>
+        {/* Foreground Text */}
+        <div className="relative z-10 pl-6 py-2">
+          <h1 className="text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight">LỊCH CÔNG TÁC</h1>
+          <h1 className="text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight mt-1">UBND PHƯỜNG CẨM PHẢ</h1>
         </div>
       </div>
 
