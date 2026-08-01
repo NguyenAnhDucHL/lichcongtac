@@ -492,3 +492,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi double hashing khiến tài khoản mới không thể đăng nhập"`
+### [2026-08-01 13:38] Thêm địa điểm mới vào danh sách tùy chọn (AdminSchedules.jsx)
+- **Mô tả**: Bổ sung thêm tùy chọn "Phòng tiếp công dân - Trụ sở HĐND và UBND phường" vào dropdown Địa điểm trên trang Quản trị lịch công tác, giúp người dùng thao tác nhập liệu nhanh hơn.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(admin): thêm phòng tiếp công dân vào danh sách địa điểm"`

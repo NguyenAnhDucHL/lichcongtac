@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import JoditEditor from 'jodit-react'
 import AdminHeader from '../components/AdminHeader'
-
+import { toast } from 'sonner'
+import { ConfirmationModal } from '../components/ui/confirmation-modal'
 
 export default function AdminSchedules() {
   const [schedules, setSchedules] = useState([])
@@ -9,7 +10,7 @@ export default function AdminSchedules() {
   const [formData, setFormData] = useState({
     dateStr: '',
     timeStr: '',
-    department: 'CƠ QUAN',
+    department: '',
     title: '',
     invitationNumber: '',
     location: '',
@@ -19,6 +20,11 @@ export default function AdminSchedules() {
     participants: '',
   })
   const [editId, setEditId] = useState(null)
+  
+  // States for confirmation modal
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -29,7 +35,8 @@ export default function AdminSchedules() {
   const LOCATIONS = [
     'Hội trường A - Trụ sở HĐND và UBND phường',
     'Phòng họp tầng 3 - Trụ sở HĐND và UBND phường',
-    'Phòng họp tầng 4 - Trụ sở HĐND và UBND phường'
+    'Phòng họp tầng 4 - Trụ sở HĐND và UBND phường',
+    'Phòng tiếp công dân - Trụ sở HĐND và UBND phường'
   ]
 
   const fetchSchedules = async () => {
@@ -173,7 +180,7 @@ export default function AdminSchedules() {
       })
 
       if (res.ok) {
-        alert(editId ? 'Cập nhật lịch công tác thành công!' : 'Thêm lịch công tác thành công!')
+        toast.success(editId ? 'Cập nhật lịch công tác thành công!' : 'Thêm lịch công tác thành công!')
         handleReset()
         fetchSchedules()
       } else {
@@ -192,6 +199,37 @@ export default function AdminSchedules() {
       setError('Lỗi kết nối máy chủ')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleDeleteClick = (id) => {
+    setItemToDelete(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return
+    setIsDeleting(true)
+
+    try {
+      const res = await fetch(`/api/schedules/${itemToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      })
+      if (res.ok) {
+        toast.success('Xóa lịch công tác thành công!')
+        fetchSchedules()
+      } else {
+        toast.error('Xóa thất bại')
+      }
+    } catch (e) {
+      toast.error('Lỗi kết nối')
+    } finally {
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -349,7 +387,7 @@ export default function AdminSchedules() {
                       value={formData.content}
                       config={{
                         readonly: false,
-                        placeholder: '• Nội dung: ...\n• Thành phần: ...\n• Địa điểm: ...',
+                        placeholder: '• Nội dung: ...\n• Thành phần dự: ...',
                         height: 300,
                         language: 'vi',
                         askBeforePasteHTML: false,
@@ -529,25 +567,9 @@ export default function AdminSchedules() {
                           <a
                             href="#"
                             className="text-[#337ab7] hover:underline"
-                            onClick={async (e) => {
+                            onClick={(e) => {
                               e.preventDefault()
-                              if (window.confirm('Bạn có chắc muốn xóa?')) {
-                                try {
-                                  const res = await fetch(`/api/schedules/${item.id}`, {
-                                    method: 'DELETE',
-                                    headers: {
-                                      Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-                                    }
-                                  })
-                                  if (res.ok) {
-                                    fetchSchedules()
-                                  } else {
-                                    alert('Xóa thất bại')
-                                  }
-                                } catch (e) {
-                                  alert('Lỗi kết nối')
-                                }
-                              }
+                              handleDeleteClick(item.id)
                             }}
                           >
                             Xóa
@@ -624,6 +646,15 @@ export default function AdminSchedules() {
           </div>
         )}
       </main>
+
+      <ConfirmationModal
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Xác nhận xóa"
+        description="Bạn có chắc chắn muốn xóa lịch công tác này? Thao tác này không thể hoàn tác."
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }
