@@ -497,3 +497,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(admin): thêm phòng tiếp công dân vào danh sách địa điểm"`
+### [2026-08-01 13:54] Sửa lại giao diện Tìm kiếm và Trang chủ responsive trên mobile
+- **Mô tả**: Thiết kế lại khối Tìm kiếm từ thẻ table sang layout flexbox giúp đáp ứng tốt các màn hình nhỏ, và điều chỉnh table với min-width 600px cho phép cuộn ngang, tránh tình trạng bị co quá đà làm tràn layout. Căn chỉnh lại header logo để không bị lẹm text.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): thiết kế lại giao diện trang search và home responsive trên mobile"`

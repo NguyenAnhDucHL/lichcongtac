@@ -12,12 +12,10 @@ namespace LichCongTac.Api.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminRepository _adminRepo;
-        private readonly IAuditLogRepository _auditLogRepo;
 
-        public AdminController(IAdminRepository adminRepo, IAuditLogRepository auditLogRepo)
+        public AdminController(IAdminRepository adminRepo)
         {
             _adminRepo = adminRepo;
-            _auditLogRepo = auditLogRepo;
         }
 
         // --- DEPARTMENTS ---
@@ -52,22 +50,5 @@ namespace LichCongTac.Api.Controllers
             return Ok(ApiResponse.Ok("Xóa phòng ban thành công."));
         }
 
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("audit-logs")]
-        public IActionResult GetAuditLogs([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
-        {
-            var result = _auditLogRepo.GetAuditLogs(page, pageSize);
-            return Ok(ApiResponse.Ok(new { items = result.items, total = result.total }));
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPost("clear-audit-logs")]
-        public IActionResult ClearAuditLogs()
-        {
-            _auditLogRepo.ClearAuditLogs();
-            _auditLogRepo.InsertAuditLog(null, "Quản trị viên đã dọn sạch toàn bộ nhật ký hệ thống.");
-            return Ok(ApiResponse.Ok("Đã dọn sạch nhật ký hệ thống."));
-        }
     }
 }

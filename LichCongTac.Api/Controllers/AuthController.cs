@@ -2,14 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using LichCongTac.Core.Data.Interfaces;
 using LichCongTac.Core.Models;
-using LichCongTac.Hubs;
 using LichCongTac.Models;
 
 namespace LichCongTac.Api.Controllers
@@ -19,23 +17,17 @@ namespace LichCongTac.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly IHubContext<NotificationHub> _hubContext;
         private readonly IUserRepository _userRepository;
         private readonly UserManager<User> _userManager;
-        private readonly IAuditLogRepository _auditLogRepo;
 
         public AuthController(
             IConfiguration configuration,
-            IHubContext<NotificationHub> hubContext,
             IUserRepository userRepository,
-            UserManager<User> userManager,
-            IAuditLogRepository auditLogRepo)
+            UserManager<User> userManager)
         {
             _configuration  = configuration;
-            _hubContext     = hubContext;
             _userRepository = userRepository;
             _userManager    = userManager;
-            _auditLogRepo   = auditLogRepo;
         }
 
         // ─── LOGIN ───────────────────────────────────────────────────────────────
@@ -61,29 +53,14 @@ namespace LichCongTac.Api.Controllers
 
             if (user == null)
             {
-                // Ghi audit log thất bại
-                _auditLogRepo.InsertLoginAuditLog(
-                    username:   request.Username,
-                    userId:     null,
-                    ipAddress:  clientIp,
-                    userAgent:  userAgent,
-                    isSuccess:  false,
-                    failReason: "user_not_found"
-                );
+
                 return Unauthorized(ApiResponse.Fail("Tài khoản hoặc mật khẩu không chính xác, hoặc tài khoản đang tạm thời bị khóa."));
             }
 
             // ── Bước 2: Kiểm tra tài khoản bị khóa (Identity Lockout) ────────────
             if (await _userManager.IsLockedOutAsync(user))
             {
-                _auditLogRepo.InsertLoginAuditLog(
-                    username:   request.Username,
-                    userId:     user.Id,
-                    ipAddress:  clientIp,
-                    userAgent:  userAgent,
-                    isSuccess:  false,
-                    failReason: "account_locked"
-                );
+
                 return Unauthorized(ApiResponse.Fail("Tài khoản hoặc mật khẩu không chính xác, hoặc tài khoản đang tạm thời bị khóa."));
             }
 
@@ -95,14 +72,7 @@ namespace LichCongTac.Api.Controllers
                 // Identity tự động tăng AccessFailedCount và khóa tài khoản nếu đủ số lần
                 await _userManager.AccessFailedAsync(user);
 
-                _auditLogRepo.InsertLoginAuditLog(
-                    username:   request.Username,
-                    userId:     user.Id,
-                    ipAddress:  clientIp,
-                    userAgent:  userAgent,
-                    isSuccess:  false,
-                    failReason: "wrong_password"
-                );
+
                 return Unauthorized(ApiResponse.Fail("Tài khoản hoặc mật khẩu không chính xác, hoặc tài khoản đang tạm thời bị khóa."));
             }
 
@@ -110,8 +80,7 @@ namespace LichCongTac.Api.Controllers
             // Reset bộ đếm sai về 0
             await _userManager.ResetAccessFailedCountAsync(user);
 
-            // Kick tất cả phiên cũ của user này ngay lập tức (real-time SignalR)
-            await _hubContext.Clients.Group($"User_{user.Id}").SendAsync("Kicked", "Tài khoản đã đăng nhập từ thiết bị khác.");
+
 
             // Xóa cache session cũ để token validation đọc lại SecurityStamp mới ngay lập tức
             var cache = HttpContext.RequestServices.GetService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
@@ -163,14 +132,7 @@ namespace LichCongTac.Api.Controllers
                 Expires  = DateTime.UtcNow.AddHours(24)
             });
 
-            // Ghi audit log thành công
-            _auditLogRepo.InsertLoginAuditLog(
-                username:  user.Username,
-                userId:    user.Id,
-                ipAddress: clientIp,
-                userAgent: userAgent,
-                isSuccess: true
-            );
+
 
             return Ok(ApiResponse.Ok(new
             {

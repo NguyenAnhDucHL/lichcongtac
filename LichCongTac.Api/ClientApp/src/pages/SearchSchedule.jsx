@@ -124,9 +124,9 @@ export default function SearchSchedule() {
             onError={(e) => { e.target.style.display = 'none' }}
           />
         </div>
-        <div className="relative z-10 pl-[130px] py-2">
-          <h1 className="text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">LỊCH CÔNG TÁC</h1>
-          <h1 className="text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">UBND PHƯỜNG CẨM PHẢ</h1>
+        <div className="relative z-10 pl-[90px] md:pl-[130px] py-2 pr-2">
+          <h1 className="text-[18px] sm:text-[20px] md:text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">LỊCH CÔNG TÁC</h1>
+          <h1 className="text-[13px] sm:text-[15px] md:text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">UBND PHƯỜNG CẨM PHẢ</h1>
         </div>
       </div>
 
@@ -175,58 +175,49 @@ export default function SearchSchedule() {
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-6">
         {/* Search box */}
-        <div className="bg-[#e8f0f7] border border-[#c0d4e8] p-6 mb-6">
+        <div className="bg-[#e8f0f7] border border-[#c0d4e8] p-4 md:p-6 mb-6">
           <h2 className="text-[#1d5792] font-bold text-base mb-4">Tìm kiếm</h2>
-          <form onSubmit={handleSearch}>
-            <table className="w-full max-w-[550px]">
-              <tbody>
-                <tr>
-                  <td className="py-2 pr-4 w-[160px] text-gray-700 font-medium">Thời gian bắt đầu</td>
-                  <td className="py-2">
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="border border-gray-300 px-2 py-1 rounded text-gray-700 text-sm w-[200px] outline-none focus:border-[#1d5792]"
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4 text-gray-700 font-medium">Thời gian kết thúc</td>
-                  <td className="py-2">
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="border border-gray-300 px-2 py-1 rounded text-gray-700 text-sm w-[200px] outline-none focus:border-[#1d5792]"
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-2 pr-4 text-gray-700 font-medium align-top pt-3">Nội dung</td>
-                  <td className="py-2">
-                    <textarea
-                      value={keyword}
-                      onChange={(e) => setKeyword(e.target.value)}
-                      rows={3}
-                      className="border border-gray-300 px-2 py-1 rounded text-gray-700 text-sm w-[300px] outline-none focus:border-[#1d5792] resize-y"
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td className="py-2">
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-1.5 rounded text-sm font-medium transition-colors disabled:opacity-50"
-                    >
-                      {loading ? 'Đang tìm...' : 'Tìm kiếm'}
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <form onSubmit={handleSearch} className="flex flex-col gap-4 max-w-[550px]">
+            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
+              <label className="text-gray-700 font-medium md:w-[160px] shrink-0">Thời gian bắt đầu</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border border-gray-300 px-3 py-1.5 rounded text-gray-700 text-sm w-full md:w-[200px] outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792]"
+              />
+            </div>
+            
+            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
+              <label className="text-gray-700 font-medium md:w-[160px] shrink-0">Thời gian kết thúc</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border border-gray-300 px-3 py-1.5 rounded text-gray-700 text-sm w-full md:w-[200px] outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792]"
+              />
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-1 md:gap-4">
+              <label className="text-gray-700 font-medium md:w-[160px] shrink-0 pt-1">Nội dung</label>
+              <textarea
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                rows={3}
+                className="border border-gray-300 px-3 py-2 rounded text-gray-700 text-sm w-full md:w-[300px] outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] resize-y"
+              />
+            </div>
+            
+            <div className="flex flex-col md:flex-row gap-1 md:gap-4 mt-2">
+              <div className="hidden md:block md:w-[160px] shrink-0"></div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50 w-full md:w-auto shadow-sm"
+              >
+                {loading ? 'Đang tìm...' : 'Tìm kiếm'}
+              </button>
+            </div>
           </form>
         </div>
 
@@ -237,7 +228,7 @@ export default function SearchSchedule() {
               Danh sách lịch làm việc {results.length > 0 ? `(${results.length} kết quả)` : ''}
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-300 text-[13px]">
+              <table className="w-full min-w-[600px] border-collapse border border-gray-300 text-[13px]">
                 <thead>
                   <tr className="bg-[#fce8d5]">
                     <th className="border border-gray-300 py-2 px-3 font-bold w-12 text-center">STT</th>

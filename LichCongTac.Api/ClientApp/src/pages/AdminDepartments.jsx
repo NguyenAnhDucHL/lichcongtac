@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react'
+import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { ConfirmationModal } from '../components/ui/confirmation-modal'
+
 import AdminHeader from '../components/AdminHeader'
 
 export default function AdminDepartments() {
@@ -9,6 +13,11 @@ export default function AdminDepartments() {
     isActive: true,
   })
   const [editId, setEditId] = useState(null)
+  
+  // States for confirmation modal
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -65,7 +74,7 @@ export default function AdminDepartments() {
       })
 
       if (res.ok) {
-        alert(editId ? 'Cập nhật phòng ban thành công!' : 'Thêm phòng ban thành công!')
+        toast.success(editId ? 'Cập nhật phòng ban thành công!' : 'Thêm phòng ban thành công!')
         handleReset()
         fetchDepartments()
       } else {
@@ -89,11 +98,17 @@ export default function AdminDepartments() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa phòng ban này?')) return
+  const handleDeleteClick = (id) => {
+    setItemToDelete(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return
+    setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/departments/${id}`, {
+      const res = await fetch(`/api/departments/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
@@ -101,14 +116,18 @@ export default function AdminDepartments() {
       })
 
       if (res.ok) {
-        alert('Xóa phòng ban thành công')
+        toast.success('Xóa phòng ban thành công')
         fetchDepartments()
       } else {
         const errData = await res.json()
-        alert(errData.message || 'Lỗi khi xóa phòng ban')
+        toast.error(errData.message || 'Lỗi khi xóa phòng ban')
       }
     } catch (err) {
-      alert('Lỗi kết nối máy chủ')
+      toast.error('Lỗi kết nối máy chủ')
+    } finally {
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -230,7 +249,7 @@ export default function AdminDepartments() {
                     </td>
                     <td className="border border-gray-200 py-2.5 px-4">
                       <button
-                        onClick={() => handleDelete(dept.id)}
+                        onClick={() => handleDeleteClick(dept.id)}
                         className="text-[#c8102e] hover:underline bg-transparent border-none cursor-pointer"
                       >
                         Xóa
@@ -243,6 +262,15 @@ export default function AdminDepartments() {
           </table>
         </div>
       </main>
+
+      <ConfirmationModal
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Xác nhận xóa"
+        description="Bạn có chắc chắn muốn xóa phòng ban này? Thao tác này không thể hoàn tác."
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

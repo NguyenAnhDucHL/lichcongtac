@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import AdminHeader from '../components/AdminHeader'
 import JoditEditor from 'jodit-react'
+import { toast } from 'sonner'
+import { ConfirmationModal } from '../components/ui/confirmation-modal'
+
 
 export default function AdminNotifications() {
   const [notifications, setNotifications] = useState([])
@@ -8,6 +11,11 @@ export default function AdminNotifications() {
   const [error, setError] = useState(null)
   
   const [editId, setEditId] = useState(null)
+  
+  // States for confirmation modal
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [itemToDelete, setItemToDelete] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [formData, setFormData] = useState({
     content: '',
     isVisible: true
@@ -86,7 +94,7 @@ export default function AdminNotifications() {
       })
 
       if (res.ok) {
-        alert(editId ? 'Cập nhật thông báo thành công!' : 'Thêm thông báo thành công!')
+        toast.success(editId ? 'Cập nhật thông báo thành công!' : 'Thêm thông báo thành công!')
         handleReset()
         fetchNotifications()
       } else {
@@ -112,18 +120,24 @@ export default function AdminNotifications() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa thông báo này?')) return
+  const handleDeleteClick = (id) => {
+    setItemToDelete(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return
+    setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/notifications/${id}`, {
+      const res = await fetch(`/api/notifications/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
         },
       })
       if (res.ok) {
-        alert('Xóa thông báo thành công!')
+        toast.success('Xóa thông báo thành công!')
         // If we delete the last item on current page
         const newTotal = notifications.length - 1
         const maxPage = Math.ceil(newTotal / PAGE_SIZE)
@@ -131,10 +145,14 @@ export default function AdminNotifications() {
         
         fetchNotifications()
       } else {
-        alert('Có lỗi xảy ra khi xóa')
+        toast.error('Có lỗi xảy ra khi xóa')
       }
     } catch (err) {
-      alert('Lỗi kết nối máy chủ')
+      toast.error('Lỗi kết nối máy chủ')
+    } finally {
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -261,7 +279,7 @@ export default function AdminNotifications() {
                         </td>
                         <td className="border border-gray-200 py-2.5 px-4">
                           <button
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => handleDeleteClick(item.id)}
                             className="text-[#337ab7] hover:underline"
                           >
                             Xóa
@@ -304,6 +322,15 @@ export default function AdminNotifications() {
           </div>
         )}
       </main>
+      
+      <ConfirmationModal
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Xác nhận xóa"
+        description="Bạn có chắc chắn muốn xóa thông báo này? Thao tác này không thể hoàn tác."
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

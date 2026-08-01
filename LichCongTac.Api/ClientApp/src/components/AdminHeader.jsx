@@ -33,7 +33,7 @@ export default function AdminHeader() {
     { label: 'LỊCH CÔNG TÁC', href: '/campha/' },
     { label: 'QUẢN TRỊ LỊCH', href: '/campha/manager/schedules' },
     { label: 'THÔNG BÁO', href: '/campha/manager/notifications' },
-    { label: 'NGÀY LỄ', href: '#' },
+    { label: 'NGÀY LỄ', href: '/campha/manager/holidays' },
     { label: 'ĐỔI MẬT KHẨU', href: '/campha/manager/change-password' },
     { label: 'ĐĂNG XUẤT', href: null, onClick: handleLogout },
   ]

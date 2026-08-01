@@ -2,23 +2,38 @@
 /* global Response */
 import React, { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Toaster } from 'sonner'
+import { AlertTriangle, RefreshCw } from 'lucide-react'
+
+import WorkSchedule from './pages/WorkSchedule.jsx'
+import AdminLogin from './pages/AdminLogin.jsx'
+import AdminAccounts from './pages/AdminAccounts.jsx'
+import AdminSchedules from './pages/AdminSchedules.jsx'
+import AdminChangePassword from './pages/AdminChangePassword.jsx'
+import AdminDepartments from './pages/AdminDepartments.jsx'
+import AdminEmployees from './pages/AdminEmployees.jsx'
+import AdminNotifications from './pages/AdminNotifications.jsx'
+import AdminHolidays from './pages/AdminHolidays.jsx'
+import SearchSchedule from './pages/SearchSchedule.jsx'
+import './styles/globals.css'
 
 // ─── Global Fetch Interceptor for standardized ApiResponse ────────────────
 const originalFetch = window.fetch
-window.fetch = async (...args) => {
-  const response = await originalFetch(...args)
-  const contentType = response.headers.get('content-type')
+window.fetch = async function () {
+  var args = Array.prototype.slice.call(arguments)
+  var response = await originalFetch.apply(window, args)
+  var contentType = response.headers.get('content-type')
   if (contentType && contentType.includes('application/json')) {
-    const clone = response.clone()
+    var clone = response.clone()
     try {
-      const json = await clone.json()
+      var json = await clone.json()
       if (
         json &&
         typeof json === 'object' &&
         'success' in json &&
         ('data' in json || 'errors' in json)
       ) {
-        let unwrappedData
+        var unwrappedData
         if (json.success) {
           unwrappedData = json.data !== null ? json.data : { message: json.message }
         } else {
@@ -29,7 +44,7 @@ window.fetch = async (...args) => {
           }
         }
 
-        const newResponse = new Response(JSON.stringify(unwrappedData), {
+        var newResponse = new Response(JSON.stringify(unwrappedData), {
           status: response.status,
           statusText: response.statusText,
           headers: response.headers,
@@ -48,27 +63,13 @@ window.fetch = async (...args) => {
   return response
 }
 
-document.addEventListener('auth:unauthorized', () => {
+document.addEventListener('auth:unauthorized', function () {
   localStorage.removeItem('auth_token')
   localStorage.removeItem('user_name')
   localStorage.removeItem('user_role')
   localStorage.removeItem('user_fullname')
   window.location.replace('/campha/manager/login')
 })
-
-
-import WorkSchedule from './pages/WorkSchedule.jsx'
-import AdminLogin from './pages/AdminLogin.jsx'
-import AdminAccounts from './pages/AdminAccounts.jsx'
-import AdminSchedules from './pages/AdminSchedules.jsx'
-import AdminChangePassword from './pages/AdminChangePassword.jsx'
-import AdminDepartments from './pages/AdminDepartments.jsx'
-import AdminEmployees from './pages/AdminEmployees.jsx'
-import AdminNotifications from './pages/AdminNotifications.jsx'
-import SearchSchedule from './pages/SearchSchedule.jsx'
-import './styles/globals.css'
-
-import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 // ─── Error Boundary ─────────────────────────────────────────────────────────
 class ErrorBoundary extends React.Component {
@@ -92,11 +93,11 @@ class ErrorBoundary extends React.Component {
             </div>
             <h2 className="text-lg font-bold text-gray-800 mb-2">Có lỗi xảy ra</h2>
             <p className="text-sm text-gray-500 mb-1">
-              {this.state.error?.message || 'Lỗi không xác định'}
+              {this.state.error && this.state.error.message ? this.state.error.message : 'Lỗi không xác định'}
             </p>
             <p className="text-xs text-gray-400 mb-6">Vui lòng tải lại trang để tiếp tục.</p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={function () { window.location.reload() }}
               className="flex items-center gap-2 mx-auto px-6 py-2.5 bg-[#c8102e] hover:bg-[#a50e27] text-white rounded-lg text-sm font-semibold transition"
             >
               <RefreshCw size={14} />
@@ -112,7 +113,7 @@ class ErrorBoundary extends React.Component {
 
 // ─── Auth Guard ─────────────────────────────────────────────────────────────
 function RequireAuth({ children }) {
-  const token = localStorage.getItem('auth_token')
+  var token = localStorage.getItem('auth_token')
   if (!token) {
     window.location.replace('/campha/manager/login')
     return null
@@ -122,10 +123,9 @@ function RequireAuth({ children }) {
 
 // ─── Root Component ─────────────────────────────────────────────────────────
 function Root() {
-  const path = window.location.pathname
+  var path = window.location.pathname
 
   if (path === '/campha/manager/login' || path === '/campha/manager/login/') {
-    // Nếu đã đăng nhập, chuyển thẳng vào trang quản trị
     if (localStorage.getItem('auth_token')) {
       window.location.replace('/campha/manager/schedules')
       return null
@@ -157,16 +157,20 @@ function Root() {
     return <RequireAuth><AdminNotifications /></RequireAuth>
   }
 
+  if (path === '/campha/manager/holidays' || path === '/campha/manager/holidays/') {
+    return <RequireAuth><AdminHolidays /></RequireAuth>
+  }
+
   if (path === '/campha/search' || path === '/campha/search/') {
     return <SearchSchedule />
   }
 
-  // Default to Work Schedule
   return <WorkSchedule />
 }
 
 createRoot(document.getElementById('root')).render(
   <ErrorBoundary>
     <Root />
+    <Toaster position="top-right" richColors />
   </ErrorBoundary>
 )

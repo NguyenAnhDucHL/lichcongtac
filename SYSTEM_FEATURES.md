@@ -63,3 +63,7 @@ Các module chuẩn bị phát triển:
 - Giao diện Công khai hiển thị Lịch (`WorkSchedule.jsx` đọc từ DB thật).
 
 - **Quản lý Thông báo**: CRUD (Thêm, Sửa, Xóa, Bật/Tắt hiển thị) sử dụng Rich Text Editor (Jodit). Thông báo được hiển thị bên dưới Lịch Công tác hàng ngày trên trang chủ, ngăn cách bởi một đường kẻ viền.
+
+## Ghi chú Quan trọng về Môi trường
+> [!WARNING]
+> Trang web `https://lichcongtac.com/campha/` **CHỈ LÀ TRANG THAM KHẢO (REFERENCE)**, đây KHÔNG PHẢI là server production của project này. Mọi thay đổi code hoặc lỗi hiển thị trên trang đó không liên quan đến tiến độ code của dự án hiện tại. Developer sử dụng trang này như một bản mẫu để clone/tham khảo thiết kế. Không bao giờ nhầm lẫn trang đó với môi trường deploy của mã nguồn này.

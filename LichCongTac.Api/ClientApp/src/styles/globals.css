@@ -468,3 +468,18 @@
   font-size: 1.17em !important;
   font-weight: bold !important;
 }
+/* Marquee Animation for Holidays */
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+  white-space: nowrap;
+}

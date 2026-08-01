@@ -11,8 +11,18 @@ namespace LichCongTac.Core.Data.Repositories
 
         public NotificationRepository(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection") 
-                ?? "Data Source=data_dump/documents.db";
+            string? configConnString = configuration.GetConnectionString("DefaultConnection");
+
+            if (!string.IsNullOrEmpty(configConnString))
+            {
+                _connectionString = configConnString;
+            }
+            else
+            {
+                string? envPath = Environment.GetEnvironmentVariable("DB_PATH");
+                string dbPath = !string.IsNullOrEmpty(envPath) ? envPath : "data_dump/documents.db";
+                _connectionString = $"Data Source={dbPath}";
+            }
         }
 
         public async Task<List<Notification>> GetAllAsync()

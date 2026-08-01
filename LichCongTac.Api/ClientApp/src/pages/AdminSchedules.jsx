@@ -20,7 +20,7 @@ export default function AdminSchedules() {
     participants: '',
   })
   const [editId, setEditId] = useState(null)
-  
+
   // States for confirmation modal
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)

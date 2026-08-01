@@ -85,33 +85,10 @@ namespace LichCongTac.Data
                     IsActive INTEGER DEFAULT 1
                 )";
 
-
-
-            string createSettingsTable = @"
-                CREATE TABLE IF NOT EXISTS AppSettings (
-                    [Key] TEXT PRIMARY KEY,
-                    [Value] TEXT
-                )";
-
-            string createAuditLogsTable = @"
-                CREATE TABLE IF NOT EXISTS AuditLogs (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    UserId INTEGER,
-                    Action TEXT,
-                    Timestamp TEXT,
-                    IpAddress TEXT,
-                    UserAgent TEXT,
-                    IsSuccess INTEGER DEFAULT 1,
-                    FailReason TEXT
-                )";
-
-
-
             new SqliteCommand(createSchedulesTable, connection).ExecuteNonQuery();
             new SqliteCommand(createUsersTable, connection).ExecuteNonQuery();
             new SqliteCommand(createDepartmentsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createSettingsTable, connection).ExecuteNonQuery();
-            new SqliteCommand(createAuditLogsTable, connection).ExecuteNonQuery();
+
             // Insert default admin if not exists
             using var checkCmd = new SqliteCommand("SELECT COUNT(*) FROM Users WHERE Role='Admin'", connection);
             long adminCount = (long)checkCmd.ExecuteScalar();

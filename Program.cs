@@ -1,1 +1,11 @@
-using System; using Microsoft.Data.Sqlite; var conn = new SqliteConnection(@"Data Source=c:\Users\User\Documents\LichCongTac\data_dump\documents.db"); conn.Open(); var cmd = conn.CreateCommand(); cmd.CommandText = "SELECT Id, Username, AccessFailedCount, LockoutEnd FROM Users WHERE Username='nguyenanhduc'"; using var reader = cmd.ExecuteReader(); if(reader.Read()) Console.WriteLine($"{reader[0]} | {reader[1]} | {reader[2]} | {reader.GetValue(3)}"); else Console.WriteLine("NotFound");
+using System;
+using BCrypt.Net;
+
+class Program
+{
+    static void Main()
+    {
+        string dbHash = "$2a$12$w.2D5x1t262P2.TqHMy2qOeHOf8e9x.7Z7Y/kYqU3R8P7b8Vw7j3O";
+        Console.WriteLine(BCrypt.Net.BCrypt.Verify("CamPha@2026!", dbHash));
+    }
+}

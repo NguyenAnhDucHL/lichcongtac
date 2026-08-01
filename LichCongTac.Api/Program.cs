@@ -9,14 +9,11 @@ using LichCongTac.Api.Security;          // ✅ CustomUserStore, HybridPasswordH
 using LichCongTac.Core.Data.Interfaces;
 using LichCongTac.Core.Data.Repositories;
 using LichCongTac.Data;
-using LichCongTac.Hubs;
 using LichCongTac.Models;
-using LichCongTac.Services;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using LichCongTac.Middleware;   // ✅ FileAccessSecurityMiddleware
 using LichCongTac.Policies;    // ✅ AppPolicies (phân quyền tập trung)
-using LichCongTac.Services.Security; // ✅ ClamAvService, BackupService
 using Microsoft.Extensions.Caching.Memory; // ✅ IMemoryCache extension methods
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,8 +26,6 @@ builder.Services.AddMemoryCache(); // ✅ Dashboard stats caching
 
 
 
-// Đăng ký SignalR
-builder.Services.AddSignalR();
 
 // Cấu hình Rate Limiting để chống tấn công DoS/Spam
 builder.Services.AddRateLimiter(options =>
@@ -78,11 +73,10 @@ builder.Services.AddRateLimiter(options =>
 
 // Đăng ký Repositories (Clean Architecture)
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ISettingRepository, SettingRepository>();
-builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+builder.Services.AddScoped<HolidayRepository>();
 builder.Services.AddScoped<NotificationRepository>();
 
 // ✅ ASP.NET Core Identity (Custom UserStore — không cần EF Core)
@@ -113,13 +107,6 @@ builder.Services.AddScoped<IPasswordHasher<User>, HybridPasswordHasher>();
 
 // Cấu hình HTTP Client cho các gọi API bên ngoài
 builder.Services.AddHttpClient();
-
-// Cấu hình Email
-builder.Services.AddSingleton<IEmailService, EmailService>();
-
-// ✅ Security Services
-builder.Services.AddSingleton<IClamAvService, ClamAvService>();  // Virus scanning
-builder.Services.AddHostedService<BackupService>();               // Auto DB backup mỗi 6h
 
 // Cấu hình JWT - Bắt buộc phải có trong biến môi trường hoặc appsettings
 var jwtSecret = builder.Configuration["JWT_SECRET"]
@@ -153,23 +140,11 @@ builder.Services.AddAuthentication(x =>
     };
     x.Events = new JwtBearerEvents
     {
-        // ✅ Chỉ cho phép query string "access_token" cho SignalR Hub
-        // Các endpoint file PDF/Evidence BẮT BUỘC phải dùng Authorization header
-        // để ngăn việc nhúng token vào URL và share cho người khác
+        // Đọc token từ HttpOnly Cookie (jwt_cookie) do AuthController set lúc Login
+        // Giúp mở file PDF an toàn bằng iframe/window.open không cần token trên URL
         OnMessageReceived = context =>
         {
-            var accessToken = context.Request.Query["access_token"];
-            var path = context.HttpContext.Request.Path;
-            
-            // 1. Chỉ SignalR mới được dùng query string auth
-            if (!string.IsNullOrEmpty(accessToken) && 
-                path.StartsWithSegments("/notificationHub"))
-            {
-                context.Token = accessToken;
-            }
-            // 2. Đọc token từ HttpOnly Cookie (jwt_cookie) do AuthController set lúc Login
-            // Giúp mở file PDF an toàn bằng iframe/window.open không cần token trên URL
-            else if (context.Request.Cookies.TryGetValue("jwt_cookie", out var cookieToken))
+            if (context.Request.Cookies.TryGetValue("jwt_cookie", out var cookieToken))
             {
                 context.Token = cookieToken;
             }
@@ -339,7 +314,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 // Áp dụng Rate Limiter "fixed" làm mặc định cho tất cả Controllers và Hub
 app.MapControllers().RequireRateLimiting("fixed");
-app.MapHub<NotificationHub>("/notificationHub").RequireRateLimiting("fixed");
 app.MapFallbackToFile("index.html");
 
 
