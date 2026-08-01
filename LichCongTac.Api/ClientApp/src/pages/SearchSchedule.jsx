@@ -221,15 +221,13 @@ export default function SearchSchedule() {
                             {item.invitationNumber && (
                               <span className="mr-1">{item.invitationNumber}</span>
                             )}
+                            {item.location && (
+                              <span className="mr-1">(Tại {item.location})</span>
+                            )}
                             {item.content && (
                               <span dangerouslySetInnerHTML={{
                                 __html: item.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
                               }} />
-                            )}
-                            {item.location && (
-                              <span className="italic text-gray-600 block mt-0.5">
-                                - Địa điểm: {item.location}
-                              </span>
                             )}
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3 text-center">

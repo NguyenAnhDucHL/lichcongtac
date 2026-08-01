@@ -182,15 +182,11 @@ export default function WorkSchedule() {
                           <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
                             <span>
                               {item.invitationNumber && `${item.invitationNumber} `}
+                              {item.location && `(Tại ${item.location}) `}
                             </span>
                             {item.content && (
                               <span>
                                 {item.content.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()}
-                              </span>
-                            )}
-                            {item.location && (
-                              <span className="italic text-gray-600 block mt-0.5">
-                                - Địa điểm: {item.location}
                               </span>
                             )}
                           </div>

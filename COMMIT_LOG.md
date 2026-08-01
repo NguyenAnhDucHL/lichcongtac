@@ -369,3 +369,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(docs): cập nhật format tên địa điểm họp"`
+
+### [2026-08-01 10:35] Cập nhật format hiển thị địa điểm ở frontend
+- **Mô tả**: Gộp địa điểm hiển thị lên cùng dòng với số giấy mời, theo format `Số giấy mời (Tại Địa điểm) Nội dung lịch họp`. Ẩn dòng hiển thị `- Địa điểm: [Tên]` rời rạc ở phía dưới.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): gộp địa điểm vào cùng dòng số giấy mời theo định dạng mới"`
