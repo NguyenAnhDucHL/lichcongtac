@@ -55,25 +55,21 @@ export default function AdminHeader() {
                 <div
                   key={idx}
                   className="relative group"
-                  onMouseEnter={() => setOpenDropdown(true)}
-                  onMouseLeave={() => setOpenDropdown(false)}
                 >
                   <button className="px-6 py-2.5 text-white text-[13px] font-bold uppercase hover:bg-[#46b8da] transition-colors bg-transparent border-none cursor-pointer h-full">
                     {item.label}
                   </button>
-                  {openDropdown && (
-                    <div className="absolute left-0 top-full bg-white shadow-lg border border-gray-200 min-w-[200px] py-1 z-50">
-                      {item.subItems.map((sub, sidx) => (
-                        <a
-                          key={sidx}
-                          href={sub.href}
-                          className="block px-4 py-2 text-gray-800 hover:bg-[#5bc0de] hover:text-white transition-colors"
-                        >
-                          {sub.label}
-                        </a>
-                      ))}
-                    </div>
-                  )}
+                  <div className="hidden group-hover:block absolute left-0 top-full bg-white shadow-lg border border-gray-200 min-w-[200px] py-1 z-50">
+                    {item.subItems.map((sub, sidx) => (
+                      <a
+                        key={sidx}
+                        href={sub.href}
+                        className="block px-4 py-2 text-gray-800 hover:bg-[#5bc0de] hover:text-white transition-colors"
+                      >
+                        {sub.label}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               )
             }

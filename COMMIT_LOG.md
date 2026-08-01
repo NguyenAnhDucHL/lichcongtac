@@ -172,3 +172,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminEmployees.jsx` (Mới)
   - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(admin): thêm quản trị phòng ban, nhân viên và menu dropdown"`
+
+### [2026-08-01 07:05] Sửa lỗi hover menu Quản trị
+- **Mô tả**: Thay thế logic hover bằng state React (`onMouseEnter`, `onMouseLeave`) sang CSS class của Tailwind (`group-hover:block`) để đảm bảo menu không bị ẩn đột ngột khi di chuột.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi dropdown menu quản trị ẩn đột ngột khi hover"`
