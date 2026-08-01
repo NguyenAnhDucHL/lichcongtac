@@ -262,3 +262,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(schedules): sửa lỗi lưu lịch do required title validation"`
+
+### [2026-08-01 08:06] Fix frontend error parsing and format CSS
+- **Mô tả**: Bổ sung logic hiển thị thông báo lỗi chi tiết từ `ValidationProblemDetails` (do backend trả về mã 400) trên giao diện Quản trị lịch để tránh hiện thông báo lỗi chung chung. Đồng thời format lại `globals.css` bằng Prettier.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(schedules): parse detailed validation error messages from backend"`

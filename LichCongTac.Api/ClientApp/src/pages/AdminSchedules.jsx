@@ -170,7 +170,15 @@ export default function AdminSchedules() {
         fetchSchedules()
       } else {
         const errData = await res.json()
-        setError(errData.message || 'Lỗi khi lưu lịch')
+        let errMsg = 'Lỗi khi lưu lịch'
+        if (errData.message) {
+          errMsg = errData.message
+        } else if (errData.errors) {
+          errMsg = Object.values(errData.errors).flat().join(', ')
+        } else if (errData.title) {
+          errMsg = errData.title
+        }
+        setError(errMsg)
       }
     } catch (err) {
       setError('Lỗi kết nối máy chủ')
