@@ -194,3 +194,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi bị làm trống password hash khi update profile"`
+
+### [2026-08-01 07:25] Tích hợp API thực cho trang Quản trị tài khoản
+- **Mô tả**: 
+  - Thay thế dữ liệu cứng (mock data) trên trang Quản trị tài khoản (`AdminAccounts.jsx`) bằng việc kết nối API thực tế.
+  - Hiển thị danh sách Phòng, Ban thực từ API vào ô chọn (dropdown).
+  - Thêm đầy đủ chức năng Thêm, Sửa, Xóa tài khoản, ánh xạ đúng mã phòng ban ra tên hiển thị.
+  - Hỗ trợ tính năng cuộn lên trên cùng tự động khi ấn nút Sửa.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(users): kết nối API thực cho chức năng quản trị tài khoản"`

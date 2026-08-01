@@ -1,38 +1,53 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AdminHeader from '../components/AdminHeader'
 
 export default function AdminAccounts() {
+  const [accounts, setAccounts] = useState([])
+  const [departments, setDepartments] = useState([])
   const [formData, setFormData] = useState({
     fullName: '',
-    department: 'CƠ QUAN',
+    departmentId: '',
     username: '',
     password: '',
     confirmPassword: '',
     isAdmin: false,
   })
+  const [editId, setEditId] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const accounts = [
-    { id: 1, fullName: 'haidv', username: 'haidv', department: 'CƠ QUAN', isAdmin: true },
-    { id: 2, fullName: 'quantri', username: 'quantri', department: 'CƠ QUAN', isAdmin: true },
-    { id: 3, fullName: 'test', username: 'test123', department: 'CƠ QUAN', isAdmin: true },
-  ]
-
-  const handleLogout = () => {
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('user_name')
-    localStorage.removeItem('user_role')
-    window.location.href = '/campha/manager/login'
+  const fetchDepartments = async () => {
+    try {
+      const res = await fetch('/api/departments', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+      })
+      if (res.ok) {
+        const json = await res.json()
+        setDepartments(json.data || json || [])
+      }
+    } catch (err) {
+      console.error('Lỗi tải danh sách phòng ban:', err)
+    }
   }
 
-  const navItems = [
-    { label: 'QUẢN TRỊ', href: '/campha/manager/accounts' },
-    { label: 'LỊCH CÔNG TÁC', href: '/campha/' },
-    { label: 'QUẢN TRỊ LỊCH', href: '/campha/manager/schedules' },
-    { label: 'THÔNG BÁO', href: '#' },
-    { label: 'NGÀY LỄ', href: '#' },
-    { label: 'ĐỔI MẬT KHẨU', href: '/campha/manager/change-password' },
-    { label: 'ĐĂNG XUẤT', href: null, onClick: handleLogout },
-  ]
+  const fetchAccounts = async () => {
+    try {
+      const res = await fetch('/api/users', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+      })
+      if (res.ok) {
+        const json = await res.json()
+        setAccounts(json.data || json || [])
+      }
+    } catch (err) {
+      console.error('Lỗi tải danh sách tài khoản:', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchDepartments()
+    fetchAccounts()
+  }, [])
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -42,18 +57,127 @@ export default function AdminAccounts() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleReset = () => {
+    setFormData({
+      fullName: '',
+      departmentId: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+      isAdmin: false,
+    })
+    setEditId(null)
+    setError('')
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Mock submit
+    
+    if (formData.password !== formData.confirmPassword) {
+      setError('Mật khẩu và xác nhận mật khẩu không khớp.')
+      return
+    }
+
+    if (!editId && !formData.password) {
+      setError('Vui lòng nhập mật khẩu cho tài khoản mới.')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const url = editId ? `/api/users/${editId}` : '/api/users'
+      const method = editId ? 'PUT' : 'POST'
+
+      // Payload body mapping
+      const body = {
+        fullName: formData.fullName,
+        username: formData.username,
+        role: formData.isAdmin ? 'Admin' : 'CanBo',
+        departmentId: formData.departmentId ? parseInt(formData.departmentId, 10) : null
+      }
+      if (formData.password) {
+        body.passwordHash = formData.password
+      }
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
+        body: JSON.stringify(body),
+      })
+
+      const result = await res.json()
+      if (res.ok && (result.success !== false)) {
+        await fetchAccounts()
+        handleReset()
+      } else {
+        setError(result.message || 'Có lỗi xảy ra, vui lòng thử lại.')
+      }
+    } catch (err) {
+      setError('Lỗi kết nối đến máy chủ.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEdit = (acc) => {
+    setEditId(acc.id)
+    setFormData({
+      fullName: acc.fullName || '',
+      departmentId: acc.departmentId || '',
+      username: acc.username || '',
+      password: '',
+      confirmPassword: '',
+      isAdmin: acc.role === 'Admin',
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa tài khoản này không?')) return
+
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+      })
+      if (res.ok) {
+        await fetchAccounts()
+        if (editId === id) handleReset()
+      } else {
+        const result = await res.json()
+        alert(result.message || 'Xóa thất bại.')
+      }
+    } catch (err) {
+      alert('Lỗi kết nối máy chủ.')
+    }
+  }
+
+  // Helper to get department name
+  const getDepartmentName = (deptId) => {
+    if (!deptId) return ''
+    const dept = departments.find(d => d.id === deptId)
+    return dept ? dept.name : deptId
   }
 
   return (
     <div className="min-h-screen bg-white font-sans text-[13px] text-gray-800">
       <AdminHeader />
 
-      {/* Main Content */}
       <main className="max-w-[1000px] mx-auto px-4 py-6">
-        <h2 className="text-[#c8102e] font-bold text-lg mb-6">Quản trị tài khoản</h2>
+        <h2 className="text-[#c8102e] font-bold text-lg mb-6">
+          {editId ? 'Sửa thông tin tài khoản' : 'Quản trị tài khoản'}
+        </h2>
+
+        {error && (
+          <div className="max-w-[600px] mb-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="max-w-[600px] mb-10">
           <table className="w-full">
@@ -77,12 +201,15 @@ export default function AdminAccounts() {
                 <td className="py-2 font-medium">Thuộc Phòng, Ban</td>
                 <td className="py-2">
                   <select
-                    name="department"
-                    value={formData.department}
+                    name="departmentId"
+                    value={formData.departmentId}
                     onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
+                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700 bg-white"
                   >
-                    <option value="CƠ QUAN">CƠ QUAN</option>
+                    <option value="">-- Chọn phòng ban --</option>
+                    {departments.map(d => (
+                      <option key={d.id} value={d.id}>{d.name}</option>
+                    ))}
                   </select>
                 </td>
               </tr>
@@ -98,12 +225,13 @@ export default function AdminAccounts() {
                     onChange={handleChange}
                     className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
                     required
+                    disabled={!!editId} // Typically shouldn't change username after creation
                   />
                 </td>
               </tr>
               <tr>
                 <td className="py-2 font-medium">
-                  Mật khẩu<span className="text-red-500">*</span>
+                  Mật khẩu{!editId && <span className="text-red-500">*</span>}
                 </td>
                 <td className="py-2">
                   <input
@@ -112,13 +240,14 @@ export default function AdminAccounts() {
                     value={formData.password}
                     onChange={handleChange}
                     className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required
+                    required={!editId}
+                    placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
                   />
                 </td>
               </tr>
               <tr>
                 <td className="py-2 font-medium">
-                  Nhập lại mật khẩu<span className="text-red-500">*</span>
+                  Nhập lại mật khẩu{!editId && <span className="text-red-500">*</span>}
                 </td>
                 <td className="py-2">
                   <input
@@ -127,7 +256,8 @@ export default function AdminAccounts() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required
+                    required={!editId && !!formData.password}
+                    placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
                   />
                 </td>
               </tr>
@@ -139,19 +269,29 @@ export default function AdminAccounts() {
                     name="isAdmin"
                     checked={formData.isAdmin}
                     onChange={handleChange}
-                    className="w-4 h-4 border-[#5cb85c] text-[#5cb85c] focus:ring-[#5cb85c] rounded-sm"
+                    className="w-4 h-4 border-[#5cb85c] text-[#5cb85c] focus:ring-[#5cb85c] rounded-sm cursor-pointer"
                   />
                 </td>
               </tr>
               <tr>
                 <td />
-                <td className="py-3">
+                <td className="py-3 flex gap-2">
                   <button
                     type="submit"
-                    className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-1.5 rounded text-sm transition-colors"
+                    disabled={loading}
+                    className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-1.5 rounded text-sm transition-colors disabled:opacity-50"
                   >
-                    Thêm
+                    {editId ? 'Cập nhật' : 'Thêm'}
                   </button>
+                  {editId && (
+                    <button
+                      type="button"
+                      onClick={handleReset}
+                      className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-1.5 rounded text-sm transition-colors"
+                    >
+                      Hủy
+                    </button>
+                  )}
                 </td>
               </tr>
             </tbody>
@@ -178,22 +318,35 @@ export default function AdminAccounts() {
                   <td className="border border-gray-200 py-2.5 px-4 font-bold">{index + 1}</td>
                   <td className="border border-gray-200 py-2.5 px-4">{acc.fullName}</td>
                   <td className="border border-gray-200 py-2.5 px-4">{acc.username}</td>
-                  <td className="border border-gray-200 py-2.5 px-4">{acc.department}</td>
+                  <td className="border border-gray-200 py-2.5 px-4">{getDepartmentName(acc.departmentId)}</td>
                   <td className="border border-gray-200 py-2.5 px-4">
-                    {acc.isAdmin ? 'Có' : 'Không'}
+                    {acc.role === 'Admin' ? 'Có' : 'Không'}
                   </td>
                   <td className="border border-gray-200 py-2.5 px-4">
-                    <a href="#" className="text-[#337ab7] hover:underline">
+                    <button 
+                      onClick={() => handleEdit(acc)}
+                      className="text-[#337ab7] hover:underline"
+                    >
                       Sửa
-                    </a>
+                    </button>
                   </td>
                   <td className="border border-gray-200 py-2.5 px-4">
-                    <a href="#" className="text-[#337ab7] hover:underline">
+                    <button 
+                      onClick={() => handleDelete(acc.id)}
+                      className="text-[#337ab7] hover:underline"
+                    >
                       Xóa
-                    </a>
+                    </button>
                   </td>
                 </tr>
               ))}
+              {accounts.length === 0 && (
+                <tr>
+                  <td colSpan="7" className="border border-gray-200 py-4 text-gray-500">
+                    Không có tài khoản nào
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
