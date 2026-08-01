@@ -483,3 +483,13 @@
   animation: marquee 20s linear infinite;
   white-space: nowrap;
 }
+
+/* Fix date/time input placeholder on iOS */
+input[type="date"].empty-date::-webkit-datetime-edit,
+input[type="time"].empty-date::-webkit-datetime-edit {
+    color: transparent;
+}
+input[type="date"].empty-date:focus::-webkit-datetime-edit,
+input[type="time"].empty-date:focus::-webkit-datetime-edit {
+    color: inherit;
+}

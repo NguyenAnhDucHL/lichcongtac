@@ -157,7 +157,7 @@ export default function AdminNotifications() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[13px] text-gray-800">
+    <div className="min-h-screen bg-white font-sans text-[15px] text-gray-800">
       <AdminHeader />
 
       <main className="max-w-[1000px] mx-auto px-4 py-6">
@@ -234,7 +234,7 @@ export default function AdminNotifications() {
         </form>
 
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-500 text-[13px]">Danh sách các thông báo ({notifications.length} bản ghi)</span>
+          <span className="text-gray-500 text-[15px]">Danh sách các thông báo ({notifications.length} bản ghi)</span>
           <span className="text-gray-400 text-xs">Trang {currentPage}/{Math.max(1, Math.ceil(notifications.length / PAGE_SIZE))}</span>
         </div>
         

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Loader2, Menu } from 'lucide-react'
+import { Loader2, Menu, Bell } from 'lucide-react'
 
 const formatLocation = (loc) => {
   if (!loc) return '';
@@ -57,7 +57,8 @@ export default function WorkSchedule() {
 
         const transformedData = sortedDates.map(dateStr => {
           const isToday = dateStr === todayFormatted;
-          const d = new Date(dateStr);
+          const parts = dateStr.split('-');
+          const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
           const dayOfWeek = d.getDay();
           const dayLabel = isToday ? 'Hôm nay' : days[dayOfWeek];
           const formattedDate = dateStr.split('-').reverse().join('/');
@@ -169,7 +170,7 @@ export default function WorkSchedule() {
                   href={item.href}
                   target={item.target || '_self'}
                   rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                  className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors`}
+                  className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-[15px] font-bold uppercase hover:bg-[#154374] transition-colors`}
                 >
                   {item.label}
                 </a>
@@ -191,15 +192,15 @@ export default function WorkSchedule() {
       )}
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-6xl mx-auto pt-0 pb-6">
         {loading ? (
           <div className="flex justify-center py-20 text-[#1d5792]">
             <Loader2 className="animate-spin w-8 h-8" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-4">
             {/* Left Column (Today & Empty Background) */}
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full md:col-span-3 px-4 pt-5">
               {/* Today's Schedule */}
               <div className="mb-4">
                 <h3 className="text-2xl font-semibold text-[#1d5792] text-center mb-4">
@@ -208,13 +209,13 @@ export default function WorkSchedule() {
                 </h3>
 
                 {displayToday.items.length > 0 ? (
-                  <div className="space-y-3 px-4">
+                  <div className="space-y-6 px-4">
                     {displayToday.items.map((item, idx) => (
                       <div key={idx} className="flex gap-2">
-                        <span className="text-[#c8102e] shrink-0 font-medium">
+                        <span className="text-[#c8102e] shrink-0 font-medium text-[16px]">
                           {item.startTime}:
                         </span>
-                        <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
+                        <div className="font-medium text-gray-800 text-[16px] leading-snug w-full text-justify">
                           <span>
                             {item.invitationNumber && `${item.invitationNumber} `}
                             {item.location && <span className="text-[#1d5792] font-semibold">(Tại {formatLocation(item.location)}) </span>}
@@ -235,24 +236,27 @@ export default function WorkSchedule() {
 
               {/* Notifications */}
               {notifications.length > 0 && (
-                <div className="mb-4">
-                  <hr className="border-gray-200 my-4" />
-                  <div className="space-y-3">
-                    {notifications.map((notif, idx) => (
-                      <div key={notif.id || idx} className="text-gray-800 text-[14px] leading-relaxed break-words content-render">
-                        <div dangerouslySetInnerHTML={{ __html: notif.content }} />
-                      </div>
-                    ))}
+                <div className="mb-6 px-4 md:px-0">
+                  <div className="bg-[#f8f9fa] border-l-4 border-[#1d5792] p-4 rounded shadow-sm">
+                    <h4 className="text-[#1d5792] font-bold text-[17px] flex items-center gap-2 mb-3 uppercase tracking-wide">
+                      <Bell className="w-5 h-5 text-[#c8102e] animate-pulse" />
+                      Thông báo
+                    </h4>
+                    <div className="space-y-3">
+                      {notifications.map((notif, idx) => (
+                        <div key={notif.id || idx} className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0">
+                          <div dangerouslySetInnerHTML={{ __html: notif.content }} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* Light blue/gray filler box mimicking screenshot */}
-              <div className="bg-[#f0f4f8] flex-grow mt-4 rounded-sm min-h-[300px]" />
             </div>
 
             {/* Right Column (Upcoming Days) */}
-            <div className="bg-[#e6fbda] p-6 rounded-sm min-h-[600px]">
+            <div className="bg-[#e6fbda] p-4 rounded-sm md:col-span-2">
               {upcomingSchedules.length > 0 ? (
                 upcomingSchedules.map((day, dayIdx) => (
                   <div key={dayIdx} className="mb-8">
@@ -262,10 +266,10 @@ export default function WorkSchedule() {
                     <div className="space-y-4">
                       {day.items.map((item, idx) => (
                         <div key={idx} className="flex gap-2">
-                          <span className="text-[#c8102e] shrink-0 font-medium">
+                          <span className="text-[#c8102e] shrink-0 font-medium text-[16px]">
                             {item.startTime}:
                           </span>
-                          <div className="font-medium text-gray-800 text-[13px] leading-relaxed w-full">
+                          <div className="font-medium text-gray-800 text-[16px] leading-snug w-full text-justify">
                             <span>
                               {item.invitationNumber && `${item.invitationNumber} `}
                               {item.location && <span className="text-[#1d5792] font-semibold">(Tại {formatLocation(item.location)}) </span>}

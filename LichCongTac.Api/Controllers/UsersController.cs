@@ -7,7 +7,7 @@ using LichCongTac.Models;
 
 namespace LichCongTac.Api.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase

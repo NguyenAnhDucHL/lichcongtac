@@ -21,6 +21,21 @@ import './styles/globals.css'
 const originalFetch = window.fetch
 window.fetch = async function () {
   var args = Array.prototype.slice.call(arguments)
+
+  var url = args[0]
+  var options = args[1] || {}
+
+  // Cache busting for GET API requests (Fix iOS Safari aggressive caching)
+  if (typeof url === 'string' && url.startsWith('/api/') && (!options.method || options.method.toUpperCase() === 'GET')) {
+    var separator = url.includes('?') ? '&' : '?'
+    args[0] = url + separator + '_t=' + new Date().getTime()
+  }
+
+  // Prevent ngrok browser warning from blocking API requests
+  options.headers = options.headers || {}
+  options.headers['ngrok-skip-browser-warning'] = 'true'
+  args[1] = options
+
   var response = await originalFetch.apply(window, args)
   var contentType = response.headers.get('content-type')
   if (contentType && contentType.includes('application/json')) {
@@ -111,11 +126,25 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-// ─── Auth Guard ─────────────────────────────────────────────────────────────
 function RequireAuth({ children }) {
   var token = localStorage.getItem('auth_token')
   if (!token) {
     window.location.replace('/campha/manager/login')
+    return null
+  }
+  return children
+}
+
+// Yêu cầu role Admin — non-admin chỉ được đổi mật khẩu
+function RequireAdmin({ children }) {
+  var token = localStorage.getItem('auth_token')
+  var role = localStorage.getItem('user_role')
+  if (!token) {
+    window.location.replace('/campha/manager/login')
+    return null
+  }
+  if (role !== 'Admin') {
+    window.location.replace('/campha/manager/change-password')
     return null
   }
   return children
@@ -134,11 +163,11 @@ function Root() {
   }
 
   if (path === '/campha/manager/accounts' || path === '/campha/manager/accounts/') {
-    return <RequireAuth><AdminAccounts /></RequireAuth>
+    return <RequireAdmin><AdminAccounts /></RequireAdmin>
   }
 
   if (path === '/campha/manager/schedules' || path === '/campha/manager/schedules/') {
-    return <RequireAuth><AdminSchedules /></RequireAuth>
+    return <RequireAdmin><AdminSchedules /></RequireAdmin>
   }
 
   if (path === '/campha/manager/change-password' || path === '/campha/manager/change-password/') {
@@ -146,19 +175,19 @@ function Root() {
   }
 
   if (path === '/campha/manager/departments' || path === '/campha/manager/departments/') {
-    return <RequireAuth><AdminDepartments /></RequireAuth>
+    return <RequireAdmin><AdminDepartments /></RequireAdmin>
   }
 
   if (path === '/campha/manager/employees' || path === '/campha/manager/employees/') {
-    return <RequireAuth><AdminEmployees /></RequireAuth>
+    return <RequireAdmin><AdminEmployees /></RequireAdmin>
   }
 
   if (path === '/campha/manager/notifications' || path === '/campha/manager/notifications/') {
-    return <RequireAuth><AdminNotifications /></RequireAuth>
+    return <RequireAdmin><AdminNotifications /></RequireAdmin>
   }
 
   if (path === '/campha/manager/holidays' || path === '/campha/manager/holidays/') {
-    return <RequireAuth><AdminHolidays /></RequireAuth>
+    return <RequireAdmin><AdminHolidays /></RequireAdmin>
   }
 
   if (path === '/campha/search' || path === '/campha/search/') {

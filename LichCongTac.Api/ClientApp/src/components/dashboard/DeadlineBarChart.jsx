@@ -8,7 +8,8 @@ import { cn } from '@/lib/utils'
 function formatDeadlineLabel(item) {
   if (item.date === 'overdue') return { short: 'Quá hạn', title: 'Quá hạn' }
 
-  const parsedDate = new Date(`${item.date}T00:00:00`)
+  const parts = item.date.split('-');
+  const parsedDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
   if (Number.isNaN(parsedDate.getTime()))
     return { short: item.label || '-', title: item.label || '-' }
 

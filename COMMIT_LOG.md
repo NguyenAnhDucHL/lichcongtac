@@ -4,6 +4,17 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-01 21:16] Fix quyền quản trị tài khoản
+- **Mô tả**: Bổ sung phân quyền role-based. Frontend thêm `RequireAdmin` check role 'Admin', non-admin bị đẩy sang trang đổi mật khẩu. Backend khóa toàn bộ các Controllers và endpoints ghi của SchedulesController về `[Authorize(Roles = "Admin")]`. 
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/UsersController.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/NotificationsController.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/HolidaysController.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): chặn quyền quản trị đối với tài khoản không phải Admin"`
+
+
 ### [2026-07-31 17:08] Thiết kế giao diện Quản trị lịch và tích hợp API
 - **Mô tả**: Thiết kế trang Quản trị lịch (`AdminSchedules.jsx`) theo giao diện mockup yêu cầu (với form giả lập WYSIWYG editor). Tích hợp gọi API để lấy danh sách lịch công tác từ database (`GET /api/schedules`) và thêm lịch mới (`POST /api/schedules`).
 - **Tệp thay đổi**:
@@ -503,3 +514,162 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): thiết kế lại giao diện trang search và home responsive trên mobile"`
+### [2026-08-01 14:02] Deploy frontend cập nhật và xử lý lỗi hash mật khẩu
+- **Mô tả**: 
+  - Đã chạy lệnh `npm run build` trong `ClientApp` để compile code frontend React và ghi vào thư mục `wwwroot` của ASP.NET, sau đó restart docker container để apply. 
+  - Đã xử lý lỗi không đăng nhập được tài khoản `hoangthinhu` bằng cách băm mật khẩu thủ công dưới dạng BCrypt và lưu vào Database để module `HybridPasswordHasher` có thể xử lý và nâng cấp hash chuẩn xác.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/wwwroot/*` (Build mới từ React Frontend)
+  - `data_dump/documents.db` (Cập nhật hash thủ công)
+- **Lệnh git commit**: `git commit -m "chore(deploy): build frontend static files và khắc phục hash bcrypt thủ công cho tài khoản"`
+### [2026-08-01 14:06] Sync frontend assets vào Docker container
+- **Mô tả**: Sửa lỗi giao diện cũ bị cache trên môi trường live do files `wwwroot` mới build chưa được copy vào trong container `lichcongtac-backend`. Đã dùng `docker cp` để đồng bộ thư mục `wwwroot` vào `/app/wwwroot` của container.
+- **Tệp thay đổi**:
+  - `lichcongtac-backend` (Container runtime)
+- **Lệnh git commit**: `git commit -m "chore(deploy): sync wwwroot vào backend container để apply thay đổi frontend"`
+### [2026-08-01 14:12] Điều chỉnh chiều rộng khung input trang Tìm kiếm trên mobile
+- **Mô tả**: Giới hạn chiều rộng tối đa (max-w) của các thẻ input và button ở trang `SearchSchedule.jsx` để không bị dài và chèn ra ngoài trên màn hình mobile, giúp giao diện gọn gàng hơn. Đã đồng bộ lại file vào container.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): giới hạn chiều rộng input trang tìm kiếm trên mobile"`
+### [2026-08-01 14:24] Điều chỉnh độ dài ô input "địa điểm khác"
+- **Mô tả**: Kéo dài thanh nhập địa điểm khác (từ 260px lên 350px) để bằng với ô dropdown bên trên, giúp giao diện cân đối hơn và người dùng có thêm không gian nhìn thấy văn bản họ nhập vào. Đã build và đồng bộ lại vào Docker.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): tăng độ dài ô input địa điểm khác trong form thêm lịch"`
+### [2026-08-01 14:25] Điều chỉnh độ dài ô input "đơn vị khác"
+- **Mô tả**: Tương tự như ô nhập địa điểm, ô nhập tên đơn vị/phòng ban khác cũng được kéo dài từ 260px lên 350px để khớp kích thước với dropdown bên trên, tạo sự đồng bộ cho form nhập liệu. Đã build và đồng bộ vào Docker container.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): tăng độ dài ô input đơn vị khác trong form thêm lịch"`
+### [2026-08-01 14:26] Rút ngắn độ dài ô input "Giấy mời số"
+- **Mô tả**: Rút ngắn trường nhập "Giấy mời số" (từ max-w 550px xuống thành w 350px) để thẳng hàng và có cùng kích thước với các trường "Thuộc Phòng, Ban" và "Địa điểm", tạo sự thống nhất cho form. Đã build và đồng bộ vào Docker container.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): rút ngắn chiều rộng ô giấy mời số cho đồng bộ với các trường khác"`
+### [2026-08-01 14:27] Cải thiện khả năng đọc chữ ở trang Đổi mật khẩu
+- **Mô tả**: Ở trang Đổi mật khẩu, dòng chữ hiển thị "Tài khoản: [tên]" được thiết kế lớn hơn (từ text-xs lên text-sm), màu đậm hơn (chuyển từ trắng mờ 80% sang trắng đặc 100%) và in đậm vừa (font-medium) giúp người lớn tuổi dễ nhìn hơn trên nền xanh.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminChangePassword.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): tăng kích cỡ chữ và độ tương phản tên tài khoản ở trang đổi mật khẩu"`
+### [2026-08-01 14:35] Hỗ trợ trình duyệt cũ trên iOS (iPhone 8 / Safari)
+- **Mô tả**: Tích hợp `@vitejs/plugin-legacy` để sinh ra bộ mã tương thích (legacy bundle) có chứa các polyfills cho các thiết bị iPhone/iPad chạy hệ điều hành đời cũ (như iOS 12-14 trên iPhone 8). Điều này giải quyết lỗi màn hình trắng không mở được trên Safari cũ do không hỗ trợ cú pháp Javascript ES6+/ES2020.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/package.json`
+  - `LichCongTac.Api/ClientApp/vite.config.js`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(ui): cấu hình vite plugin legacy hỗ trợ các phiên bản safari cũ trên iphone 8"`
+### [2026-08-01 14:42] Cải thiện giao diện hiển thị Thông báo
+- **Mô tả**: Thay thế thiết kế thông báo dạng chữ đơn thuần ở trang chủ (phần Thông báo dưới Lịch công tác hôm nay) bằng một khối giao diện đẹp mắt (nền xám nhạt, viền xanh dương bên trái), kèm theo một icon Chuông thông báo (Bell) màu đỏ nhấp nháy để thu hút sự chú ý của người dùng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(ui): xoá filler box màu xám rỗng bên dưới khung Thông báo để tránh gây nhầm lẫn thiếu data"`
+
+### [2026-08-01 15:40] Sửa lỗi điện thoại hiển thị "Không có lịch công tác" do trình duyệt (Safari) cache dữ liệu cũ
+- **Mô tả**: Vấn đề một số điện thoại (iOS) tải trang chủ nhưng không thấy lịch nào ("Không có lịch công tác") dù máy tính vẫn thấy bình thường là do **bộ nhớ đệm (cache) cực kỳ hung hăng của Safari** đối với các API GET request. Safari đã lưu lại dữ liệu API từ những ngày trước (khi không có lịch) và cứ thế trả về cho những lần mở web tiếp theo thay vì gọi lên máy chủ để lấy lịch mới. Đã khắc phục bằng cách can thiệp vào `fetch interceptor` ở file `main.jsx`: tự động gắn thêm tham số `_t=timestamp` vào tất cả các lời gọi API GET để đánh lừa Safari rằng đây là một URL hoàn toàn mới, ép nó phải tải dữ liệu tươi từ máy chủ. Đồng thời bổ sung header `ngrok-skip-browser-warning` để ngăn ngrok chặn ngầm các request API trên điện thoại.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/main.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(core): thêm cache buster (_t) vào toàn bộ API GET để trị dứt điểm lỗi Safari cache dữ liệu cũ"`
+
+### [2026-08-01 15:52] Căn lề hai bên (justify) và tăng kích thước chữ cho nội dung lịch công tác
+- **Mô tả**: Nội dung văn bản chi tiết của lịch công tác và phần Thông báo ở màn hình chính được tinh chỉnh lại theo yêu cầu UI/UX. Kích thước chữ được đồng bộ lên mức chuẩn `16px` (trước đây là 13px-14px) để dễ đọc hơn trên mọi thiết bị. Đồng thời, bố cục hiển thị mốc thời gian (giờ) được chuyển từ dạng chia cột (flex) sang dạng nối tiếp (inline), giúp khi văn bản dài tự động xuống dòng và bám sát lề trái phía dưới mốc thời gian (y hệt form mẫu hệ thống cũ). Cuối cùng, toàn bộ đoạn văn bản nội dung được dàn đều lề hai bên (justify, giống định dạng trong file Word) bằng cách bổ sung class `text-justify`, giúp khối văn bản trở nên vuông vắn, trang trọng và đẹp mắt hơn.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): điều chỉnh fontsize thành 16px, wrap text thời gian và căn lề justify cho toàn bộ text trên trang chủ"`
+
+### [2026-08-01 14:45] Sửa lỗi trắng màn hình khi thêm trang web vào màn hình chính (PWA) trên điện thoại
+- **Mô tả**: Sửa lỗi màn hình trắng khi người dùng iPhone và các điện thoại khác lưu trang web ra màn hình chính (Add to Home Screen). Các nguyên nhân đã được khắc phục bao gồm: (1) Thêm file `manifest.json` và các thẻ meta iOS để PWA hoạt động chuẩn; (2) Chuyển `base` config của Vite thành relative (`./`) để sửa lỗi 404 khi load asset lúc khởi động từ màn hình chính; (3) Gỡ bỏ một số thư viện CDN thừa (chart.js, pdf.js, lucide) ra khỏi `index.html` để tránh lỗi Syntax Error trên các dòng máy cũ (như iPhone 8 / iOS 12-14).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/public/manifest.json` (Mới)
+  - `LichCongTac.Api/ClientApp/index.html` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/vite.config.js` (Sửa đổi)
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi trắng màn hình PWA trên điện thoại và thêm manifest"`
+### [2026-08-01 14:55] Sửa lỗi hiển thị ô chọn ngày tháng (Date Input) trên trình duyệt mobile
+- **Mô tả**: Trình duyệt trên mobile (đặc biệt là iOS Safari) thường không hiển thị định dạng ngày tháng mặc định (`dd/mm/yyyy`) khi ô `type="date"` trống, dẫn đến việc ô nhập ngày tháng trông như một textbox trống (như trong ảnh chụp màn hình). Đã áp dụng thủ thuật chuyển đổi `type="text"` và `type="date"` linh hoạt khi người dùng chạm vào (onFocus/onBlur) kết hợp thêm thuộc tính `placeholder="dd/mm/yyyy"` để ô này luôn hiển thị định dạng rõ ràng. Đồng thời, loại bỏ thuộc tính `max-w-[280px]` trên mobile để các ô nhập liệu được kéo dài ra toàn bộ màn hình, khắc phục tình trạng ô bị cụt một nửa trông mất cân đối.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi hiển thị ô chọn ngày và bố cục form tìm kiếm trên di động"`
+### [2026-08-01 14:56] Sửa lỗi trắng trang khi vào các route con (ví dụ /manager/login)
+- **Mô tả**: Khi chuyển `base` của Vite thành dạng tương đối (`./`) ở commit trước, các route lồng nhau như `/manager/login` sẽ tải sai đường dẫn tĩnh (tìm trong `/campha/manager/vite-assets/` thay vì `/campha/vite-assets/`), gây ra lỗi 404 và màn hình trắng. Đã đổi lại cấu hình `base: '/campha/'` trong `vite.config.js` thành đường dẫn tuyệt đối bắt đầu từ thư mục gốc ảo. Việc này kết hợp với `UsePathBase("/campha")` ở Kestrel đã giải quyết triệt để lỗi định tuyến tĩnh cho mọi môi trường (Nginx và Ngrok). Đã rebuild lại Frontend và copy vào wwwroot.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/vite.config.js`
+  - `LichCongTac.Api/wwwroot/*`
+- **Lệnh git commit**: `git commit -m "fix(routing): sửa lỗi nạp tài nguyên tĩnh gây trắng màn hình trên route con do base URL sai"`
+### [2026-08-01 15:00] Sửa lỗi bộ chọn ngày (Date Picker) không tự mở trên iOS Safari khi focus
+- **Mô tả**: Ở commit trước, việc thay đổi linh hoạt `type="text"` sang `type="date"` khi onFocus khiến iOS Safari không thể tự động mở popup chọn ngày ngay ở lần chạm đầu tiên (vì Safari yêu cầu click trực tiếp lên một input `type="date"` thực sự). Đã đổi chiến lược: giữ nguyên `type="date"`, dùng CSS ngầm ẩn chữ trắng gốc của trình duyệt (`::-webkit-datetime-edit { color: transparent }`) và dùng một `div` đè lên làm placeholder (`dd/mm/yyyy`) sử dụng `pointer-events-none`. Khi người dùng chạm, sự kiện click lọt thẳng qua thẻ div và mở ngay bộ chọn ngày của OS. Khi đang focus (hoặc khi đã nhập giá trị), lớp CSS ẩn này được xóa bỏ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css`
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi date picker không mở ngay trên iOS và hoàn thiện giao diện placeholder"`
+
+### [2026-08-01 15:03] Đồng bộ giao diện ô chọn Thời gian (Date/Time) toàn dự án
+- **Mô tả**: Áp dụng triệt để giải pháp placeholder ảo (CSS `.empty-date` kết hợp `absolute div`) cho toàn bộ các ô nhập `type="date"` và `type="time"` còn lại trong mã nguồn để đảm bảo tính nhất quán trên nền tảng di động.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx`
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): đồng bộ giao diện hiển thị cho toàn bộ ô chọn thời gian"`
+
+### [2026-08-01 15:06] Co lại kích thước ô nhập thời gian trên Mobile
+- **Mô tả**: Bổ sung lại class `max-w-[280px]` trên mobile cho các thẻ bọc (wrapper) ô input thời gian ở form `Tìm kiếm` (`SearchSchedule.jsx`). Việc loại bỏ class này ở commit trước khiến ô input kéo giãn 100% (`w-full`) trên màn hình điện thoại, tạo cảm giác "tràn" hoặc quá dài so với các input khác (như textarea `Nội dung`).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): giới hạn chiều rộng max-w cho ô chọn thời gian trên màn hình di động"`
+
+### [2026-08-01 15:08] Sửa lỗi tràn giao diện ô nhập Ngày Giờ ở Quản trị lịch
+- **Mô tả**: Do đặc tính của `type="date"` và `type="time"` trên Safari tự động có min-width riêng, nếu đặt chúng trong cùng một thẻ FlexRow mà không cho phép co lại (`min-w-0`), chúng sẽ cố tình giãn thẳng ra ngoài viền màn hình (tràn ra bên phải). Thay vì dùng flex, đã đổi thẻ bọc sang dùng `grid grid-cols-2` trên màn hình nhỏ và thêm class `min-w-0` để ép các ô này tự thu gọn vừa khít với màn hình di động.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(ui): đổi layout flex sang grid-cols-2 cho cụm input thời gian để chống tràn màn hình"`
+
+### [2026-08-01 15:10] Chuyển đổi hiển thị Ngày/Giờ sang dạng xếp dọc trên Mobile
+- **Mô tả**: Do đặc tính của `type="date"` và `type="time"` trên Safari tự động có kích thước tối thiểu lớn, khi sử dụng layout chia cột (`grid-cols-2` hoặc `flex` ngang) trên các màn hình di động nhỏ, ô nhập sẽ bị ép tràn ra ngoài viền gây lỗi hiển thị. Thay đổi layout từ ngang sang xếp dọc (`flex-col`) chuyên biệt cho Mobile (trên Tablet/Desktop từ `sm` trở lên sẽ giữ nguyên giao diện ngang bằng `sm:flex-row`). Việc này giúp các ô nhập có không gian 100% chiều rộng để hiển thị thoải mái, đồng điệu với các form input khác.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(ui): xếp dọc ô ngày và giờ trên mobile để khắc phục tràn màn hình do min-width"`
+
+### [2026-08-01 15:11] Thu gọn chiều rộng các ô thời gian ở khu vực Quản trị
+- **Mô tả**: Sau khi đã xếp dọc các ô nhập Thời gian ở khu vực Quản trị (`AdminSchedules`, `AdminHolidays`), kích thước mặc định 100% (`w-full`) khiến giao diện trên điện thoại trông khá dài, tương tự như ở khung Tìm kiếm. Đã bổ sung thuộc tính `max-w-[280px]` trên màn hình di động cho tất cả các thẻ bọc thời gian trong khu vực admin, giúp chúng được hiển thị gọn gàng, vừa mắt và đồng nhất với thiết kế trên màn hình WorkSchedule.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx`
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): đồng bộ giới hạn chiều rộng max-w cho tất cả các ô thời gian trên thiết bị di động"`
+
+### [2026-08-01 15:13] Sửa menu dropdown Quản trị trên màn hình Mobile
+- **Mô tả**: Do đặc tính của màn hình cảm ứng trên Mobile không có con trỏ chuột (`hover`), các menu con (như Quản trị tài khoản, Quản trị phòng ban) đang dùng CSS `group-hover` sẽ không thể mở ra khi bấm vào chữ "QUẢN TRỊ". Đã xử lý lại logic thanh Menu `AdminHeader`: thêm icon mũi tên báo hiệu (Chevron) và tạo hiệu ứng đóng/mở (Accordion) khi người dùng bấm vào trên thiết bị di động. Các mục con được thụt lề và đổi màu nền chuyên biệt để phân biệt rõ ràng với menu chính. Trên máy tính vẫn giữ nguyên hiệu ứng trỏ chuột để sổ xuống (Dropdown) mượt mà.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(ui): thêm hiệu ứng accordion cho menu dropdown trên giao diện mobile"`
+
+### [2026-08-01 15:25] Điều chỉnh tỷ lệ cột giao diện Lịch công tác chính (60% - 40%)
+- **Mô tả**: Thay đổi tỷ lệ chia cột trên màn hình chính (trang hiển thị Lịch công tác). Trước đây, cột trái (Hôm nay) và cột phải (Các ngày tới) được chia đều tỷ lệ 50-50 (`grid-cols-2`). Đã điều chỉnh sang hệ lưới 5 cột (`grid-cols-5`), trong đó cột trái chiếm 3 phần (60%) và cột phải chiếm 2 phần (40%) để tạo không gian rộng rãi hơn cho nội dung lịch họp hiện tại cũng như mục Thông báo.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "style(ui): thay đổi tỷ lệ hiển thị cột trái phải thành 60-40 trên trang chủ"`
+
+### [2026-08-01 15:31] Sửa lỗi trắng trang (không hiển thị dữ liệu) trên một số dòng điện thoại (iOS Safari cũ)
+- **Mô tả**: Nguyên nhân khiến một số điện thoại (đặc biệt là iPhone đời cũ dùng Safari cũ) vào trang chủ nhưng không thấy lịch công tác là do lỗi **Invalid Date**. Trình duyệt Safari phiên bản cũ không hỗ trợ tốt việc dùng lệnh `new Date("YYYY-MM-DD")` với chuỗi có dấu gạch ngang, dẫn đến lỗi hàm và làm sập logic xử lý dữ liệu. Giải pháp là tách chuỗi `YYYY-MM-DD` ra làm 3 phần (năm, tháng, ngày) và truyền vào `new Date(year, month, day)`. Đã rà soát và áp dụng bản sửa lỗi này cho toàn bộ source code (WorkSchedule, AdminSchedules, SearchSchedule, Dashboard charts) để đảm bảo tương thích 100% với mọi trình duyệt và hệ điều hành cũ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx`
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx`
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx`
+  - `LichCongTac.Api/ClientApp/src/components/dashboard/DeadlineBarChart.jsx`
+  - `LichCongTac.Api/wwwroot/*` (Build mới)
+- **Lệnh git commit**: `git commit -m "fix(core): sửa lỗi crash do parse Date từ chuỗi YYYY-MM-DD trên iOS Safari cũ"`

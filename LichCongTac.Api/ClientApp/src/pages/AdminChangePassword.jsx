@@ -128,7 +128,7 @@ export default function AdminChangePassword() {
   const username = localStorage.getItem('user_name') || ''
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[13px] text-gray-800">
+    <div className="min-h-screen bg-white font-sans text-[15px] text-gray-800">
       <AdminHeader />
 
       {/* Main Content */}
@@ -144,7 +144,7 @@ export default function AdminChangePassword() {
               <div>
                 <h2 className="text-white font-bold text-base">Đổi mật khẩu</h2>
                 {username && (
-                  <p className="text-white/80 text-xs mt-0.5">Tài khoản: {username}</p>
+                  <p className="text-white text-sm font-medium mt-1">Tài khoản: {username}</p>
                 )}
               </div>
             </div>
@@ -155,7 +155,7 @@ export default function AdminChangePassword() {
               {successMsg && (
                 <div className="flex items-start gap-2.5 mb-5 p-3.5 bg-green-50 border border-green-200 rounded-lg">
                   <CheckCircle2 size={17} className="text-green-500 shrink-0 mt-0.5" />
-                  <p className="text-green-700 text-[13px]">{successMsg}</p>
+                  <p className="text-green-700 text-[15px]">{successMsg}</p>
                 </div>
               )}
 
@@ -163,14 +163,14 @@ export default function AdminChangePassword() {
               {errorMsg && (
                 <div className="flex items-start gap-2.5 mb-5 p-3.5 bg-red-50 border border-red-200 rounded-lg">
                   <XCircle size={17} className="text-red-400 shrink-0 mt-0.5" />
-                  <p className="text-red-600 text-[13px]">{errorMsg}</p>
+                  <p className="text-red-600 text-[15px]">{errorMsg}</p>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Old password */}
                 <div>
-                  <label className="block text-gray-600 font-medium mb-1.5 text-[13px]">
+                  <label className="block text-gray-600 font-medium mb-1.5 text-[15px]">
                     Mật khẩu hiện tại <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -180,7 +180,7 @@ export default function AdminChangePassword() {
                       onChange={(e) => setOldPassword(e.target.value)}
                       required
                       placeholder="Nhập mật khẩu hiện tại"
-                      className="w-full border border-gray-300 rounded-lg px-3.5 pr-10 py-2.5 text-[13px] outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30 transition"
+                      className="w-full border border-gray-300 rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30 transition"
                     />
                     <button
                       type="button"
@@ -197,7 +197,7 @@ export default function AdminChangePassword() {
 
                 {/* New password */}
                 <div>
-                  <label className="block text-gray-600 font-medium mb-1.5 text-[13px]">
+                  <label className="block text-gray-600 font-medium mb-1.5 text-[15px]">
                     Mật khẩu mới <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -207,7 +207,7 @@ export default function AdminChangePassword() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       placeholder="Nhập mật khẩu mới"
-                      className="w-full border border-gray-300 rounded-lg px-3.5 pr-10 py-2.5 text-[13px] outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30 transition"
+                      className="w-full border border-gray-300 rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30 transition"
                     />
                     <button
                       type="button"
@@ -223,7 +223,7 @@ export default function AdminChangePassword() {
 
                 {/* Confirm password */}
                 <div>
-                  <label className="block text-gray-600 font-medium mb-1.5 text-[13px]">
+                  <label className="block text-gray-600 font-medium mb-1.5 text-[15px]">
                     Xác nhận mật khẩu mới <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
@@ -233,7 +233,7 @@ export default function AdminChangePassword() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       placeholder="Nhập lại mật khẩu mới"
-                      className={`w-full border rounded-lg px-3.5 pr-10 py-2.5 text-[13px] outline-none transition ${confirmPassword && confirmPassword !== newPassword
+                      className={`w-full border rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none transition ${confirmPassword && confirmPassword !== newPassword
                         ? 'border-red-300 focus:border-red-400 focus:ring-1 focus:ring-red-300/30'
                         : confirmPassword && confirmPassword === newPassword
                           ? 'border-green-300 focus:border-green-400 focus:ring-1 focus:ring-green-300/30'
@@ -265,7 +265,7 @@ export default function AdminChangePassword() {
                   <button
                     type="submit"
                     disabled={loading || !!successMsg}
-                    className="w-full bg-[#5cb85c] hover:bg-[#4cae4c] disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-lg text-[13px] font-bold transition-colors shadow-sm flex items-center justify-center gap-2"
+                    className="w-full bg-[#5cb85c] hover:bg-[#4cae4c] disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-lg text-[15px] font-bold transition-colors shadow-sm flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>

@@ -35,7 +35,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllSchedules([FromQuery] string? startDate, [FromQuery] string? endDate)
         {
             IEnumerable<Schedule> schedules;
@@ -51,7 +51,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetScheduleById(int id)
         {
             var schedule = await _scheduleRepository.GetByIdAsync(id);
@@ -63,7 +63,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateSchedule([FromBody] ScheduleCreateDto dto)
         {
             if (!ModelState.IsValid)
@@ -97,7 +97,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateSchedule(int id, [FromBody] ScheduleUpdateDto dto)
         {
             if (!ModelState.IsValid)
@@ -133,7 +133,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSchedule(int id)
         {
             var existing = await _scheduleRepository.GetByIdAsync(id);

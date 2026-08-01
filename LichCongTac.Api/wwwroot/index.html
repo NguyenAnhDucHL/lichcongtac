@@ -1,51 +1,39 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-          for(let registration of registrations) {
-            registration.unregister()
-          }
-        })
-      }
-    </script>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Phần Mềm Lịch Công Tác | Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="icon" type="image/png" href="/assets/logo.png" />
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Self-XSS Warning Console Script -->
-    <script>
-      Object.defineProperty(window, 'console', {
-        value: console,
-        writable: false,
-        configurable: false,
+<head>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        for (let registration of registrations) {
+          registration.unregister()
+        }
       })
-      console.log(
-        '%cDừng lại!',
-        'color: red; font-family: sans-serif; font-size: 50px; font-weight: bold; text-shadow: 1px 1px 2px black;'
-      )
-      console.log(
-        '%cĐây là một tính năng của trình duyệt dành cho các nhà phát triển. Nếu ai đó bảo bạn sao chép rồi dán nội dung nào đó vào đây để bật một tính năng của hệ thống hoặc "hack" tài khoản của người khác, đó là hành vi lừa đảo và sẽ khiến họ có thể truy cập vào tài khoản của bạn.',
-        'font-family: sans-serif; font-size: 20px; font-weight: normal;'
-      )
-    </script>
-    <script type="module" crossorigin src="/vite-assets/index-DxEVLTiS.js"></script>
-    <link rel="stylesheet" crossorigin href="/vite-assets/index-D81XqyhX.css">
-  </head>
-  <body class="app-booting">
-    <div id="root"></div>
-  </body>
+    }
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Lịch CT" />
+  <title>Phần Mềm Lịch Công Tác | Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="manifest" href="/campha/manifest.json" />
+
+  <script type="module" crossorigin src="/campha/vite-assets/index-CKlIT6Sz.js"></script>
+  <link rel="stylesheet" crossorigin href="/campha/vite-assets/index-Bh1-XIe-.css">
+  <script type="module">import.meta.url;import("_").catch(()=>1);(async function*(){})().next();window.__vite_is_modern_browser=true</script>
+  <script type="module">!function(){if(window.__vite_is_modern_browser)return;console.warn("vite: loading legacy chunks, syntax error above and the same error below should be ignored");var e=document.getElementById("vite-legacy-polyfill"),n=document.createElement("script");n.src=e.src,n.onload=function(){System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))},document.body.appendChild(n)}();</script>
+</head>
+
+<body class="app-booting">
+  <div id="root"></div>
+  <script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>
+  <script nomodule crossorigin id="vite-legacy-polyfill" src="/campha/vite-assets/polyfills-legacy-CWr1lymo.js"></script>
+  <script nomodule crossorigin id="vite-legacy-entry" data-src="/campha/vite-assets/index-legacy-BEwUmgnW.js">System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))</script>
+</body>
+
 </html>

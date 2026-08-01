@@ -270,6 +270,9 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Thêm UsePathBase để hỗ trợ chạy trực tiếp qua /campha (vd: qua Ngrok hoặc IP local)
+app.UsePathBase("/campha");
+
 app.UseMiddleware<LichCongTac.Api.Middleware.GlobalExceptionMiddleware>();
 
 // Cấu hình để nhận diện HTTPS từ Nginx/Ngrok Proxy (Quan trọng khi dùng ngrok)

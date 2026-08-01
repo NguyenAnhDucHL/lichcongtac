@@ -19,7 +19,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var holidays = await _holidayRepository.GetAllAsync();
@@ -38,7 +38,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] HolidayDto request)
         {
             if (string.IsNullOrWhiteSpace(request.Date) || string.IsNullOrWhiteSpace(request.Content))
@@ -72,7 +72,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] HolidayDto request)
         {
             if (string.IsNullOrWhiteSpace(request.Date) || string.IsNullOrWhiteSpace(request.Content))
@@ -99,7 +99,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var existing = await _holidayRepository.GetByIdAsync(id);

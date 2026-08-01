@@ -132,9 +132,9 @@ export default function AdminHolidays() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] font-sans">
+    <div className="min-h-screen bg-[#f5f5f5] font-sans text-[15px]">
       <AdminHeader />
-      
+
       <main className="max-w-[1000px] mx-auto bg-white min-h-[500px] p-6 shadow-sm border border-gray-200 mt-4 mb-8">
         <h2 className="text-[#c8102e] text-xl font-bold mb-6 border-b border-gray-200 pb-2">
           Quản lý ngày lễ
@@ -147,17 +147,22 @@ export default function AdminHolidays() {
               <label className="w-full sm:w-32 text-sm font-semibold text-gray-700">
                 Thời gian <span className="text-red-500">*</span>
               </label>
-              <div className="flex-1">
+              <div className="flex-1 relative group max-w-[280px] sm:max-w-none">
+                {!formData.date && (
+                  <div className="absolute inset-0 p-2 pointer-events-none text-gray-400 text-sm flex items-center group-focus-within:hidden">
+                    dd/mm/yyyy
+                  </div>
+                )}
                 <input
                   type="date"
                   required
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-[#46b8da] focus:ring-1 focus:ring-[#46b8da]"
+                  className={`w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-[#46b8da] focus:ring-1 focus:ring-[#46b8da] bg-transparent ${!formData.date ? 'empty-date' : 'text-gray-700'}`}
                 />
               </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row sm:items-start gap-2">
               <label className="w-full sm:w-32 text-sm font-semibold text-gray-700 mt-2">
                 Nội dung <span className="text-red-500">*</span>

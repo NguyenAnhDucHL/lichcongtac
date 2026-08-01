@@ -8,7 +8,8 @@ const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm'
 function formatDateDisplay(dateString) {
   if (!dateString) return { dayName: '', date: '' }
   try {
-    const d = new Date(dateString)
+    const parts = dateString.split('T')[0].split('-')
+    const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
     const dayName = DAYS[d.getDay()]
     const dd = String(d.getDate()).padStart(2, '0')
     const mm = String(d.getMonth() + 1).padStart(2, '0')
@@ -113,7 +114,7 @@ export default function SearchSchedule() {
     }, [])
 
   return (
-    <div className="min-h-screen bg-white font-sans text-sm text-gray-800">
+    <div className="min-h-screen bg-white font-sans text-[16px] text-gray-800">
       {/* Header */}
       <div className="max-w-6xl mx-auto bg-white relative flex flex-col justify-center min-h-[86px] overflow-hidden">
         <div className="absolute inset-0 z-0 flex justify-start">
@@ -151,7 +152,7 @@ export default function SearchSchedule() {
                   href={item.href}
                   target={item.target || '_self'}
                   rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                  className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors ${item.href === '/campha/search' ? 'bg-[#154374]' : ''}`}
+                  className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-[15px] font-bold uppercase hover:bg-[#154374] transition-colors ${item.href === '/campha/search' ? 'bg-[#154374]' : ''}`}
                 >
                   {item.label}
                 </a>
@@ -180,22 +181,36 @@ export default function SearchSchedule() {
           <form onSubmit={handleSearch} className="flex flex-col gap-4 max-w-[550px]">
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
               <label className="text-gray-700 font-medium md:w-[160px] shrink-0">Thời gian bắt đầu</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="border border-gray-300 px-3 py-1.5 rounded text-gray-700 text-sm w-full md:w-[200px] outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792]"
-              />
+              <div className="relative w-full max-w-[280px] md:max-w-none md:w-[200px] group">
+                {!startDate && (
+                  <div className="absolute inset-0 px-3 py-1.5 pointer-events-none text-gray-400 text-sm flex items-center group-focus-within:hidden">
+                    dd/mm/yyyy
+                  </div>
+                )}
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className={`border border-gray-300 px-3 py-1.5 rounded text-[16px] w-full outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] bg-transparent ${!startDate ? 'empty-date' : 'text-gray-700'}`}
+                />
+              </div>
             </div>
-            
+
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
               <label className="text-gray-700 font-medium md:w-[160px] shrink-0">Thời gian kết thúc</label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="border border-gray-300 px-3 py-1.5 rounded text-gray-700 text-sm w-full md:w-[200px] outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792]"
-              />
+              <div className="relative w-full max-w-[280px] md:max-w-none md:w-[200px] group">
+                {!endDate && (
+                  <div className="absolute inset-0 px-3 py-1.5 pointer-events-none text-gray-400 text-sm flex items-center group-focus-within:hidden">
+                    dd/mm/yyyy
+                  </div>
+                )}
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className={`border border-gray-300 px-3 py-1.5 rounded text-[16px] w-full outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] bg-transparent ${!endDate ? 'empty-date' : 'text-gray-700'}`}
+                />
+              </div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-1 md:gap-4">
@@ -204,16 +219,16 @@ export default function SearchSchedule() {
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 rows={3}
-                className="border border-gray-300 px-3 py-2 rounded text-gray-700 text-sm w-full md:w-[300px] outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] resize-y"
+                className="border border-gray-300 px-3 py-2 rounded text-gray-700 text-[16px] w-full md:w-[300px] outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] resize-y"
               />
             </div>
-            
+
             <div className="flex flex-col md:flex-row gap-1 md:gap-4 mt-2">
               <div className="hidden md:block md:w-[160px] shrink-0"></div>
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-2 rounded text-sm font-medium transition-colors disabled:opacity-50 w-full md:w-auto shadow-sm"
+                className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-2 rounded text-[16px] font-medium transition-colors disabled:opacity-50 w-full md:w-auto shadow-sm"
               >
                 {loading ? 'Đang tìm...' : 'Tìm kiếm'}
               </button>
@@ -224,11 +239,11 @@ export default function SearchSchedule() {
         {/* Results */}
         {searched && (
           <>
-            <div className="text-gray-500 text-xs mb-2">
+            <div className="text-gray-500 text-[14px] mb-2">
               Danh sách lịch làm việc {results.length > 0 ? `(${results.length} kết quả)` : ''}
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px] border-collapse border border-gray-300 text-[13px]">
+              <table className="w-full min-w-[600px] border-collapse border border-gray-300 text-[15px]">
                 <thead>
                   <tr className="bg-[#fce8d5]">
                     <th className="border border-gray-300 py-2 px-3 font-bold w-12 text-center">STT</th>

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import legacy from '@vitejs/plugin-legacy'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -10,8 +11,17 @@ const __dirname = dirname(__filename)
 const backendTarget = process.env.VITE_BACKEND_URL || 'http://localhost:59608'
 
 export default defineConfig({
+  base: '/campha/',
   publicDir: 'public',
-  plugins: [tailwindcss(), react()],
+  plugins: [
+    tailwindcss(),
+    react(),
+    legacy({
+      targets: ['defaults', 'safari >= 12', 'ios >= 12'],
+      modernTargets: ['safari >= 15', 'ios >= 15', 'chrome >= 87', 'edge >= 88', 'firefox >= 78'],
+      polyfills: true
+    })
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
@@ -36,7 +46,7 @@ export default defineConfig({
     },
   },
   build: {
-    target: 'es2015',
+    target: 'es2020',
     outDir: '../wwwroot',
     emptyOutDir: false,
     assetsDir: 'vite-assets',

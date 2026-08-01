@@ -132,7 +132,7 @@ export default function AdminDepartments() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[13px] text-gray-800">
+    <div className="min-h-screen bg-white font-sans text-[15px] text-gray-800">
       <AdminHeader />
 
       <main className="max-w-[1000px] mx-auto px-4 py-6">
@@ -144,77 +144,76 @@ export default function AdminDepartments() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="max-w-[600px] mb-10">
-          <table className="w-full">
-            <tbody>
-              <tr>
-                <td className="py-2 w-[150px] font-medium">
-                  Tên phòng ban<span className="text-red-500">*</span>
-                </td>
-                <td className="py-2">
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 font-medium">Mô tả</td>
-                <td className="py-2">
-                  <input
-                    type="text"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 font-medium">Trạng thái</td>
-                <td className="py-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      name="isActive"
-                      checked={formData.isActive}
-                      onChange={handleChange}
-                      className="w-4 h-4 border-[#5cb85c] text-[#5cb85c] focus:ring-[#5cb85c] rounded-sm"
-                    />
-                    <span>Hoạt động</span>
-                  </label>
-                </td>
-              </tr>
-              <tr>
-                <td />
-                <td className="py-3 flex gap-2">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-1.5 rounded text-sm transition-colors disabled:opacity-50"
-                  >
-                    {loading ? 'Đang lưu...' : editId ? 'Cập nhật' : 'Thêm'}
-                  </button>
-                  {editId && (
-                    <button
-                      type="button"
-                      onClick={handleReset}
-                      className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-1.5 rounded text-sm transition-colors"
-                    >
-                      Hủy
-                    </button>
-                  )}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <form onSubmit={handleSubmit} className="max-w-[600px] mb-10 flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">
+              Tên phòng ban<span className="text-red-500">*</span>
+            </div>
+            <div className="flex-1 w-full">
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full md:w-[350px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">Mô tả</div>
+            <div className="flex-1 w-full">
+              <input
+                type="text"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full md:w-[350px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">Trạng thái</div>
+            <div className="flex-1 w-full">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="isActive"
+                  checked={formData.isActive}
+                  onChange={handleChange}
+                  className="w-4 h-4 border-[#5cb85c] text-[#5cb85c] focus:ring-[#5cb85c] rounded-sm"
+                />
+                <span>Hoạt động</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full mt-2">
+            <div className="hidden md:block md:w-[150px] shrink-0"></div>
+            <div className="flex-1 w-full flex gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-2 rounded font-medium text-sm transition-colors disabled:opacity-50 w-full md:w-auto shadow-sm"
+              >
+                {loading ? 'Đang lưu...' : editId ? 'Cập nhật' : 'Thêm'}
+              </button>
+              {editId && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded font-medium text-sm transition-colors shadow-sm w-full md:w-auto"
+                >
+                  Hủy
+                </button>
+              )}
+            </div>
+          </div>
         </form>
 
-        <div className="text-gray-500 mb-2 text-[13px]">Danh sách phòng ban</div>
+        <div className="text-gray-500 mb-2 text-[15px]">Danh sách phòng ban</div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-200 text-center">
             <thead>

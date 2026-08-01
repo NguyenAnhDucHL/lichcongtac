@@ -19,7 +19,7 @@ export default function AdminAccounts() {
   const [editId, setEditId] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  
+
   // States for confirmation modal
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
@@ -83,7 +83,7 @@ export default function AdminAccounts() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (formData.password !== formData.confirmPassword) {
       setError('Mật khẩu và xác nhận mật khẩu không khớp.')
       return
@@ -189,7 +189,7 @@ export default function AdminAccounts() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[13px] text-gray-800">
+    <div className="min-h-screen bg-white font-sans text-[15px] text-gray-800">
       <AdminHeader />
 
       <main className="max-w-[1000px] mx-auto px-4 py-6">
@@ -203,144 +203,146 @@ export default function AdminAccounts() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="max-w-[600px] mb-10">
-          <table className="w-full">
-            <tbody>
-              <tr>
-                <td className="py-2 w-[150px] font-medium">
-                  Họ và tên<span className="text-red-500">*</span>
-                </td>
-                <td className="py-2">
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 font-medium">Thuộc Phòng, Ban</td>
-                <td className="py-2">
-                  <select
-                    name="departmentId"
-                    value={formData.departmentId}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700 bg-white"
-                  >
-                    <option value="">-- Chọn phòng ban --</option>
-                    {departments.map(d => (
-                      <option key={d.id} value={d.id}>{d.name}</option>
-                    ))}
-                  </select>
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 font-medium">
-                  Tài khoản<span className="text-red-500">*</span>
-                </td>
-                <td className="py-2">
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    className="w-[350px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required
-                    disabled={!!editId} // Typically shouldn't change username after creation
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 font-medium">
-                  Mật khẩu{!editId && <span className="text-red-500">*</span>}
-                </td>
-                <td className="py-2">
-                  <div className="relative w-[350px]">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="w-full border border-[#5cb85c] rounded px-2 py-1 pr-8 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                      required={!editId}
-                      placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 font-medium">
-                  Nhập lại mật khẩu{!editId && <span className="text-red-500">*</span>}
-                </td>
-                <td className="py-2">
-                  <div className="relative w-[350px]">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className="w-full border border-[#5cb85c] rounded px-2 py-1 pr-8 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                      required={!editId && !!formData.password}
-                      placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
-                    >
-                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td className="py-2 font-medium">Quản trị toàn bộ</td>
-                <td className="py-2">
-                  <input
-                    type="checkbox"
-                    name="isAdmin"
-                    checked={formData.isAdmin}
-                    onChange={handleChange}
-                    className="w-4 h-4 border-[#5cb85c] text-[#5cb85c] focus:ring-[#5cb85c] rounded-sm cursor-pointer"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td />
-                <td className="py-3 flex gap-2">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-1.5 rounded text-sm transition-colors disabled:opacity-50"
-                  >
-                    {editId ? 'Cập nhật' : 'Thêm'}
-                  </button>
-                  {editId && (
-                    <button
-                      type="button"
-                      onClick={handleReset}
-                      className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-1.5 rounded text-sm transition-colors"
-                    >
-                      Hủy
-                    </button>
-                  )}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <form onSubmit={handleSubmit} className="max-w-[600px] mb-10 flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">
+              Họ và tên<span className="text-red-500">*</span>
+            </div>
+            <div className="flex-1 w-full">
+              <input
+                type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full md:w-[350px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">Thuộc Phòng, Ban</div>
+            <div className="flex-1 w-full">
+              <select
+                name="departmentId"
+                value={formData.departmentId}
+                onChange={handleChange}
+                className="w-full md:w-[350px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700 bg-white"
+              >
+                <option value="">-- Chọn phòng ban --</option>
+                {departments.map(d => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">
+              Tài khoản<span className="text-red-500">*</span>
+            </div>
+            <div className="flex-1 w-full">
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full md:w-[350px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                required
+                disabled={!!editId} // Typically shouldn't change username after creation
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">
+              Mật khẩu{!editId && <span className="text-red-500">*</span>}
+            </div>
+            <div className="flex-1 w-full">
+              <div className="relative w-full md:w-[350px]">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full border border-[#5cb85c] rounded px-3 py-1.5 pr-10 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                  required={!editId}
+                  placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">
+              Nhập lại mật khẩu{!editId && <span className="text-red-500">*</span>}
+            </div>
+            <div className="flex-1 w-full">
+              <div className="relative w-full md:w-[350px]">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full border border-[#5cb85c] rounded px-3 py-1.5 pr-10 outline-none focus:ring-1 focus:ring-[#5cb85c]"
+                  required={!editId && !!formData.password}
+                  placeholder={editId ? '(Bỏ trống nếu không đổi)' : ''}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-2 top-1.5 text-gray-500 hover:text-gray-700"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
+            <div className="font-medium md:w-[150px] shrink-0">Quản trị toàn bộ</div>
+            <div className="flex-1 w-full pt-1">
+              <input
+                type="checkbox"
+                name="isAdmin"
+                checked={formData.isAdmin}
+                onChange={handleChange}
+                className="w-5 h-5 border-[#5cb85c] text-[#5cb85c] focus:ring-[#5cb85c] rounded-sm cursor-pointer"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full mt-2">
+            <div className="hidden md:block md:w-[150px] shrink-0"></div>
+            <div className="flex-1 w-full flex gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-2 rounded font-medium text-sm transition-colors disabled:opacity-50 w-full md:w-auto shadow-sm"
+              >
+                {editId ? 'Cập nhật' : 'Thêm'}
+              </button>
+              {editId && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded font-medium text-sm transition-colors shadow-sm w-full md:w-auto"
+                >
+                  Hủy
+                </button>
+              )}
+            </div>
+          </div>
         </form>
 
-        <div className="text-gray-500 mb-2 text-[13px]">Danh sách tài khoản</div>
+        <div className="text-gray-500 mb-2 text-[15px]">Danh sách tài khoản</div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-200 text-center">
             <thead>
@@ -365,7 +367,7 @@ export default function AdminAccounts() {
                     {acc.role === 'Admin' ? 'Có' : 'Không'}
                   </td>
                   <td className="border border-gray-200 py-2.5 px-4">
-                    <button 
+                    <button
                       onClick={() => handleEdit(acc)}
                       className="text-[#337ab7] hover:underline"
                     >
@@ -373,7 +375,7 @@ export default function AdminAccounts() {
                     </button>
                   </td>
                   <td className="border border-gray-200 py-2.5 px-4">
-                    <button 
+                    <button
                       onClick={() => handleDeleteClick(acc.id)}
                       className="text-[#337ab7] hover:underline"
                     >

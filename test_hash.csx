@@ -1,5 +1,7 @@
 using System;
-using BCrypt.Net;
+using Microsoft.AspNetCore.Identity;
 
-string dbHash = "$2a$12$8CESOUb0PvnhyWq4SWs/tu/i46Ulc9yWDSPIVDkv17u0rsxeiGotG";
-Console.WriteLine(BCrypt.Net.BCrypt.Verify("CamPha@2026!", dbHash));
+var hasher = new PasswordHasher<object>();
+var hash = "AQAAAAIAAYagAAAAEFb7ReyaKU8uYGYsVQw1WCM+Ei0b6Y9ZB5nl2cDBmeU1nNeAkMYIagR5q5TGHIrP+g==";
+var result = hasher.VerifyHashedPassword(null, hash, "CamPha@2026!");
+Console.WriteLine($"Matches CamPha@2026!: {result}");

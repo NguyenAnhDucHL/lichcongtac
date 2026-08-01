@@ -40,7 +40,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] Notification model)
         {
             if (string.IsNullOrWhiteSpace(model.Content))
@@ -59,7 +59,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] Notification model)
         {
             if (string.IsNullOrWhiteSpace(model.Content))
@@ -75,7 +75,7 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var existing = await _repository.GetByIdAsync(id);
