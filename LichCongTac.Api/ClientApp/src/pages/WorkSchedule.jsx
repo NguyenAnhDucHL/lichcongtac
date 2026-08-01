@@ -147,6 +147,11 @@ export default function WorkSchedule() {
                               {item.content.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()}
                             </span>
                           )}
+                          {item.location && (
+                            <span className="italic text-gray-600 block mt-0.5">
+                              - Địa điểm: {item.location}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -181,6 +186,11 @@ export default function WorkSchedule() {
                             {item.content && (
                               <span>
                                 {item.content.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()}
+                              </span>
+                            )}
+                            {item.location && (
+                              <span className="italic text-gray-600 block mt-0.5">
+                                - Địa điểm: {item.location}
                               </span>
                             )}
                           </div>

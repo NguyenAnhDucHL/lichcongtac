@@ -313,3 +313,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(nav): highlight tab active trong AdminHeader theo pathname"`
+
+### [2026-08-01 10:04] Thêm trường Địa điểm (Location)
+- **Mô tả**: Bảng `Schedules` đã có sẵn cột `Location`. Đã thêm trường input `Địa điểm` vào form tạo/sửa lịch trong `AdminSchedules.jsx` và hiển thị `- Địa điểm: [tên địa điểm]` ở màn hình Lịch công tác ngoài trang chủ và trang Tìm kiếm nếu có dữ liệu.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(schedules): thêm field nhập địa điểm vào form quản trị và hiển thị ra UI"`

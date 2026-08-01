@@ -285,7 +285,20 @@ export default function AdminSchedules() {
                     value={formData.invitationNumber}
                     onChange={handleChange}
                     placeholder="VD: 1131/GM-VP.UBND"
-                    className="w-[100%] max-w-[800px] border border-gray-300 rounded px-2 py-1 outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
+                    className="w-full border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td className="py-2 font-medium">Địa điểm</td>
+                <td className="py-2">
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="VD: Phòng họp số 1"
+                    className="w-full border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
                   />
                 </td>
               </tr>

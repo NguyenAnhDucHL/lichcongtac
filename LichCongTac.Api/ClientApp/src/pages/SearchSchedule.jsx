@@ -226,6 +226,11 @@ export default function SearchSchedule() {
                                 __html: item.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
                               }} />
                             )}
+                            {item.location && (
+                              <span className="italic text-gray-600 block mt-0.5">
+                                - Địa điểm: {item.location}
+                              </span>
+                            )}
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3 text-center">
                             {item.preparingUnit || 'Văn phòng'}
