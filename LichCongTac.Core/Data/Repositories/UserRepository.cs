@@ -334,7 +334,7 @@ namespace LichCongTac.Core.Data.Repositories
                     DepartmentId   = @d,
                     SecurityStamp  = @stamp,
                     NormalizedUserName = upper(Username),
-                    PasswordHash   = @ph,
+                    PasswordHash   = CASE WHEN @ph = '' THEN PasswordHash ELSE @ph END,
                     ZaloId         = @zalo,
                     NotificationPreference = @notif
                 WHERE Id = @id";

@@ -186,3 +186,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(auth): thêm listener xử lý lỗi 401 để tự động đăng xuất"`
+
+### [2026-08-01 07:19] Fix lỗi cập nhật profile làm trống mật khẩu
+- **Mô tả**: 
+  - Khắc phục lỗi vô tình xóa mật khẩu (làm trống trường `PasswordHash`) trong cơ sở dữ liệu khi quản trị viên cập nhật thông tin cá nhân nhưng không đổi mật khẩu.
+  - Sửa đổi câu lệnh SQL trong `UserRepository.UpdateUser` để sử dụng `CASE WHEN` nhằm giữ nguyên `PasswordHash` cũ nếu đầu vào rỗng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi bị làm trống password hash khi update profile"`
