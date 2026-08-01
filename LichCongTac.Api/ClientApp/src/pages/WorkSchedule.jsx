@@ -140,7 +140,6 @@ export default function WorkSchedule() {
                           <span>
                             {item.invitationNumber && `${item.invitationNumber} `}
                             {item.location && `(${item.location}) `}
-                            {item.title}
                           </span>
                           {item.content && (
                             <div className="my-1 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.content }} />

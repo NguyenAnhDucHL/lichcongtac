@@ -132,7 +132,7 @@ export default function AdminSchedules() {
     setError('')
     try {
       const payload = {
-        title: formData.title || 'Lịch công tác',
+        title: formData.title || ' ',
         invitationNumber: formData.invitationNumber,
         date: formData.dateStr,
         startTime: formData.timeStr,
@@ -248,21 +248,6 @@ export default function AdminSchedules() {
               </tr>
 
               {/* Form fields that were combined into a WYSIWYG editor in the old system, now structured for clarity but keeping layout similar */}
-              <tr>
-                <td className="py-2 font-medium">
-                  Tiêu đề <span className="text-red-500">*</span>
-                </td>
-                <td className="py-2">
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="w-[100%] max-w-[800px] border border-[#5cb85c] rounded px-2 py-1 outline-none focus:ring-1 focus:ring-[#5cb85c]"
-                    required
-                  />
-                </td>
-              </tr>
               <tr>
                 <td className="py-2 font-medium">Giấy mời số</td>
                 <td className="py-2">
@@ -442,7 +427,6 @@ export default function AdminSchedules() {
                       <td className="border border-gray-200 py-2.5 px-4 text-left">
                         <span className="text-red-600 font-bold mr-2">{item.startTime}</span>
                         <span className="text-gray-800">
-                          {item.title}
                           {item.location && ` (Tại ${item.location}) `}
                           {item.content && ` ${item.content} `}
                           {item.presider && ` Dự đồng chí ${item.presider}.`}

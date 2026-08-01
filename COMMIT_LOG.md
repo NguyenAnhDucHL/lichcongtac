@@ -236,3 +236,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(schedules): xóa mã cứng và tải danh sách phòng ban động khi tạo lịch"`
+
+### [2026-08-01 07:44] Xóa trường Tiêu đề trên giao diện quản trị lịch
+- **Mô tả**: Theo yêu cầu, xóa trường "Tiêu đề" trên form tạo/sửa lịch công tác do người dùng chỉ cần nhập liệu toàn bộ vào phần "Nội dung chi tiết". Dữ liệu title gửi xuống DB mặc định được gán khoảng trắng để qua validation NOT NULL, và ẩn hiển thị title trên lịch làm việc.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(schedules): xóa trường Tiêu đề khỏi form và giao diện hiển thị"`
