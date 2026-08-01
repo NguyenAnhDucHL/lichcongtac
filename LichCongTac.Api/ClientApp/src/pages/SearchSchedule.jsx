@@ -289,7 +289,7 @@ export default function SearchSchedule() {
 
       {/* Footer */}
       <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs mt-8">
-        Bản quyền thuộc về LichCongTac.Com
+        Bản quyền thuộc về UBND phường Cẩm Phả
       </footer>
     </div>
   )

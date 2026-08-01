@@ -356,3 +356,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): thụt lề title header để không đè lên logo"`
+
+### [2026-08-01 10:20] Đổi thông tin bản quyền ở chân trang
+- **Mô tả**: Thay đổi dòng text bản quyền từ "Bản quyền thuộc về LichCongTac.Com" thành "Bản quyền thuộc về UBND phường Cẩm Phả" ở footer. Bổ sung footer này cho cả trang chủ (`WorkSchedule.jsx`) để đồng bộ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): đổi tên bản quyền thành UBND phường Cẩm Phả"`
