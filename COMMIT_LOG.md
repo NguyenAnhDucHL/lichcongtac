@@ -471,3 +471,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(frontend): đồng bộ thiết kế box layout cho trang tìm kiếm"`
+### [2026-08-01 13:25] Sửa lỗi không hiển thị ngày lễ ở trang Tìm kiếm (SearchSchedule.jsx)
+- **Mô tả**: Sửa lỗi trang Tìm kiếm không hiện thanh chạy chữ ngày lễ do bị lỗi parse dữ liệu JSON từ API (tương tự lỗi cũ ở trang chủ) vì Global Fetch Interceptor đã bóc tách sẵn trường `data`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(frontend): sửa lỗi không hiển thị ngày lễ ở trang tìm kiếm"`

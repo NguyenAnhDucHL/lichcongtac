@@ -44,7 +44,9 @@ export default function SearchSchedule() {
     fetch('/api/holidays/today')
       .then(res => res.json())
       .then(json => {
-        if (json.success && json.data) {
+        if (json && json.content) {
+          setTodayHoliday(json)
+        } else if (json.success && json.data) {
           setTodayHoliday(json.data)
         }
       })
