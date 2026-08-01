@@ -286,8 +286,8 @@ namespace LichCongTac.Core.Data.Repositories
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
 
-            // Hash mật khẩu nếu chưa hash
-            var passwordToStore = (user.PasswordHash?.StartsWith("$2") == true)
+            // Hash mật khẩu nếu chưa hash (hỗ trợ cả BCrypt cũ và Identity PBKDF2 mới)
+            var passwordToStore = (user.PasswordHash?.StartsWith("$2") == true || user.PasswordHash?.StartsWith("AQAAAA") == true)
                 ? user.PasswordHash
                 : BCrypt.Net.BCrypt.HashPassword(user.PasswordHash ?? "ChangeMe@123", workFactor: 12);
 

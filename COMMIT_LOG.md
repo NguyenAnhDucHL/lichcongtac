@@ -487,3 +487,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/AdminEmployees.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(admin): thêm tính năng hiển thị mật khẩu ở trang quản trị tài khoản và nhân viên"`
+### [2026-08-01 13:34] Sửa lỗi không đăng nhập được tài khoản mới tạo (Lỗi Double Hashing)
+- **Mô tả**: Sửa lỗi logic trong `UserRepository.CreateUser` khiến mật khẩu mới tạo (đã được băm bằng PBKDF2 của Identity) bị băm thêm một lần nữa bằng BCrypt, dẫn đến việc không thể đăng nhập. Đã thêm điều kiện bỏ qua bước băm BCrypt nếu chuỗi mật khẩu bắt đầu bằng `AQAAAA` (dấu hiệu của PBKDF2 V3).
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi double hashing khiến tài khoản mới không thể đăng nhập"`
