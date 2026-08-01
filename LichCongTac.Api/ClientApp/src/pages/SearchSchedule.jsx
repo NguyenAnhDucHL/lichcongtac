@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Search, FileText, Loader2, Menu } from 'lucide-react'
 
 const PAGE_SIZE = 10
 
@@ -34,7 +35,21 @@ export default function SearchSchedule() {
   const [results, setResults] = useState([])
   const [searched, setSearched] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [todayHoliday, setTodayHoliday] = useState(null)
+
+  // Fetch today's holiday on mount
+  useEffect(() => {
+    fetch('/api/holidays/today')
+      .then(res => res.json())
+      .then(json => {
+        if (json.success && json.data) {
+          setTodayHoliday(json.data)
+        }
+      })
+      .catch(err => console.error('Lỗi tải ngày lễ:', err))
+  }, [])
 
   const handleSearch = async (e) => {
     e.preventDefault()
@@ -114,21 +129,46 @@ export default function SearchSchedule() {
       </div>
 
       {/* Navigation */}
-      <nav className="bg-[#1d5792] shadow-md">
-        <div className="max-w-6xl mx-auto flex flex-wrap">
-          {navItems.map((item, idx) => (
-            <a
-              key={idx}
-              href={item.href}
-              target={item.target || '_self'}
-              rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-              className={`px-6 py-3 text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors ${item.href === '/campha/search' ? 'bg-[#154374]' : ''}`}
+      <div className="max-w-6xl mx-auto">
+        <nav className="bg-[#1d5792] shadow-md relative z-20">
+          <div className="flex flex-col md:flex-row md:items-center">
+            {/* Mobile Menu Toggle */}
+            <div
+              className="md:hidden flex justify-between items-center px-4 py-3 cursor-pointer"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {item.label}
-            </a>
-          ))}
+              <span className="text-white font-serif font-bold uppercase text-base tracking-wide">MENU</span>
+              <Menu className="text-white w-7 h-7" />
+            </div>
+
+            {/* Nav Items */}
+            <div className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row w-full`}>
+              {navItems.map((item, idx) => (
+                <a
+                  key={idx}
+                  href={item.href}
+                  target={item.target || '_self'}
+                  rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
+                  className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-xs font-bold uppercase hover:bg-[#154374] transition-colors ${item.href === '/campha/search' ? 'bg-[#154374]' : ''}`}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      {/* Holiday Marquee */}
+      {todayHoliday && (
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-[#fcf8e3] text-[#c8102e] py-1.5 border-b border-[#faebcc] overflow-hidden whitespace-nowrap relative">
+            <marquee scrollamount="6" className="text-[13px] font-semibold tracking-wide">
+              ⚛ {todayHoliday.content} ⚛
+            </marquee>
+          </div>
         </div>
-      </nav>
+      )}
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-6">
@@ -286,9 +326,11 @@ export default function SearchSchedule() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs mt-8">
-        Bản quyền thuộc về UBND phường Cẩm Phả
-      </footer>
+      <div className="max-w-6xl mx-auto">
+        <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs mt-8">
+          Bản quyền thuộc về UBND phường Cẩm Phả
+        </footer>
+      </div>
     </div>
   )
 }

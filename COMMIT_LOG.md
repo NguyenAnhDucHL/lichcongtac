@@ -466,3 +466,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(frontend): thu gọn chiều rộng thanh điều hướng để đồng nhất giao diện"`
+### [2026-08-01 13:20] Thu gọn thanh Navigation Bar ở trang Tìm Kiếm (SearchSchedule.jsx)
+- **Mô tả**: Đồng bộ thiết kế (Box Layout) từ trang chủ sang trang Tìm kiếm: đưa thanh điều hướng, thanh chạy chữ ngày lễ và thanh Footer vào trong giới hạn chiều rộng `max-w-6xl mx-auto` để giao diện vuông vức, không bị tràn ra 2 mép màn hình.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(frontend): đồng bộ thiết kế box layout cho trang tìm kiếm"`
