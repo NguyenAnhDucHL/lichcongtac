@@ -22,9 +22,21 @@ function formatDateDisplay(dateString) {
 
 const navItems = [
   { label: 'HOME', href: '/campha/' },
-  { label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH', href: 'https://congchuc.quangninh.gov.vn/sso/Login.aspx', target: '_blank' },
-  { label: 'CỔNG THÔNG TIN', href: 'https://quangninh.gov.vn/Trang/Default.aspx', target: '_blank' },
-  { label: 'THƯ ĐIỆN TỬ', href: 'https://mail.quangninh.gov.vn/owa/auth/logon.aspx?replaceCurrent=1&url=https%3a%2f%2fmail.quangninh.gov.vn%2fowa%2f', target: '_blank' },
+  {
+    label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH',
+    href: 'https://congchuc.quangninh.gov.vn/sso/Login.aspx',
+    target: '_blank',
+  },
+  {
+    label: 'CỔNG THÔNG TIN',
+    href: 'https://quangninh.gov.vn/Trang/Default.aspx',
+    target: '_blank',
+  },
+  {
+    label: 'THƯ ĐIỆN TỬ',
+    href: 'https://mail.quangninh.gov.vn/owa/auth/logon.aspx?replaceCurrent=1&url=https%3a%2f%2fmail.quangninh.gov.vn%2fowa%2f',
+    target: '_blank',
+  },
   { label: 'TÌM KIẾM', href: '/campha/search' },
   { label: 'QUẢN TRỊ', href: '/campha/manager/login' },
 ]
@@ -43,15 +55,15 @@ export default function SearchSchedule() {
   // Fetch today's holiday on mount
   useEffect(() => {
     fetch('/api/holidays/today')
-      .then(res => res.json())
-      .then(json => {
+      .then((res) => res.json())
+      .then((json) => {
         if (json && json.content) {
           setTodayHoliday(json)
         } else if (json.success && json.data) {
           setTodayHoliday(json.data)
         }
       })
-      .catch(err => console.error('Lỗi tải ngày lễ:', err))
+      .catch((err) => console.error('Lỗi tải ngày lễ:', err))
   }, [])
 
   const handleSearch = async (e) => {
@@ -70,7 +82,6 @@ export default function SearchSchedule() {
       let data = []
       if (Array.isArray(json)) data = json
       else if (json.data) data = json.data
-      else if (Array.isArray(json)) data = json
 
       // Filter by keyword on frontend
       if (keyword.trim()) {
@@ -122,12 +133,18 @@ export default function SearchSchedule() {
             src="/assets/header-banner.jpg"
             alt="Lịch Công Tác UBND Phường Cẩm Phả"
             className="h-full w-auto max-h-[86px] object-contain"
-            onError={(e) => { e.target.style.display = 'none' }}
+            onError={(e) => {
+              e.target.style.display = 'none'
+            }}
           />
         </div>
         <div className="relative z-10 pl-[90px] md:pl-[130px] py-2 pr-2">
-          <h1 className="text-[18px] sm:text-[20px] md:text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">LỊCH CÔNG TÁC</h1>
-          <h1 className="text-[13px] sm:text-[15px] md:text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">UBND PHƯỜNG CẨM PHẢ</h1>
+          <h1 className="text-[18px] sm:text-[20px] md:text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">
+            LỊCH CÔNG TÁC
+          </h1>
+          <h1 className="text-[13px] sm:text-[15px] md:text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">
+            UBND PHƯỜNG CẨM PHẢ
+          </h1>
         </div>
       </div>
 
@@ -140,12 +157,16 @@ export default function SearchSchedule() {
               className="md:hidden flex justify-between items-center px-4 py-3 cursor-pointer"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              <span className="text-white font-serif font-bold uppercase text-base tracking-wide">MENU</span>
+              <span className="text-white font-serif font-bold uppercase text-base tracking-wide">
+                MENU
+              </span>
               <Menu className="text-white w-7 h-7" />
             </div>
 
             {/* Nav Items */}
-            <div className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row w-full`}>
+            <div
+              className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row w-full`}
+            >
               {navItems.map((item, idx) => (
                 <a
                   key={idx}
@@ -180,7 +201,9 @@ export default function SearchSchedule() {
           <h2 className="text-[#1d5792] font-bold text-base mb-4">Tìm kiếm</h2>
           <form onSubmit={handleSearch} className="flex flex-col gap-4 max-w-[550px]">
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
-              <label className="text-gray-700 font-medium md:w-[160px] shrink-0">Thời gian bắt đầu</label>
+              <label className="text-gray-700 font-medium md:w-[160px] shrink-0">
+                Thời gian bắt đầu
+              </label>
               <div className="relative w-full max-w-[280px] md:max-w-none md:w-[200px] group">
                 {!startDate && (
                   <div className="absolute inset-0 px-3 py-1.5 pointer-events-none text-gray-400 text-sm flex items-center group-focus-within:hidden">
@@ -197,7 +220,9 @@ export default function SearchSchedule() {
             </div>
 
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
-              <label className="text-gray-700 font-medium md:w-[160px] shrink-0">Thời gian kết thúc</label>
+              <label className="text-gray-700 font-medium md:w-[160px] shrink-0">
+                Thời gian kết thúc
+              </label>
               <div className="relative w-full max-w-[280px] md:max-w-none md:w-[200px] group">
                 {!endDate && (
                   <div className="absolute inset-0 px-3 py-1.5 pointer-events-none text-gray-400 text-sm flex items-center group-focus-within:hidden">
@@ -214,7 +239,9 @@ export default function SearchSchedule() {
             </div>
 
             <div className="flex flex-col md:flex-row gap-1 md:gap-4">
-              <label className="text-gray-700 font-medium md:w-[160px] shrink-0 pt-1">Nội dung</label>
+              <label className="text-gray-700 font-medium md:w-[160px] shrink-0 pt-1">
+                Nội dung
+              </label>
               <textarea
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
@@ -224,7 +251,7 @@ export default function SearchSchedule() {
             </div>
 
             <div className="flex flex-col md:flex-row gap-1 md:gap-4 mt-2">
-              <div className="hidden md:block md:w-[160px] shrink-0"></div>
+              <div className="hidden md:block md:w-[160px] shrink-0" />
               <button
                 type="submit"
                 disabled={loading}
@@ -246,10 +273,18 @@ export default function SearchSchedule() {
               <table className="w-full min-w-[600px] border-collapse border border-gray-300 text-[15px]">
                 <thead>
                   <tr className="bg-[#fce8d5]">
-                    <th className="border border-gray-300 py-2 px-3 font-bold w-12 text-center">STT</th>
-                    <th className="border border-gray-300 py-2 px-3 font-bold w-28 text-center">Ngày</th>
-                    <th className="border border-gray-300 py-2 px-3 font-bold text-center">Nội dung</th>
-                    <th className="border border-gray-300 py-2 px-3 font-bold w-28 text-center">Phòng, ban</th>
+                    <th className="border border-gray-300 py-2 px-3 font-bold w-12 text-center">
+                      STT
+                    </th>
+                    <th className="border border-gray-300 py-2 px-3 font-bold w-28 text-center">
+                      Ngày
+                    </th>
+                    <th className="border border-gray-300 py-2 px-3 font-bold text-center">
+                      Nội dung
+                    </th>
+                    <th className="border border-gray-300 py-2 px-3 font-bold w-28 text-center">
+                      Phòng, ban
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -259,23 +294,32 @@ export default function SearchSchedule() {
                       const dateInfo = formatDateDisplay(item.date)
                       return (
                         <tr key={item.id} className="hover:bg-gray-50">
-                          <td className="border border-gray-300 py-2.5 px-3 text-center font-bold">{globalIndex}</td>
+                          <td className="border border-gray-300 py-2.5 px-3 text-center font-bold">
+                            {globalIndex}
+                          </td>
                           <td className="border border-gray-300 py-2.5 px-3 text-center leading-tight">
                             <div>{dateInfo.dayName}</div>
                             <div className="text-[#1d5792] font-bold">{dateInfo.date}</div>
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3">
-                            <span className="text-[#c8102e] font-bold mr-2">{item.startTime}</span>
+                            {item.startTime && (
+                              <span className="text-[#c8102e] font-bold mr-2">
+                                {item.startTime}
+                              </span>
+                            )}
                             {item.invitationNumber && (
                               <span className="mr-1">{item.invitationNumber}</span>
                             )}
-                            {item.location && (
-                              <span className="mr-1">(Tại {item.location})</span>
-                            )}
+                            {item.location && <span className="mr-1">(Tại {item.location})</span>}
                             {item.content && (
-                              <span dangerouslySetInnerHTML={{
-                                __html: item.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
-                              }} />
+                              <span
+                                dangerouslySetInnerHTML={{
+                                  __html: item.content
+                                    .replace(/<[^>]*>/g, ' ')
+                                    .replace(/\s+/g, ' ')
+                                    .trim(),
+                                }}
+                              />
                             )}
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3 text-center">
@@ -286,7 +330,10 @@ export default function SearchSchedule() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="4" className="border border-gray-300 py-6 text-center text-gray-500 italic">
+                      <td
+                        colSpan="4"
+                        className="border border-gray-300 py-6 text-center text-gray-500 italic"
+                      >
                         Không tìm thấy lịch công tác phù hợp.
                       </td>
                     </tr>
@@ -308,7 +355,9 @@ export default function SearchSchedule() {
                 )}
                 {pageNumbers.map((p, idx) =>
                   p === '...' ? (
-                    <span key={`e-${idx}`} className="px-1 text-gray-500">|</span>
+                    <span key={`e-${idx}`} className="px-1 text-gray-500">
+                      |
+                    </span>
                   ) : (
                     <button
                       key={p}

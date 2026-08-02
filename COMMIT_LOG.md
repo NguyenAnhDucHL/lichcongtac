@@ -673,3 +673,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/components/dashboard/DeadlineBarChart.jsx`
   - `LichCongTac.Api/wwwroot/*` (Build mới)
 - **Lệnh git commit**: `git commit -m "fix(core): sửa lỗi crash do parse Date từ chuỗi YYYY-MM-DD trên iOS Safari cũ"`
+
+### [2026-08-02 22:38] Fix hiển thị thừa dấu hai chấm khi lịch công tác không có giờ
+- **Mô tả**: Sửa lỗi giao diện hiển thị dấu hai chấm `:` dư thừa ở đầu nội dung lịch công tác khi người dùng tạo lịch nhưng để trống trường thời gian (startTime). Lỗi này ảnh hưởng đến cả trang chủ (WorkSchedule.jsx) và trang tìm kiếm (SearchSchedule.jsx).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): ẩn thời gian và dấu hai chấm khi lịch không thiết lập giờ"`
