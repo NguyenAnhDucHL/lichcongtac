@@ -242,9 +242,9 @@ export default function WorkSchedule() {
                   <div className="space-y-6 px-4">
                     {displayToday.items.map((item, idx) => (
                       <div key={idx} className="flex gap-2">
-                        {item.startTime && (
+                        {item.startTime && item.startTime.trim() !== '' && (
                           <span className="text-[#c8102e] shrink-0 font-medium text-[16px]">
-                            {item.startTime}:
+                            {item.startTime.trim()}:
                           </span>
                         )}
                         <div className="font-medium text-gray-800 text-[16px] leading-snug w-full text-justify">
@@ -308,9 +308,9 @@ export default function WorkSchedule() {
                     <div className="space-y-4">
                       {day.items.map((item, idx) => (
                         <div key={idx} className="flex gap-2">
-                          {item.startTime && (
+                          {item.startTime && item.startTime.trim() !== '' && (
                             <span className="text-[#c8102e] shrink-0 font-medium text-[16px]">
-                              {item.startTime}:
+                              {item.startTime.trim()}:
                             </span>
                           )}
                           <div className="font-medium text-gray-800 text-[16px] leading-snug w-full text-justify">

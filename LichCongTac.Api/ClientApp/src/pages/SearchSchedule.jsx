@@ -302,9 +302,9 @@ export default function SearchSchedule() {
                             <div className="text-[#1d5792] font-bold">{dateInfo.date}</div>
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3">
-                            {item.startTime && (
+                            {item.startTime && item.startTime.trim() !== '' && (
                               <span className="text-[#c8102e] font-bold mr-2">
-                                {item.startTime}
+                                {item.startTime.trim()}
                               </span>
                             )}
                             {item.invitationNumber && (

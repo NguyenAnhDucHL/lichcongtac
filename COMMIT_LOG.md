@@ -680,3 +680,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(ui): ẩn thời gian và dấu hai chấm khi lịch không thiết lập giờ"`
+
+### [2026-08-02 22:40] Sửa lỗi hiển thị dấu hai chấm cho khoảng trắng trong lịch
+- **Mô tả**: Fix lỗi render dấu hai chấm ở startTime khi giá trị trong DB là khoảng trắng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi hiển thị khoảng trắng khi lịch không có startTime"`
