@@ -4,6 +4,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-02 23:30] Tối ưu hóa truy vấn Database, loại bỏ SELECT *
+- **Mô tả**: Thay thế toàn bộ các câu lệnh `SELECT *` bằng việc liệt kê rõ các cột cụ thể trong các repository (`DepartmentRepository` và `ScheduleRepository`). Điều này giúp cải thiện hiệu năng I/O bộ nhớ và tuân thủ chặt chẽ kiến trúc backend của dự án, tránh load dữ liệu dư thừa.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/DepartmentRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/ScheduleRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "perf(db): tối ưu truy vấn thay thế SELECT * bằng cột cụ thể trong Repositories"`
+
 ### [2026-08-01 21:16] Fix quyền quản trị tài khoản
 - **Mô tả**: Bổ sung phân quyền role-based. Frontend thêm `RequireAdmin` check role 'Admin', non-admin bị đẩy sang trang đổi mật khẩu. Backend khóa toàn bộ các Controllers và endpoints ghi của SchedulesController về `[Authorize(Roles = "Admin")]`. 
 - **Tệp thay đổi**:
@@ -687,3 +694,17 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi hiển thị khoảng trắng khi lịch không có startTime"`
+
+### [2026-08-03 17:51] Cập nhật DatePicker thuần Việt cho lịch công tác
+- **Mô tả**: Thay thế 2 input (date, time) mặc định của trình duyệt thành 1 component `react-datepicker` duy nhất để hiển thị chuẩn định dạng ngày giờ Việt Nam (Ngày/Tháng/Năm Giờ:Phút). Cài thêm thư viện `react-datepicker`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/package.json` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(ui): tích hợp react-datepicker cho quản lý lịch công tác chuẩn Việt Nam"`
+
+### [2026-08-03 17:54] Căn lề và chỉnh màu lịch công tác
+- **Mô tả**: Căn giữa tiêu đề ngày tháng của các lịch sắp tới, thay đổi màu sắc và tăng kích thước chữ của các mục: thời gian (đỏ), số giấy mời (xanh lục), địa điểm (xanh lam) để dễ nhìn hơn cho người lớn tuổi.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): can giua tieu de ngay va doi mau cac truong chi tiet"`

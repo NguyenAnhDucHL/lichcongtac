@@ -233,7 +233,7 @@ export default function WorkSchedule() {
             <div className="flex flex-col h-full md:col-span-3 px-4 pt-5">
               {/* Today's Schedule */}
               <div className="mb-4">
-                <h3 className="text-2xl font-semibold text-[#1d5792] text-center mb-4">
+                <h3 className="text-[18px] md:text-2xl font-bold text-[#1d5792] text-center mb-5">
                   {displayToday.dayLabel}: {displayToday.dayLabel === 'Hôm nay' ? '' : 'Chủ nhật,'}{' '}
                   ngày {displayToday.date}
                 </h3>
@@ -243,21 +243,25 @@ export default function WorkSchedule() {
                     {displayToday.items.map((item, idx) => (
                       <div key={idx} className="flex gap-2">
                         {item.startTime && item.startTime.trim() !== '' && (
-                          <span className="text-[#c8102e] shrink-0 font-medium text-[16px]">
+                          <span className="text-[#c8102e] shrink-0 font-bold text-[17px] md:text-[18px]">
                             {item.startTime.trim()}:
                           </span>
                         )}
-                        <div className="font-medium text-gray-800 text-[16px] leading-snug w-full text-justify">
+                        <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
                           <span>
-                            {item.invitationNumber && `${item.invitationNumber} `}
+                            {item.invitationNumber && (
+                              <span className="text-[#047857] font-bold mr-1">
+                                {item.invitationNumber}
+                              </span>
+                            )}
                             {item.location && (
-                              <span className="text-[#1d5792] font-semibold">
+                              <span className="text-[#1d5792] font-bold mr-1">
                                 (Tại {formatLocation(item.location)}){' '}
                               </span>
                             )}
                           </span>
                           {item.content && (
-                            <span>
+                            <span className="text-gray-900">
                               {item.content
                                 .replace(/<[^>]*>/g, ' ')
                                 .replace(/&nbsp;/g, ' ')
@@ -302,28 +306,32 @@ export default function WorkSchedule() {
               {upcomingSchedules.length > 0 ? (
                 upcomingSchedules.map((day, dayIdx) => (
                   <div key={dayIdx} className="mb-8">
-                    <h3 className="text-[17px] font-semibold text-[#1d5792] mb-3">
+                    <h3 className="text-[18px] md:text-[19px] font-bold text-[#1d5792] mb-4 text-center">
                       {day.dayLabel}, ngày {day.date}:
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                       {day.items.map((item, idx) => (
                         <div key={idx} className="flex gap-2">
                           {item.startTime && item.startTime.trim() !== '' && (
-                            <span className="text-[#c8102e] shrink-0 font-medium text-[16px]">
+                            <span className="text-[#c8102e] shrink-0 font-bold text-[17px] md:text-[18px]">
                               {item.startTime.trim()}:
                             </span>
                           )}
-                          <div className="font-medium text-gray-800 text-[16px] leading-snug w-full text-justify">
+                          <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
                             <span>
-                              {item.invitationNumber && `${item.invitationNumber} `}
+                              {item.invitationNumber && (
+                                <span className="text-[#047857] font-bold mr-1">
+                                  {item.invitationNumber}
+                                </span>
+                              )}
                               {item.location && (
-                                <span className="text-[#1d5792] font-semibold">
+                                <span className="text-[#1d5792] font-bold mr-1">
                                   (Tại {formatLocation(item.location)}){' '}
                                 </span>
                               )}
                             </span>
                             {item.content && (
-                              <span>
+                              <span className="text-gray-900">
                                 {item.content
                                   .replace(/<[^>]*>/g, ' ')
                                   .replace(/&nbsp;/g, ' ')

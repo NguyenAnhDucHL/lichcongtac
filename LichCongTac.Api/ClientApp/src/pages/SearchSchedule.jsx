@@ -303,16 +303,16 @@ export default function SearchSchedule() {
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3">
                             {item.startTime && item.startTime.trim() !== '' && (
-                              <span className="text-[#c8102e] font-bold mr-2">
-                                {item.startTime.trim()}
+                              <span className="text-[#c8102e] font-bold text-[16px] mr-2">
+                                {item.startTime.trim()}:
                               </span>
                             )}
                             {item.invitationNumber && (
-                              <span className="mr-1">{item.invitationNumber}</span>
+                              <span className="text-[#047857] font-bold mr-1">{item.invitationNumber}</span>
                             )}
-                            {item.location && <span className="mr-1">(Tại {item.location})</span>}
+                            {item.location && <span className="text-[#1d5792] font-bold mr-1">(Tại {item.location})</span>}
                             {item.content && (
-                              <span
+                              <span className="text-gray-900"
                                 dangerouslySetInnerHTML={{
                                   __html: item.content
                                     .replace(/<[^>]*>/g, ' ')
