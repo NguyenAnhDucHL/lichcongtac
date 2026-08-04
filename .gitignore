@@ -62,3 +62,6 @@ ToolCalendar.Core/Models/PaddleOCR/
 Models/PaddleOCR/
 scratch/
 
+
+# Ignore local launch settings
+LichCongTac.Api/Properties/launchSettings.json

@@ -708,3 +708,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): can giua tieu de ngay va doi mau cac truong chi tiet"`
+
+### [2026-08-04 14:41] Cập nhật đường dẫn DB và ignore launchSettings.json
+- **Mô tả**: Sửa DB_PATH trong launchSettings.json về đúng thư mục của máy cục bộ và đưa tệp này vào .gitignore để tránh conflict đường dẫn cục bộ khi deploy ở các máy khác nhau.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Properties/launchSettings.json` (Xóa khỏi git track)
+  - `.gitignore` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "chore: sua db path va ignore launchSettings.json tranh conflict local"`
+
