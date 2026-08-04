@@ -64,7 +64,7 @@ namespace LichCongTac.Core.Data.Repositories
             await conn.OpenAsync();
 
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT Id, Title, Date, StartTime, Location, Content, Presider, PreparingUnit, Participants, IsPublic, CreatedAt, CreatedBy, UpdatedAt, InvitationNumber FROM Schedules";
+            cmd.CommandText = "SELECT Id, Title, Date, StartTime, Location, Content, InvitationNumber, Presider, PreparingUnit, Participants, IsPublic, CreatedAt, CreatedBy, UpdatedAt FROM Schedules";
             if (!includeInternal)
             {
                 cmd.CommandText += " WHERE IsPublic = 1";
@@ -87,7 +87,7 @@ namespace LichCongTac.Core.Data.Repositories
             await conn.OpenAsync();
 
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT Id, Title, Date, StartTime, Location, Content, Presider, PreparingUnit, Participants, IsPublic, CreatedAt, CreatedBy, UpdatedAt, InvitationNumber FROM Schedules WHERE Date >= @StartDate AND Date <= @EndDate";
+            cmd.CommandText = "SELECT Id, Title, Date, StartTime, Location, Content, InvitationNumber, Presider, PreparingUnit, Participants, IsPublic, CreatedAt, CreatedBy, UpdatedAt FROM Schedules WHERE Date >= @StartDate AND Date <= @EndDate";
             cmd.Parameters.AddWithValue("@StartDate", startDate);
             cmd.Parameters.AddWithValue("@EndDate", endDate);
 
@@ -112,7 +112,7 @@ namespace LichCongTac.Core.Data.Repositories
             await conn.OpenAsync();
 
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT Id, Title, Date, StartTime, Location, Content, Presider, PreparingUnit, Participants, IsPublic, CreatedAt, CreatedBy, UpdatedAt, InvitationNumber FROM Schedules WHERE Id = @Id";
+            cmd.CommandText = "SELECT Id, Title, Date, StartTime, Location, Content, InvitationNumber, Presider, PreparingUnit, Participants, IsPublic, CreatedAt, CreatedBy, UpdatedAt FROM Schedules WHERE Id = @Id";
             cmd.Parameters.AddWithValue("@Id", id);
 
             using var reader = await cmd.ExecuteReaderAsync();
