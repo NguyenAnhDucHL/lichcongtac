@@ -708,3 +708,25 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): can giua tieu de ngay va doi mau cac truong chi tiet"`
+
+### [2026-08-03 19:35] Cập nhật màu sắc UI theo phản hồi
+- **Mô tả**: Thay đổi màu sắc của Số giấy mời sang màu hổ phách đậm (Amber) và Địa điểm sang màu tím (Violet) để tạo độ tương phản tốt hơn và tách biệt rõ với màu xanh của tiêu đề ngày, giúp người lớn tuổi dễ đọc hơn.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): doi mau so giay moi va dia diem de de nhin hon"`
+
+
+### [2026-08-04 14:24] Cải thiện UX nhập liệu dài
+- **Mô tả**: Đổi thẻ input thành textarea cho các trường 'Nhập đơn vị khác' và 'Nhập địa điểm khác' trong trang AdminSchedules để cho phép văn bản tự động xuống dòng và hiển thị đầy đủ các chuỗi văn bản dài. Tăng chiều rộng lên 500px.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): doi input thanh textarea de ho tro nhap lieu dai"`
+
+
+### [2026-08-04 14:29] Mở rộng kích thước ô chọn phòng ban và địa điểm
+- **Mô tả**: Tăng chiều rộng của các thẻ select (Thuộc Phòng, Ban; Địa điểm) và ô input Giấy mời số từ 350px lên 500px trên desktop để người dùng có thể nhìn rõ toàn bộ chữ dài bên trong.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): tang chieu rong the select phong ban va dia diem len 500px"`
+

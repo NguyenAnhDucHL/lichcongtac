@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
@@ -7,6 +8,20 @@ export default function AdminLogin() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('reason') === 'expired') {
+      toast.error(
+        'Phiên đăng nhập đã hết hạn hoặc tài khoản đang được đăng nhập ở nơi khác. Vui lòng đăng nhập lại.',
+        {
+          duration: 5000,
+        }
+      )
+      // Xóa query param để không hiện lại khi F5
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()

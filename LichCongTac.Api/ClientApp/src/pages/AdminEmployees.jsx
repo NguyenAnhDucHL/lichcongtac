@@ -100,7 +100,10 @@ export default function AdminEmployees() {
       const url = editId ? `/api/users/${editId}` : `/api/users`
       const method = editId ? 'PUT' : 'POST'
 
-      const payload = { ...formData, departmentId: formData.departmentId ? parseInt(formData.departmentId) : null }
+      const payload = {
+        ...formData,
+        departmentId: formData.departmentId ? parseInt(formData.departmentId) : null,
+      }
       if (!editId) {
         payload.role = formData.role
       } else if (!payload.password) {
@@ -113,7 +116,7 @@ export default function AdminEmployees() {
         role: payload.role,
         departmentId: payload.departmentId,
         zaloId: payload.zaloId,
-        notificationPreference: payload.notificationPreference
+        notificationPreference: payload.notificationPreference,
       }
       if (payload.password) {
         bodyData.passwordHash = payload.password
@@ -133,10 +136,13 @@ export default function AdminEmployees() {
         throw new Error(result.message || 'Lỗi khi lưu nhân viên')
       }
 
-      toast.success(editId ? 'Cập nhật nhân viên thành công!' : 'Thêm nhân viên thành công. Lưu ý: Cần Sửa lại để bổ sung Zalo/Phòng ban!')
+      toast.success(
+        editId
+          ? 'Cập nhật nhân viên thành công!'
+          : 'Thêm nhân viên thành công. Lưu ý: Cần Sửa lại để bổ sung Zalo/Phòng ban!'
+      )
       handleReset()
       fetchUsers()
-
     } catch (err) {
       setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
@@ -221,7 +227,7 @@ export default function AdminEmployees() {
               />
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
             <div className="font-medium md:w-[150px] shrink-0">Thuộc Phòng, Ban</div>
             <div className="flex-1 w-full">
@@ -233,12 +239,14 @@ export default function AdminEmployees() {
               >
                 <option value="">-- Chọn phòng ban --</option>
                 {departments.map((d) => (
-                  <option key={d.id} value={d.id}>{d.name}</option>
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
             <div className="font-medium md:w-[150px] shrink-0">
               Tài khoản<span className="text-red-500">*</span>
@@ -255,7 +263,7 @@ export default function AdminEmployees() {
               />
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
             <div className="font-medium md:w-[150px] shrink-0">
               Mật khẩu{!editId && <span className="text-red-500">*</span>}
@@ -263,7 +271,7 @@ export default function AdminEmployees() {
             <div className="flex-1 w-full">
               <div className="relative w-full md:w-[350px]">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -280,7 +288,7 @@ export default function AdminEmployees() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
             <div className="font-medium md:w-[150px] shrink-0">
               Nhập lại mật khẩu{!editId && <span className="text-red-500">*</span>}
@@ -288,7 +296,7 @@ export default function AdminEmployees() {
             <div className="flex-1 w-full">
               <div className="relative w-full md:w-[350px]">
                 <input
-                  type={showConfirmPassword ? "text" : "password"}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -305,7 +313,7 @@ export default function AdminEmployees() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
             <div className="font-medium md:w-[150px] shrink-0">Zalo ID</div>
             <div className="flex-1 w-full">
@@ -318,7 +326,7 @@ export default function AdminEmployees() {
               />
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
             <div className="font-medium md:w-[150px] shrink-0">Thông báo Zalo</div>
             <div className="flex-1 w-full">
@@ -336,7 +344,7 @@ export default function AdminEmployees() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full mt-2">
-            <div className="hidden md:block md:w-[150px] shrink-0"></div>
+            <div className="hidden md:block md:w-[150px] shrink-0" />
             <div className="flex-1 w-full flex gap-3">
               <button
                 type="submit"
@@ -378,15 +386,23 @@ export default function AdminEmployees() {
                   <td className="border border-gray-200 py-2.5 px-4 font-bold">{index + 1}</td>
                   <td className="border border-gray-200 py-2.5 px-4 text-left">{user.fullName}</td>
                   <td className="border border-gray-200 py-2.5 px-4">{user.username}</td>
-                  <td className="border border-gray-200 py-2.5 px-4">{user.departmentName || '---'}</td>
+                  <td className="border border-gray-200 py-2.5 px-4">
+                    {user.departmentName || '---'}
+                  </td>
                   <td className="border border-gray-200 py-2.5 px-4">{user.zaloId || '---'}</td>
                   <td className="border border-gray-200 py-2.5 px-4">
-                    <button onClick={() => handleEdit(user)} className="text-[#337ab7] hover:underline bg-transparent border-none cursor-pointer">
+                    <button
+                      onClick={() => handleEdit(user)}
+                      className="text-[#337ab7] hover:underline bg-transparent border-none cursor-pointer"
+                    >
                       Sửa
                     </button>
                   </td>
                   <td className="border border-gray-200 py-2.5 px-4">
-                    <button onClick={() => handleDeleteClick(user.id)} className="text-[#c8102e] hover:underline bg-transparent border-none cursor-pointer">
+                    <button
+                      onClick={() => handleDeleteClick(user.id)}
+                      className="text-[#c8102e] hover:underline bg-transparent border-none cursor-pointer"
+                    >
                       Xóa
                     </button>
                   </td>

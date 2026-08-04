@@ -18,7 +18,10 @@ function PasswordStrengthBar({ password }) {
     { label: '1 chữ HOA (A-Z)', ok: /[A-Z]/.test(password) },
     { label: '1 chữ thường (a-z)', ok: /[a-z]/.test(password) },
     { label: '1 chữ số (0-9)', ok: /[0-9]/.test(password) },
-    { label: '1 ký tự đặc biệt (!@#$...)', ok: /[!@#$%^&*()_+\-=[\]{}|;':",./|<>?]/.test(password) },
+    {
+      label: '1 ký tự đặc biệt (!@#$...)',
+      ok: /[!@#$%^&*()_+\-=[\]{}|;':",./|<>?]/.test(password),
+    },
   ]
   const score = checks.filter((c) => c.ok).length
   const colors = ['#ef4444', '#ef4444', '#f97316', '#eab308', '#22c55e', '#16a34a']
@@ -233,12 +236,13 @@ export default function AdminChangePassword() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       placeholder="Nhập lại mật khẩu mới"
-                      className={`w-full border rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none transition ${confirmPassword && confirmPassword !== newPassword
-                        ? 'border-red-300 focus:border-red-400 focus:ring-1 focus:ring-red-300/30'
-                        : confirmPassword && confirmPassword === newPassword
-                          ? 'border-green-300 focus:border-green-400 focus:ring-1 focus:ring-green-300/30'
-                          : 'border-gray-300 focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30'
-                        }`}
+                      className={`w-full border rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none transition ${
+                        confirmPassword && confirmPassword !== newPassword
+                          ? 'border-red-300 focus:border-red-400 focus:ring-1 focus:ring-red-300/30'
+                          : confirmPassword && confirmPassword === newPassword
+                            ? 'border-green-300 focus:border-green-400 focus:ring-1 focus:ring-green-300/30'
+                            : 'border-gray-300 focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30'
+                      }`}
                     />
                     <button
                       type="button"

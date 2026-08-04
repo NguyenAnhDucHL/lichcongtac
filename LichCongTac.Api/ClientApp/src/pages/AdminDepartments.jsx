@@ -13,7 +13,7 @@ export default function AdminDepartments() {
     isActive: true,
   })
   const [editId, setEditId] = useState(null)
-  
+
   // States for confirmation modal
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
@@ -160,7 +160,7 @@ export default function AdminDepartments() {
               />
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full">
             <div className="font-medium md:w-[150px] shrink-0">Mô tả</div>
             <div className="flex-1 w-full">
@@ -191,7 +191,7 @@ export default function AdminDepartments() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full mt-2">
-            <div className="hidden md:block md:w-[150px] shrink-0"></div>
+            <div className="hidden md:block md:w-[150px] shrink-0" />
             <div className="flex-1 w-full flex gap-3">
               <button
                 type="submit"

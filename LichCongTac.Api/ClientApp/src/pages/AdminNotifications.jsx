@@ -4,21 +4,20 @@ import JoditEditor from 'jodit-react'
 import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
 
-
 export default function AdminNotifications() {
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  
+
   const [editId, setEditId] = useState(null)
-  
+
   // States for confirmation modal
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [formData, setFormData] = useState({
     content: '',
-    isVisible: true
+    isVisible: true,
   })
   const editor = useRef(null)
 
@@ -78,7 +77,7 @@ export default function AdminNotifications() {
     try {
       const payload = {
         content: formData.content,
-        isVisible: formData.isVisible ? 1 : 0
+        isVisible: formData.isVisible ? 1 : 0,
       }
 
       const method = editId ? 'PUT' : 'POST'
@@ -115,7 +114,7 @@ export default function AdminNotifications() {
     setEditId(item.id)
     setFormData({
       content: item.content,
-      isVisible: item.isVisible === 1
+      isVisible: item.isVisible === 1,
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -142,7 +141,7 @@ export default function AdminNotifications() {
         const newTotal = notifications.length - 1
         const maxPage = Math.ceil(newTotal / PAGE_SIZE)
         if (currentPage > maxPage && maxPage > 0) setCurrentPage(maxPage)
-        
+
         fetchNotifications()
       } else {
         toast.error('Có lỗi xảy ra khi xóa')
@@ -183,20 +182,47 @@ export default function AdminNotifications() {
                 defaultActionOnPaste: 'insert_as_html',
                 toolbarButtonSize: 'small',
                 buttons: [
-                  'source', '|',
-                  'bold', 'strikethrough', 'underline', 'italic', '|',
-                  'superscript', 'subscript', '|',
-                  'ul', 'ol', '|',
-                  'outdent', 'indent', '|',
-                  'font', 'fontsize', 'brush', 'paragraph', '|',
-                  'image', 'table', 'link', '|',
-                  'align', 'undo', 'redo', '|',
-                  'hr', 'eraser', 'copyformat', '|',
-                  'symbol', 'fullsize', 'print', 'about'
+                  'source',
+                  '|',
+                  'bold',
+                  'strikethrough',
+                  'underline',
+                  'italic',
+                  '|',
+                  'superscript',
+                  'subscript',
+                  '|',
+                  'ul',
+                  'ol',
+                  '|',
+                  'outdent',
+                  'indent',
+                  '|',
+                  'font',
+                  'fontsize',
+                  'brush',
+                  'paragraph',
+                  '|',
+                  'image',
+                  'table',
+                  'link',
+                  '|',
+                  'align',
+                  'undo',
+                  'redo',
+                  '|',
+                  'hr',
+                  'eraser',
+                  'copyformat',
+                  '|',
+                  'symbol',
+                  'fullsize',
+                  'print',
+                  'about',
                 ],
-                removeButtons: ['file', 'video']
+                removeButtons: ['file', 'video'],
               }}
-              onBlur={newContent => setFormData(prev => ({ ...prev, content: newContent }))}
+              onBlur={(newContent) => setFormData((prev) => ({ ...prev, content: newContent }))}
               onChange={() => {}}
             />
           </div>
@@ -219,7 +245,7 @@ export default function AdminNotifications() {
               disabled={loading}
               className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-1.5 rounded text-sm transition-colors disabled:opacity-50"
             >
-              {loading ? 'Đang lưu...' : (editId ? 'Cập nhật' : 'Thêm')}
+              {loading ? 'Đang lưu...' : editId ? 'Cập nhật' : 'Thêm'}
             </button>
             {editId && (
               <button
@@ -234,10 +260,14 @@ export default function AdminNotifications() {
         </form>
 
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-500 text-[15px]">Danh sách các thông báo ({notifications.length} bản ghi)</span>
-          <span className="text-gray-400 text-xs">Trang {currentPage}/{Math.max(1, Math.ceil(notifications.length / PAGE_SIZE))}</span>
+          <span className="text-gray-500 text-[15px]">
+            Danh sách các thông báo ({notifications.length} bản ghi)
+          </span>
+          <span className="text-gray-400 text-xs">
+            Trang {currentPage}/{Math.max(1, Math.ceil(notifications.length / PAGE_SIZE))}
+          </span>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-200 text-center">
             <thead>
@@ -257,15 +287,19 @@ export default function AdminNotifications() {
                     const globalIndex = (currentPage - 1) * PAGE_SIZE + index + 1
                     return (
                       <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="border border-gray-200 py-2.5 px-4 font-bold">{globalIndex}</td>
+                        <td className="border border-gray-200 py-2.5 px-4 font-bold">
+                          {globalIndex}
+                        </td>
                         <td className="border border-gray-200 py-2.5 px-4 text-left">
-                          <span 
+                          <span
                             className="text-gray-800 line-clamp-3"
                             dangerouslySetInnerHTML={{ __html: item.content }}
-                          ></span>
+                          />
                         </td>
                         <td className="border border-gray-200 py-2.5 px-4">
-                          <span className={item.isVisible === 1 ? 'text-[#337ab7]' : 'text-gray-400'}>
+                          <span
+                            className={item.isVisible === 1 ? 'text-[#337ab7]' : 'text-gray-400'}
+                          >
                             {item.isVisible === 1 ? 'Có' : 'Không'}
                           </span>
                         </td>
@@ -303,7 +337,7 @@ export default function AdminNotifications() {
         {notifications.length > PAGE_SIZE && (
           <div className="flex justify-center mt-6 gap-2">
             <button
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
               className="px-3 py-1 border border-gray-300 rounded text-gray-600 disabled:opacity-50 hover:bg-gray-50"
             >
@@ -313,7 +347,9 @@ export default function AdminNotifications() {
               {currentPage} / {Math.ceil(notifications.length / PAGE_SIZE)}
             </span>
             <button
-              onClick={() => setCurrentPage(p => Math.min(Math.ceil(notifications.length / PAGE_SIZE), p + 1))}
+              onClick={() =>
+                setCurrentPage((p) => Math.min(Math.ceil(notifications.length / PAGE_SIZE), p + 1))
+              }
               disabled={currentPage === Math.ceil(notifications.length / PAGE_SIZE)}
               className="px-3 py-1 border border-gray-300 rounded text-gray-600 disabled:opacity-50 hover:bg-gray-50"
             >
@@ -322,7 +358,7 @@ export default function AdminNotifications() {
           </div>
         )}
       </main>
-      
+
       <ConfirmationModal
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}

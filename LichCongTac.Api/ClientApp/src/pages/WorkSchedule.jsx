@@ -250,12 +250,12 @@ export default function WorkSchedule() {
                         <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
                           <span>
                             {item.invitationNumber && (
-                              <span className="text-[#047857] font-bold mr-1">
+                              <span className="text-[#b45309] font-bold mr-1">
                                 {item.invitationNumber}
                               </span>
                             )}
                             {item.location && (
-                              <span className="text-[#1d5792] font-bold mr-1">
+                              <span className="text-[#4c1d95] font-bold mr-1">
                                 (Tại {formatLocation(item.location)}){' '}
                               </span>
                             )}
@@ -320,12 +320,12 @@ export default function WorkSchedule() {
                           <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
                             <span>
                               {item.invitationNumber && (
-                                <span className="text-[#047857] font-bold mr-1">
+                                <span className="text-[#b45309] font-bold mr-1">
                                   {item.invitationNumber}
                                 </span>
                               )}
                               {item.location && (
-                                <span className="text-[#1d5792] font-bold mr-1">
+                                <span className="text-[#4c1d95] font-bold mr-1">
                                   (Tại {formatLocation(item.location)}){' '}
                                 </span>
                               )}

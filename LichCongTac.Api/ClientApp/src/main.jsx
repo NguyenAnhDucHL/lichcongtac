@@ -26,7 +26,11 @@ window.fetch = async function () {
   var options = args[1] || {}
 
   // Cache busting for GET API requests (Fix iOS Safari aggressive caching)
-  if (typeof url === 'string' && url.startsWith('/api/') && (!options.method || options.method.toUpperCase() === 'GET')) {
+  if (
+    typeof url === 'string' &&
+    url.startsWith('/api/') &&
+    (!options.method || options.method.toUpperCase() === 'GET')
+  ) {
     var separator = url.includes('?') ? '&' : '?'
     args[0] = url + separator + '_t=' + new Date().getTime()
   }
@@ -83,7 +87,7 @@ document.addEventListener('auth:unauthorized', function () {
   localStorage.removeItem('user_name')
   localStorage.removeItem('user_role')
   localStorage.removeItem('user_fullname')
-  window.location.replace('/campha/manager/login')
+  window.location.replace('/campha/manager/login?reason=expired')
 })
 
 // ─── Error Boundary ─────────────────────────────────────────────────────────
@@ -108,11 +112,15 @@ class ErrorBoundary extends React.Component {
             </div>
             <h2 className="text-lg font-bold text-gray-800 mb-2">Có lỗi xảy ra</h2>
             <p className="text-sm text-gray-500 mb-1">
-              {this.state.error && this.state.error.message ? this.state.error.message : 'Lỗi không xác định'}
+              {this.state.error && this.state.error.message
+                ? this.state.error.message
+                : 'Lỗi không xác định'}
             </p>
             <p className="text-xs text-gray-400 mb-6">Vui lòng tải lại trang để tiếp tục.</p>
             <button
-              onClick={function () { window.location.reload() }}
+              onClick={function () {
+                window.location.reload()
+              }}
               className="flex items-center gap-2 mx-auto px-6 py-2.5 bg-[#c8102e] hover:bg-[#a50e27] text-white rounded-lg text-sm font-semibold transition"
             >
               <RefreshCw size={14} />
@@ -163,31 +171,59 @@ function Root() {
   }
 
   if (path === '/campha/manager/accounts' || path === '/campha/manager/accounts/') {
-    return <RequireAdmin><AdminAccounts /></RequireAdmin>
+    return (
+      <RequireAdmin>
+        <AdminAccounts />
+      </RequireAdmin>
+    )
   }
 
   if (path === '/campha/manager/schedules' || path === '/campha/manager/schedules/') {
-    return <RequireAdmin><AdminSchedules /></RequireAdmin>
+    return (
+      <RequireAdmin>
+        <AdminSchedules />
+      </RequireAdmin>
+    )
   }
 
   if (path === '/campha/manager/change-password' || path === '/campha/manager/change-password/') {
-    return <RequireAuth><AdminChangePassword /></RequireAuth>
+    return (
+      <RequireAuth>
+        <AdminChangePassword />
+      </RequireAuth>
+    )
   }
 
   if (path === '/campha/manager/departments' || path === '/campha/manager/departments/') {
-    return <RequireAdmin><AdminDepartments /></RequireAdmin>
+    return (
+      <RequireAdmin>
+        <AdminDepartments />
+      </RequireAdmin>
+    )
   }
 
   if (path === '/campha/manager/employees' || path === '/campha/manager/employees/') {
-    return <RequireAdmin><AdminEmployees /></RequireAdmin>
+    return (
+      <RequireAdmin>
+        <AdminEmployees />
+      </RequireAdmin>
+    )
   }
 
   if (path === '/campha/manager/notifications' || path === '/campha/manager/notifications/') {
-    return <RequireAdmin><AdminNotifications /></RequireAdmin>
+    return (
+      <RequireAdmin>
+        <AdminNotifications />
+      </RequireAdmin>
+    )
   }
 
   if (path === '/campha/manager/holidays' || path === '/campha/manager/holidays/') {
-    return <RequireAdmin><AdminHolidays /></RequireAdmin>
+    return (
+      <RequireAdmin>
+        <AdminHolidays />
+      </RequireAdmin>
+    )
   }
 
   if (path === '/campha/search' || path === '/campha/search/') {

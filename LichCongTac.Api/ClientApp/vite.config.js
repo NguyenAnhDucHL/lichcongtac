@@ -19,8 +19,8 @@ export default defineConfig({
     legacy({
       targets: ['defaults', 'safari >= 12', 'ios >= 12'],
       modernTargets: ['safari >= 15', 'ios >= 15', 'chrome >= 87', 'edge >= 88', 'firefox >= 78'],
-      polyfills: true
-    })
+      polyfills: true,
+    }),
   ],
   resolve: {
     alias: {

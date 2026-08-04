@@ -179,7 +179,7 @@ export default function AdminHolidays() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2">
-              <div className="w-full sm:w-32 hidden sm:block"></div>
+              <div className="w-full sm:w-32 hidden sm:block" />
               <div className="flex-1 flex gap-2">
                 <button
                   type="submit"
@@ -229,13 +229,19 @@ export default function AdminHolidays() {
                 </tr>
               ) : holidays.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="p-4 text-center text-gray-500 italic border-b border-[#ddd]">
+                  <td
+                    colSpan="5"
+                    className="p-4 text-center text-gray-500 italic border-b border-[#ddd]"
+                  >
                     Chưa có ngày lễ nào được thiết lập.
                   </td>
                 </tr>
               ) : (
                 holidays.map((h, idx) => (
-                  <tr key={h.id} className="border-b border-[#ddd] hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={h.id}
+                    className="border-b border-[#ddd] hover:bg-gray-50 transition-colors"
+                  >
                     <td className="p-3 border-r border-[#ddd] text-center">{idx + 1}</td>
                     <td className="p-3 border-r border-[#ddd] text-center font-semibold text-blue-600">
                       {formatDate(h.date)}

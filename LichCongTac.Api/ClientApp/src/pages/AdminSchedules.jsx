@@ -3,7 +3,12 @@ import JoditEditor from 'jodit-react'
 import AdminHeader from '../components/AdminHeader'
 import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
+import DatePicker, { registerLocale } from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import { vi } from 'date-fns/locale'
+import { Calendar } from 'lucide-react'
 
+registerLocale('vi', vi)
 export default function AdminSchedules() {
   const [schedules, setSchedules] = useState([])
   const [users, setUsers] = useState([])
@@ -36,7 +41,7 @@ export default function AdminSchedules() {
     'Hội trường A - Trụ sở HĐND và UBND phường',
     'Phòng họp tầng 3 - Trụ sở HĐND và UBND phường',
     'Phòng họp tầng 4 - Trụ sở HĐND và UBND phường',
-    'Phòng tiếp công dân - Trụ sở HĐND và UBND phường'
+    'Phòng tiếp công dân - Trụ sở HĐND và UBND phường',
   ]
 
   const fetchSchedules = async () => {
@@ -180,7 +185,9 @@ export default function AdminSchedules() {
       })
 
       if (res.ok) {
-        toast.success(editId ? 'Cập nhật lịch công tác thành công!' : 'Thêm lịch công tác thành công!')
+        toast.success(
+          editId ? 'Cập nhật lịch công tác thành công!' : 'Thêm lịch công tác thành công!'
+        )
         handleReset()
         fetchSchedules()
       } else {
@@ -215,8 +222,8 @@ export default function AdminSchedules() {
       const res = await fetch(`/api/schedules/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        },
       })
       if (res.ok) {
         toast.success('Xóa lịch công tác thành công!')
@@ -270,34 +277,42 @@ export default function AdminSchedules() {
               Thời gian <span className="text-red-500">*</span>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 w-full">
-              <div className="relative w-full max-w-[280px] md:max-w-none md:w-[200px] group">
-                {!formData.dateStr && (
-                  <div className="absolute inset-0 px-3 py-1.5 pointer-events-none text-gray-400 flex items-center group-focus-within:hidden">
-                    dd/mm/yyyy
-                  </div>
-                )}
-                <input
-                  type="date"
-                  name="dateStr"
-                  value={formData.dateStr}
-                  onChange={handleChange}
-                  className={`w-full min-w-0 border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] bg-transparent ${!formData.dateStr ? 'empty-date' : 'text-gray-700'}`}
+              <div className="relative w-full max-w-[280px] md:max-w-none md:w-[350px] group flex items-center">
+                <DatePicker
+                  selected={
+                    formData.dateStr
+                      ? new Date(`${formData.dateStr}T${formData.timeStr || '00:00'}`)
+                      : null
+                  }
+                  onChange={(date) => {
+                    if (date) {
+                      const yyyy = date.getFullYear()
+                      const mm = String(date.getMonth() + 1).padStart(2, '0')
+                      const dd = String(date.getDate()).padStart(2, '0')
+                      const hh = String(date.getHours()).padStart(2, '0')
+                      const min = String(date.getMinutes()).padStart(2, '0')
+
+                      setFormData((prev) => ({
+                        ...prev,
+                        dateStr: `${yyyy}-${mm}-${dd}`,
+                        timeStr: `${hh}:${min}`,
+                      }))
+                    } else {
+                      setFormData((prev) => ({ ...prev, dateStr: '', timeStr: '' }))
+                    }
+                  }}
+                  showTimeSelect
+                  timeFormat="HH:mm"
+                  timeIntervals={15}
+                  timeCaption="Giờ"
+                  dateFormat="dd/MM/yyyy HH:mm"
+                  locale="vi"
+                  placeholderText="Ngày/Tháng/Năm Giờ:Phút"
+                  wrapperClassName="w-full"
+                  className="w-full min-w-0 border border-[#5cb85c] rounded pl-3 pr-10 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
                   required
                 />
-              </div>
-              <div className="relative w-full max-w-[280px] md:max-w-none md:w-[142px] group">
-                {!formData.timeStr && (
-                  <div className="absolute inset-0 px-3 py-1.5 pointer-events-none text-gray-400 flex items-center group-focus-within:hidden">
-                    --:--
-                  </div>
-                )}
-                <input
-                  type="time"
-                  name="timeStr"
-                  value={formData.timeStr}
-                  onChange={handleChange}
-                  className={`w-full min-w-0 border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] bg-transparent ${!formData.timeStr ? 'empty-date' : 'text-gray-700'}`}
-                />
+                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
               </div>
             </div>
           </div>
@@ -309,11 +324,13 @@ export default function AdminSchedules() {
                 name="department"
                 value={
                   !formData.department
-                    ? ""
-                    : (departments.some(d => d.name === formData.department) ? formData.department : "Khác")
+                    ? ''
+                    : departments.some((d) => d.name === formData.department)
+                      ? formData.department
+                      : 'Khác'
                 }
-                onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
-                className="w-full md:w-[350px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
+                onChange={(e) => setFormData((prev) => ({ ...prev, department: e.target.value }))}
+                className="w-full md:w-[500px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
               >
                 <option value="">-- Chọn phòng ban --</option>
                 {departments.map((dept) => (
@@ -323,19 +340,22 @@ export default function AdminSchedules() {
                 ))}
                 <option value="Khác">-- Nhập phòng ban khác --</option>
               </select>
-              {(!departments.some(d => d.name === formData.department) && !!formData.department) && (
-                <div className="mt-2 flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
-                  <span className="text-xs text-gray-500 italic">hoặc nhập tên đơn vị khác:</span>
-                  <input
-                    type="text"
-                    placeholder="VD: Công an phường, Quân sự, ..."
-                    value={formData.department === 'Khác' ? '' : formData.department}
-                    onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
-                    className="w-full md:w-[350px] border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
-                    autoFocus
-                  />
-                </div>
-              )}
+              {!departments.some((d) => d.name === formData.department) &&
+                !!formData.department && (
+                  <div className="mt-2 flex flex-col gap-1 w-full">
+                    <span className="text-xs text-gray-500 italic">hoặc nhập tên đơn vị khác:</span>
+                    <textarea
+                      placeholder="VD: Công an phường, Quân sự, ..."
+                      value={formData.department === 'Khác' ? '' : formData.department}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, department: e.target.value }))
+                      }
+                      rows={2}
+                      className="w-full md:w-[500px] border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c] resize-y"
+                      autoFocus
+                    />
+                  </div>
+                )}
             </div>
           </div>
 
@@ -348,7 +368,7 @@ export default function AdminSchedules() {
                 value={formData.invitationNumber}
                 onChange={handleChange}
                 placeholder="VD: 1131/GM-VP.UBND"
-                className="w-full md:w-[350px] border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
+                className="w-full md:w-[500px] border border-gray-300 rounded px-3 py-1.5 outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
               />
             </div>
           </div>
@@ -360,11 +380,13 @@ export default function AdminSchedules() {
                 name="location"
                 value={
                   !formData.location
-                    ? ""
-                    : (LOCATIONS.includes(formData.location) ? formData.location : "Khác")
+                    ? ''
+                    : LOCATIONS.includes(formData.location)
+                      ? formData.location
+                      : 'Khác'
                 }
-                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                className="w-full md:w-[350px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
+                onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
+                className="w-full md:w-[500px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
               >
                 <option value="">-- Chọn địa điểm --</option>
                 {LOCATIONS.map((loc, idx) => (
@@ -374,15 +396,15 @@ export default function AdminSchedules() {
                 ))}
                 <option value="Khác">-- Nhập địa điểm khác --</option>
               </select>
-              {(!LOCATIONS.includes(formData.location) && !!formData.location) && (
-                <div className="mt-2 flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+              {!LOCATIONS.includes(formData.location) && !!formData.location && (
+                <div className="mt-2 flex flex-col gap-1 w-full">
                   <span className="text-xs text-gray-500 italic">hoặc nhập địa điểm khác:</span>
-                  <input
-                    type="text"
+                  <textarea
                     placeholder="VD: Phòng họp số 1"
                     value={formData.location === 'Khác' ? '' : formData.location}
-                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    className="w-full md:w-[350px] border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
+                    onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
+                    rows={2}
+                    className="w-full md:w-[500px] border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c] resize-y"
                     autoFocus
                   />
                 </div>
@@ -408,17 +430,43 @@ export default function AdminSchedules() {
                     defaultActionOnPaste: 'insert_as_html',
                     toolbarButtonSize: 'small',
                     buttons: [
-                      'source', '|',
-                      'bold', 'strikethrough', 'underline', 'italic', '|',
-                      'superscript', 'subscript', '|',
-                      'ul', 'ol', '|',
-                      'outdent', 'indent', '|',
-                      'font', 'fontsize', 'brush', 'paragraph', '|',
-                      'image', 'table', 'link', '|',
-                      'align', 'undo', 'redo', '|',
-                      'hr', 'eraser', 'copyformat', '|',
-                      'symbol', 'fullsize', 'print'
-                    ]
+                      'source',
+                      '|',
+                      'bold',
+                      'strikethrough',
+                      'underline',
+                      'italic',
+                      '|',
+                      'superscript',
+                      'subscript',
+                      '|',
+                      'ul',
+                      'ol',
+                      '|',
+                      'outdent',
+                      'indent',
+                      '|',
+                      'font',
+                      'fontsize',
+                      'brush',
+                      'paragraph',
+                      '|',
+                      'image',
+                      'table',
+                      'link',
+                      '|',
+                      'align',
+                      'undo',
+                      'redo',
+                      '|',
+                      'hr',
+                      'eraser',
+                      'copyformat',
+                      '|',
+                      'symbol',
+                      'fullsize',
+                      'print',
+                    ],
                   }}
                   onBlur={(newContent) => setFormData({ ...formData, content: newContent })}
                 />
@@ -440,7 +488,9 @@ export default function AdminSchedules() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-start gap-1 md:gap-4 w-full">
-            <div className="font-medium md:w-[150px] shrink-0 pt-1 md:pt-2">Người được thông báo</div>
+            <div className="font-medium md:w-[150px] shrink-0 pt-1 md:pt-2">
+              Người được thông báo
+            </div>
             <div className="flex-1 w-full">
               <div className="flex flex-wrap gap-2 mb-2 w-[100%] max-w-[600px]">
                 {users.map((user) => (
@@ -457,9 +507,7 @@ export default function AdminSchedules() {
                         if (e.target.checked) {
                           setSelectedParticipants([...selectedParticipants, name])
                         } else {
-                          setSelectedParticipants(
-                            selectedParticipants.filter((p) => p !== name)
-                          )
+                          setSelectedParticipants(selectedParticipants.filter((p) => p !== name))
                         }
                       }}
                     />
@@ -482,14 +530,14 @@ export default function AdminSchedules() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-start gap-1 md:gap-4 w-full mt-4">
-            <div className="hidden md:block md:w-[150px] shrink-0"></div>
+            <div className="hidden md:block md:w-[150px] shrink-0" />
             <div className="flex-1 w-full flex gap-3">
               <button
                 type="submit"
                 disabled={loading}
                 className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-2 rounded font-medium text-sm transition-colors disabled:opacity-50 w-full md:w-auto shadow-sm"
               >
-                {loading ? 'Đang lưu...' : (editId ? 'Cập nhật' : 'Thêm')}
+                {loading ? 'Đang lưu...' : editId ? 'Cập nhật' : 'Thêm'}
               </button>
               {editId && (
                 <button
@@ -505,8 +553,12 @@ export default function AdminSchedules() {
         </form>
 
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-500 text-[15px]">Danh sách lịch làm việc ({schedules.length} bản ghi)</span>
-          <span className="text-gray-400 text-xs">Trang {currentPage}/{Math.max(1, Math.ceil(schedules.length / PAGE_SIZE))}</span>
+          <span className="text-gray-500 text-[15px]">
+            Danh sách lịch làm việc ({schedules.length} bản ghi)
+          </span>
+          <span className="text-gray-400 text-xs">
+            Trang {currentPage}/{Math.max(1, Math.ceil(schedules.length / PAGE_SIZE))}
+          </span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-200 text-center">
@@ -530,7 +582,9 @@ export default function AdminSchedules() {
                     const dateInfo = formatDateDisplay(item.date)
                     return (
                       <tr key={item.id} className="hover:bg-gray-50">
-                        <td className="border border-gray-200 py-2.5 px-4 font-bold">{globalIndex}</td>
+                        <td className="border border-gray-200 py-2.5 px-4 font-bold">
+                          {globalIndex}
+                        </td>
                         <td className="border border-gray-200 py-2.5 px-4 leading-tight">
                           <div>{dateInfo.dayName}</div>
                           <div className="text-blue-700 font-bold">{dateInfo.date}</div>
@@ -538,7 +592,12 @@ export default function AdminSchedules() {
                         <td className="border border-gray-200 py-2.5 px-4 text-left">
                           <span className="text-red-600 font-bold mr-2">{item.startTime}</span>
                           <span className="text-gray-800">
-                            {item.content && ` ${item.content.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()} `}
+                            {item.content &&
+                              ` ${item.content
+                                .replace(/<[^>]*>/g, ' ')
+                                .replace(/&nbsp;/g, ' ')
+                                .replace(/\s+/g, ' ')
+                                .trim()} `}
                           </span>
                         </td>
                         <td className="border border-gray-200 py-2.5 px-4">
@@ -555,7 +614,9 @@ export default function AdminSchedules() {
                               e.preventDefault()
                               setEditId(item.id)
                               setFormData({
-                                dateStr: item.date ? item.date.split('T')[0] : new Date().toISOString().split('T')[0],
+                                dateStr: item.date
+                                  ? item.date.split('T')[0]
+                                  : new Date().toISOString().split('T')[0],
                                 timeStr: item.startTime || '',
                                 department: item.preparingUnit || 'CƠ QUAN',
                                 title: item.title || '',
@@ -566,7 +627,12 @@ export default function AdminSchedules() {
                                 isPublic: item.isPublic === 1 || item.isPublic === true,
                                 participants: item.participants || '',
                               })
-                              const parts = item.participants ? item.participants.split(',').map(s => s.trim()).filter(s => s) : []
+                              const parts = item.participants
+                                ? item.participants
+                                    .split(',')
+                                    .map((s) => s.trim())
+                                    .filter((s) => s)
+                                : []
                               setSelectedParticipants(parts)
                               window.scrollTo({ top: 0, behavior: 'smooth' })
                             }}
@@ -618,7 +684,12 @@ export default function AdminSchedules() {
               ‹
             </button>
             {Array.from({ length: Math.ceil(schedules.length / PAGE_SIZE) }, (_, i) => i + 1)
-              .filter((p) => p === 1 || p === Math.ceil(schedules.length / PAGE_SIZE) || Math.abs(p - currentPage) <= 2)
+              .filter(
+                (p) =>
+                  p === 1 ||
+                  p === Math.ceil(schedules.length / PAGE_SIZE) ||
+                  Math.abs(p - currentPage) <= 2
+              )
               .reduce((acc, p, idx, arr) => {
                 if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...')
                 acc.push(p)
@@ -626,22 +697,27 @@ export default function AdminSchedules() {
               }, [])
               .map((p, idx) =>
                 p === '...' ? (
-                  <span key={`ellipsis-${idx}`} className="px-2 py-1 text-xs text-gray-400">…</span>
+                  <span key={`ellipsis-${idx}`} className="px-2 py-1 text-xs text-gray-400">
+                    …
+                  </span>
                 ) : (
                   <button
                     key={p}
                     onClick={() => setCurrentPage(p)}
-                    className={`px-3 py-1 text-xs border rounded ${currentPage === p
-                      ? 'bg-[#337ab7] text-white border-[#337ab7]'
-                      : 'border-gray-300 hover:bg-gray-100'
-                      }`}
+                    className={`px-3 py-1 text-xs border rounded ${
+                      currentPage === p
+                        ? 'bg-[#337ab7] text-white border-[#337ab7]'
+                        : 'border-gray-300 hover:bg-gray-100'
+                    }`}
                   >
                     {p}
                   </button>
                 )
               )}
             <button
-              onClick={() => setCurrentPage((p) => Math.min(Math.ceil(schedules.length / PAGE_SIZE), p + 1))}
+              onClick={() =>
+                setCurrentPage((p) => Math.min(Math.ceil(schedules.length / PAGE_SIZE), p + 1))
+              }
               disabled={currentPage === Math.ceil(schedules.length / PAGE_SIZE)}
               className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
             >

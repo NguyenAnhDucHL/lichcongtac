@@ -106,7 +106,7 @@ export default function AdminAccounts() {
         fullName: formData.fullName,
         username: formData.username,
         role: formData.isAdmin ? 'Admin' : 'CanBo',
-        departmentId: formData.departmentId ? parseInt(formData.departmentId, 10) : null
+        departmentId: formData.departmentId ? parseInt(formData.departmentId, 10) : null,
       }
       if (formData.password) {
         body.passwordHash = formData.password
@@ -122,7 +122,7 @@ export default function AdminAccounts() {
       })
 
       const result = await res.json()
-      if (res.ok && (result.success !== false)) {
+      if (res.ok && result.success !== false) {
         await fetchAccounts()
         handleReset()
       } else {
@@ -184,7 +184,7 @@ export default function AdminAccounts() {
   // Helper to get department name
   const getDepartmentName = (deptId) => {
     if (!deptId) return ''
-    const dept = departments.find(d => d.id === deptId)
+    const dept = departments.find((d) => d.id === deptId)
     return dept ? dept.name : deptId
   }
 
@@ -230,8 +230,10 @@ export default function AdminAccounts() {
                 className="w-full md:w-[350px] border border-[#5cb85c] rounded px-3 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700 bg-white"
               >
                 <option value="">-- Chọn phòng ban --</option>
-                {departments.map(d => (
-                  <option key={d.id} value={d.id}>{d.name}</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -261,7 +263,7 @@ export default function AdminAccounts() {
             <div className="flex-1 w-full">
               <div className="relative w-full md:w-[350px]">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -287,7 +289,7 @@ export default function AdminAccounts() {
             <div className="flex-1 w-full">
               <div className="relative w-full md:w-[350px]">
                 <input
-                  type={showConfirmPassword ? "text" : "password"}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -320,7 +322,7 @@ export default function AdminAccounts() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 w-full mt-2">
-            <div className="hidden md:block md:w-[150px] shrink-0"></div>
+            <div className="hidden md:block md:w-[150px] shrink-0" />
             <div className="flex-1 w-full flex gap-3">
               <button
                 type="submit"
@@ -362,7 +364,9 @@ export default function AdminAccounts() {
                   <td className="border border-gray-200 py-2.5 px-4 font-bold">{index + 1}</td>
                   <td className="border border-gray-200 py-2.5 px-4">{acc.fullName}</td>
                   <td className="border border-gray-200 py-2.5 px-4">{acc.username}</td>
-                  <td className="border border-gray-200 py-2.5 px-4">{getDepartmentName(acc.departmentId)}</td>
+                  <td className="border border-gray-200 py-2.5 px-4">
+                    {getDepartmentName(acc.departmentId)}
+                  </td>
                   <td className="border border-gray-200 py-2.5 px-4">
                     {acc.role === 'Admin' ? 'Có' : 'Không'}
                   </td>

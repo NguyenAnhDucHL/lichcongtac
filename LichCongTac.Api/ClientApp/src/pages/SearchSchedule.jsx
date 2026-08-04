@@ -307,12 +307,21 @@ export default function SearchSchedule() {
                                 {item.startTime.trim()}:
                               </span>
                             )}
-                            {item.invitationNumber && (
-                              <span className="text-[#047857] font-bold mr-1">{item.invitationNumber}</span>
-                            )}
-                            {item.location && <span className="text-[#1d5792] font-bold mr-1">(Tại {item.location})</span>}
+                            <span>
+                              {item.invitationNumber && (
+                                <span className="text-[#b45309] font-bold mr-1">
+                                  {item.invitationNumber}
+                                </span>
+                              )}
+                              {item.location && (
+                                <span className="text-[#4c1d95] font-bold mr-1">
+                                  (Tại {item.location})
+                                </span>
+                              )}
+                            </span>
                             {item.content && (
-                              <span className="text-gray-900"
+                              <span
+                                className="text-gray-900"
                                 dangerouslySetInnerHTML={{
                                   __html: item.content
                                     .replace(/<[^>]*>/g, ' ')
