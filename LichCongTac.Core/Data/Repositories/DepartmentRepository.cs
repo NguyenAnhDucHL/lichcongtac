@@ -54,7 +54,7 @@ namespace LichCongTac.Core.Data.Repositories
             var list = new List<Department>();
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
-            using var cmd = new SqliteCommand("SELECT * FROM Departments", connection);
+            using var cmd = new SqliteCommand("SELECT Id, Name, Description, IsActive FROM Departments", connection);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -67,7 +67,7 @@ namespace LichCongTac.Core.Data.Repositories
         {
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
-            using var cmd = new SqliteCommand("SELECT * FROM Departments WHERE Id = @id", connection);
+            using var cmd = new SqliteCommand("SELECT Id, Name, Description, IsActive FROM Departments WHERE Id = @id", connection);
             cmd.Parameters.AddWithValue("@id", id);
             using var reader = cmd.ExecuteReader();
             return reader.Read() ? MapDepartment(reader) : null;
