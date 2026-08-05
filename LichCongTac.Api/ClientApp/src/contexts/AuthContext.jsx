@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { toast } from 'sonner'
-import { KeyRound, Loader2, X } from 'lucide-react'
+import { KeyRound, Loader2, X, Eye, EyeOff } from 'lucide-react'
 import { authService } from '../services/auth.service'
 
 const AuthContext = createContext(null)
@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [modalPassword, setModalPassword] = useState('')
   const [modalLoading, setModalLoading] = useState(false)
   const [modalError, setModalError] = useState('')
+  const [showModalPassword, setShowModalPassword] = useState(false)
 
   useEffect(() => {
     // Khởi tạo state từ localStorage
@@ -37,6 +38,11 @@ export const AuthProvider = ({ children }) => {
 
     // Lắng nghe sự kiện đăng xuất từ interceptor 401
     const handleUnauthorized = (e) => {
+      // Bỏ qua nếu đang ở trang login hoặc nếu token đã bị xóa (người dùng chủ động bấm Đăng xuất)
+      if (window.location.pathname.includes('/login') || !localStorage.getItem('auth_token')) {
+        return
+      }
+
       // Hiển thị modal để user đăng nhập lại tại chỗ thay vì redirect mất form data
       setModalUsername(localStorage.getItem('user_name') || '')
       setModalPassword('')
@@ -77,8 +83,13 @@ export const AuthProvider = ({ children }) => {
     setModalError('')
     try {
       const data = await authService.login({ username: modalUsername, password: modalPassword })
-      if (data && data.user) {
-        login(data.user, data.token)
+      if (data && data.token) {
+        const userData = {
+          name: data.username || data.fullName,
+          role: data.role,
+          fullname: data.fullName
+        }
+        login(userData, data.token)
         setShowExpiredModal(false)
         setModalPassword('')
         document.dispatchEvent(
@@ -142,13 +153,22 @@ export const AuthProvider = ({ children }) => {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">Mật khẩu</label>
-                <input
-                  type="password"
-                  required
-                  value={modalPassword}
-                  onChange={(e) => setModalPassword(e.target.value)}
-                  className="w-full rounded border border-gray-300 px-3 py-2 outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c]"
-                />
+                <div className="relative">
+                  <input
+                    type={showModalPassword ? 'text' : 'password'}
+                    required
+                    value={modalPassword}
+                    onChange={(e) => setModalPassword(e.target.value)}
+                    className="w-full rounded border border-gray-300 px-3 py-2 outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c] pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowModalPassword(!showModalPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  >
+                    {showModalPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
               </div>
               <button
                 type="submit"

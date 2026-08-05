@@ -13,11 +13,8 @@ export const SignalRProvider = ({ children }) => {
     let newConnection
     try {
       newConnection = new signalR.HubConnectionBuilder()
-        .withUrl('/appHub', {
-          skipNegotiation: true,
-          transport: signalR.HttpTransportType.WebSockets,
-        })
-        .withAutomaticReconnect()
+        .withUrl('/appHub')  // ← bỏ skipNegotiation + transport cứng, để SignalR tự chọn (WS → SSE → LongPolling)
+        .withAutomaticReconnect([2000, 5000, 10000, 30000]) // retry: 2s, 5s, 10s, 30s
         .build()
 
       newConnection

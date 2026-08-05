@@ -1,245 +1,121 @@
 /* global DOMParser */
-import React, { useState, useEffect, useCallback } from 'react'
-import { Loader2, Menu, Bell } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { Loader2, Bell } from 'lucide-react'
 import { useAppSignalR } from '../contexts/SignalRContext'
 import { scheduleService } from '../services/schedule.service'
 import { notificationService } from '../services/notification.service'
+import { PublicLayout } from '../shared/components/PublicLayout'
+
+// --- Pure helper functions ---
 const formatLocation = (loc) => {
   if (!loc) return ''
-  let cleanLoc = loc.trim()
-  // Loại bỏ dấu ngoặc đơn bọc ngoài nếu có
-  if (cleanLoc.startsWith('(') && cleanLoc.endsWith(')')) {
-    cleanLoc = cleanLoc.slice(1, -1).trim()
-  }
-  // Loại bỏ chữ "Tại " ở đầu nếu có
-  if (cleanLoc.toLowerCase().startsWith('tại ')) {
-    cleanLoc = cleanLoc.substring(4).trim()
-  }
-  // Thử loại bỏ ngoặc đơn một lần nữa đề phòng trường hợp (Tại (Phòng...))
-  if (cleanLoc.startsWith('(') && cleanLoc.endsWith(')')) {
-    cleanLoc = cleanLoc.slice(1, -1).trim()
-  }
-  if (cleanLoc.toLowerCase().startsWith('tại ')) {
-    cleanLoc = cleanLoc.substring(4).trim()
-  }
-  return cleanLoc
+  let s = loc.trim()
+  if (s.startsWith('(') && s.endsWith(')')) s = s.slice(1, -1).trim()
+  if (s.toLowerCase().startsWith('tại ')) s = s.substring(4).trim()
+  if (s.startsWith('(') && s.endsWith(')')) s = s.slice(1, -1).trim()
+  if (s.toLowerCase().startsWith('tại ')) s = s.substring(4).trim()
+  return s
 }
 
-const extractTextFromHtml = (html) => {
+const extractText = (html) => {
   if (!html) return ''
   const doc = new DOMParser().parseFromString(html, 'text/html')
-  return (doc.body.textContent || '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
+  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
+const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
+
+const groupAndTransform = (arrayData) => {
+  const today = new Date()
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const grouped = {}
+  arrayData.forEach((item) => {
+    if (!item.date) return
+    const dateStr = item.date.split('T')[0]
+    if (!grouped[dateStr]) grouped[dateStr] = []
+    grouped[dateStr].push(item)
+  })
+  const maxDate = new Date()
+  maxDate.setDate(maxDate.getDate() + 7)
+  const maxStr = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`
+
+  return Object.keys(grouped).sort()
+    .filter((d) => d >= todayStr && d <= maxStr)
+    .map((dateStr) => {
+      const parts = dateStr.split('-')
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
+      const isToday = dateStr === todayStr
+      return {
+        isToday, originalDate: dateStr,
+        dayLabel: isToday ? 'Hôm nay' : DAYS[d.getDay()],
+        date: dateStr.split('-').reverse().join('/'),
+        items: grouped[dateStr].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || '')),
+      }
+    })
+}
+
+// --- Sub-components (local, small) ---
+function ScheduleItem({ item }) {
+  return (
+    <div className="flex gap-2">
+      {item.startTime?.trim() && (
+        <span className="text-[#c8102e] shrink-0 font-bold text-[17px] md:text-[18px]">
+          {item.startTime.trim()}:
+        </span>
+      )}
+      <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
+        {item.invitationNumber && <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>}
+        {item.location && <span className="text-[#005f6b] font-bold mr-1">(Tại {formatLocation(item.location)}){' '}</span>}
+        {item.content && <span className="text-gray-900">{extractText(item.content)}</span>}
+      </div>
+    </div>
+  )
+}
+
+// --- Page ---
 export default function WorkSchedule() {
   const [scheduleData, setScheduleData] = useState([])
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [todayHoliday, setTodayHoliday] = useState(null)
-
   const { lastScheduleUpdate, lastHolidayUpdate } = useAppSignalR()
 
   const fetchData = useCallback(async () => {
     try {
-      const data = await scheduleService.getPublicSchedule()
-      const arrayData = Array.isArray(data) ? data : data?.data || []
-
-      const today = new Date()
-      const yyyy = today.getFullYear()
-      const mm = String(today.getMonth() + 1).padStart(2, '0')
-      const dd = String(today.getDate()).padStart(2, '0')
-      const todayFormatted = `${yyyy}-${mm}-${dd}`
-
-      const grouped = {}
-      arrayData.forEach((item) => {
-        if (!item.date) return
-        const dateStr = item.date.split('T')[0]
-        if (!grouped[dateStr]) grouped[dateStr] = []
-        grouped[dateStr].push(item)
-      })
-
-      const sortedDates = Object.keys(grouped).sort()
-      const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
-
-      const transformedData = sortedDates
-        .map((dateStr) => {
-          const isToday = dateStr === todayFormatted
-          const parts = dateStr.split('-')
-          const d = new Date(
-            parseInt(parts[0], 10),
-            parseInt(parts[1], 10) - 1,
-            parseInt(parts[2], 10)
-          )
-          const dayOfWeek = d.getDay()
-          const dayLabel = isToday ? 'Hôm nay' : days[dayOfWeek]
-          const formattedDate = dateStr.split('-').reverse().join('/')
-
-          return {
-            isToday: isToday,
-            dayLabel: dayLabel,
-            date: formattedDate,
-            originalDate: dateStr,
-            items: grouped[dateStr].sort((a, b) =>
-              (a.startTime || '').localeCompare(b.startTime || '')
-            ),
-          }
-        })
-        .filter((d) => {
-          if (d.originalDate < todayFormatted) return false
-          const maxDate = new Date()
-          maxDate.setDate(maxDate.getDate() + 7)
-          const maxFormatted = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`
-          return d.originalDate <= maxFormatted
-        })
-
-      setScheduleData(transformedData)
-      setLoading(false)
+      const raw = await scheduleService.getPublicSchedule()
+      setScheduleData(groupAndTransform(Array.isArray(raw) ? raw : raw?.data || []))
     } catch (err) {
-      console.error('Lỗi tải dữ liệu lịch:', err)
+      console.error('Lỗi tải lịch:', err)
+    } finally {
       setLoading(false)
     }
-
-    // Fetch notifications
     try {
-      const data = await notificationService.getVisibleNotifications()
-      setNotifications(Array.isArray(data) ? data : data?.data || [])
-    } catch (err) {
-      console.error('Lỗi tải thông báo:', err)
-    }
-
-    // Fetch today's holiday
+      const notifRaw = await notificationService.getVisibleNotifications()
+      setNotifications(Array.isArray(notifRaw) ? notifRaw : notifRaw?.data || [])
+    } catch { /* silent */ }
     try {
-      const data = await scheduleService.getTodayHoliday()
-      setTodayHoliday(data?.content ? data : data?.data || null)
-    } catch (err) {
-      console.error('Lỗi tải ngày lễ:', err)
-    }
+      const hol = await scheduleService.getTodayHoliday()
+      setTodayHoliday(hol?.content ? hol : hol?.data || null)
+    } catch { /* silent */ }
   }, [])
 
-  useEffect(() => {
-    fetchData()
-  }, [fetchData, lastScheduleUpdate])
+  useEffect(() => { fetchData() }, [fetchData, lastScheduleUpdate])
 
   useEffect(() => {
-    // Fetch today's holiday again if there is an update
-    scheduleService
-      .getTodayHoliday()
-      .then((data) => {
-        setTodayHoliday(data?.content ? data : data?.data || null)
-      })
-      .catch((err) => console.error('Lỗi tải ngày lễ:', err))
+    scheduleService.getTodayHoliday()
+      .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
+      .catch(() => {})
   }, [lastHolidayUpdate])
 
-  const navItems = [
-    { label: 'HOME', href: '/' },
-    {
-      label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH',
-      href: 'https://congchuc.quangninh.gov.vn/sso/Login.aspx',
-      target: '_blank',
-    },
-    {
-      label: 'CỔNG THÔNG TIN',
-      href: 'https://quangninh.gov.vn/Trang/Default.aspx',
-      target: '_blank',
-    },
-    {
-      label: 'THƯ ĐIỆN TỬ',
-      href: 'https://mail.quangninh.gov.vn/owa/auth/logon.aspx?replaceCurrent=1&url=https%3a%2f%2fmail.quangninh.gov.vn%2fowa%2f',
-      target: '_blank',
-    },
-    { label: 'TÌM KIẾM', href: '/campha/search' },
-    { label: 'QUẢN TRỊ', href: '/campha/manager/login' },
-  ]
-
-  const todaySchedule = scheduleData.find((d) => d.isToday) || null
-  const upcomingSchedules = scheduleData.filter((d) => !d.isToday)
-
-  // Fallback if no "today" in data but we want to show something
-  const displayToday = todaySchedule || {
+  const todayData = scheduleData.find((d) => d.isToday) || {
     dayLabel: 'Hôm nay',
-    date: new Date().toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }),
+    date: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }),
     items: [],
   }
+  const upcoming = scheduleData.filter((d) => !d.isToday)
 
   return (
-    <div className="min-h-screen bg-white font-sans text-sm text-gray-800">
-      {/* Header Image */}
-      <div className="max-w-6xl mx-auto bg-white relative flex flex-col justify-center min-h-[86px] overflow-hidden">
-        <div className="absolute inset-0 z-0 flex justify-start">
-          <img
-            src="/assets/header-banner.jpg"
-            alt="Lịch Công Tác UBND Phường Cẩm Phả"
-            className="h-full w-auto max-h-[86px] object-contain"
-            onError={(e) => {
-              e.target.style.display = 'none'
-            }}
-          />
-        </div>
-        <div className="relative z-10 pl-[90px] md:pl-[130px] py-2 pr-2">
-          <h1 className="text-[18px] sm:text-[20px] md:text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">
-            LỊCH CÔNG TÁC
-          </h1>
-          <h1 className="text-[13px] sm:text-[15px] md:text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">
-            UBND PHƯỜNG CẨM PHẢ
-          </h1>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="max-w-6xl mx-auto">
-        <nav className="bg-[#1d5792] shadow-md relative z-20">
-          <div className="flex flex-col md:flex-row md:items-center">
-            {/* Mobile Menu Toggle */}
-            <div
-              className="md:hidden flex justify-between items-center px-4 py-3 cursor-pointer"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <span className="text-white font-serif font-bold uppercase text-base tracking-wide">
-                MENU
-              </span>
-              <Menu className="text-white w-7 h-7" />
-            </div>
-
-            {/* Nav Items */}
-            <div
-              className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row w-full`}
-            >
-              {navItems.map((item, idx) => (
-                <a
-                  key={idx}
-                  href={item.href}
-                  target={item.target || '_self'}
-                  rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                  className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-[15px] font-bold uppercase hover:bg-[#154374] transition-colors`}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </nav>
-      </div>
-
-      {/* Holiday Marquee */}
-      {todayHoliday && (
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-[#fcf8e3] text-[#c8102e] py-1.5 border-b border-[#faebcc] overflow-hidden whitespace-nowrap relative">
-            <marquee scrollamount="6" className="text-[13px] font-semibold tracking-wide">
-              ⚛ {todayHoliday.content} ⚛
-            </marquee>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content */}
+    <PublicLayout activeHref="/campha/" todayHoliday={todayHoliday}>
       <main className="max-w-6xl mx-auto pt-0 pb-6">
         {loading ? (
           <div className="flex justify-center py-20 text-[#1d5792]">
@@ -247,65 +123,28 @@ export default function WorkSchedule() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-4">
-            {/* Left Column (Today & Empty Background) */}
+            {/* Left: Today */}
             <div className="flex flex-col h-full md:col-span-3 px-4 pt-5">
-              {/* Today's Schedule */}
-              <div className="mb-4">
-                <h3 className="text-[18px] md:text-2xl font-bold text-[#1d5792] text-center mb-5">
-                  {displayToday.dayLabel}: {displayToday.dayLabel === 'Hôm nay' ? '' : 'Chủ nhật,'}{' '}
-                  ngày {displayToday.date}
-                </h3>
-
-                {displayToday.items.length > 0 ? (
-                  <div className="space-y-6 px-4">
-                    {displayToday.items.map((item, idx) => (
-                      <div key={idx} className="flex gap-2">
-                        {item.startTime && item.startTime.trim() !== '' && (
-                          <span className="text-[#c8102e] shrink-0 font-bold text-[17px] md:text-[18px]">
-                            {item.startTime.trim()}:
-                          </span>
-                        )}
-                        <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
-                          <span>
-                            {item.invitationNumber && (
-                              <span className="text-[#005f6b] font-bold mr-1">
-                                {item.invitationNumber}
-                              </span>
-                            )}
-                            {item.location && (
-                              <span className="text-[#005f6b] font-bold mr-1">
-                                (Tại {formatLocation(item.location)}){' '}
-                              </span>
-                            )}
-                          </span>
-                          {item.content && (
-                            <span className="text-gray-900">
-                              {extractTextFromHtml(item.content)}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-gray-500 italic py-4">Không có lịch công tác</p>
-                )}
-              </div>
-
-              {/* Notifications */}
+              <h3 className="text-[18px] md:text-2xl font-bold text-[#1d5792] text-center mb-5">
+                {todayData.dayLabel}: ngày {todayData.date}
+              </h3>
+              {todayData.items.length > 0 ? (
+                <div className="space-y-6 px-4">
+                  {todayData.items.map((item, idx) => <ScheduleItem key={idx} item={item} />)}
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 italic py-4">Không có lịch công tác</p>
+              )}
               {notifications.length > 0 && (
-                <div className="mb-6 px-4 md:px-0">
+                <div className="mb-6 px-4 md:px-0 mt-6">
                   <div className="bg-[#f8f9fa] border-l-4 border-[#1d5792] p-4 rounded shadow-sm">
                     <h4 className="text-[#1d5792] font-bold text-[17px] flex items-center gap-2 mb-3 uppercase tracking-wide">
-                      <Bell className="w-5 h-5 text-[#c8102e] animate-pulse" />
-                      Thông báo
+                      <Bell className="w-5 h-5 text-[#c8102e] animate-pulse" /> Thông báo
                     </h4>
                     <div className="space-y-3">
                       {notifications.map((notif, idx) => (
-                        <div
-                          key={notif.id || idx}
-                          className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0"
-                        >
+                        <div key={notif.id || idx}
+                          className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0">
                           <div dangerouslySetInnerHTML={{ __html: notif.content }} />
                         </div>
                       ))}
@@ -314,44 +153,16 @@ export default function WorkSchedule() {
                 </div>
               )}
             </div>
-
-            {/* Right Column (Upcoming Days) */}
+            {/* Right: Upcoming */}
             <div className="bg-[#e6fbda] p-4 rounded-sm md:col-span-2">
-              {upcomingSchedules.length > 0 ? (
-                upcomingSchedules.map((day, dayIdx) => (
-                  <div key={dayIdx} className="mb-8">
+              {upcoming.length > 0 ? (
+                upcoming.map((day, idx) => (
+                  <div key={idx} className="mb-8">
                     <h3 className="text-[18px] md:text-[19px] font-bold text-[#1d5792] mb-4 text-center">
                       {day.dayLabel}, ngày {day.date}:
                     </h3>
                     <div className="space-y-5">
-                      {day.items.map((item, idx) => (
-                        <div key={idx} className="flex gap-2">
-                          {item.startTime && item.startTime.trim() !== '' && (
-                            <span className="text-[#c8102e] shrink-0 font-bold text-[17px] md:text-[18px]">
-                              {item.startTime.trim()}:
-                            </span>
-                          )}
-                          <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
-                            <span>
-                              {item.invitationNumber && (
-                                <span className="text-[#005f6b] font-bold mr-1">
-                                  {item.invitationNumber}
-                                </span>
-                              )}
-                              {item.location && (
-                                <span className="text-[#005f6b] font-bold mr-1">
-                                  (Tại {formatLocation(item.location)}){' '}
-                                </span>
-                              )}
-                            </span>
-                            {item.content && (
-                              <span className="text-gray-900">
-                                {extractTextFromHtml(item.content)}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                      {day.items.map((item, i) => <ScheduleItem key={i} item={item} />)}
                     </div>
                   </div>
                 ))
@@ -362,13 +173,6 @@ export default function WorkSchedule() {
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <div className="max-w-6xl mx-auto">
-        <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs mt-8">
-          Bản quyền thuộc về UBND phường Cẩm Phả
-        </footer>
-      </div>
-    </div>
+    </PublicLayout>
   )
 }

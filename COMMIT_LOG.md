@@ -4,6 +4,84 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-06 02:37] Thêm nút "Quay về xem Lịch công tác" tại trang Đăng nhập
+- **Mô tả**: Khi người dùng cài đặt ứng dụng web ra màn hình chính (PWA/Standalone mode) trên điện thoại, trình duyệt sẽ ẩn đi thanh địa chỉ và nút Back. Điều này khiến họ bị kẹt ở trang Đăng nhập nếu lỡ tay ấn Đăng xuất. Bổ sung nút quay về trang public bên dưới form đăng nhập.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi — Thêm Link điều hướng về `/campha/`)
+- **Lệnh git commit**: `git commit -m "feat(auth): thêm nút quay về lịch công tác ở trang đăng nhập hỗ trợ pwa"`
+
+
+### [2026-08-06 02:35] Fix lỗi Modal "Phiên hết hạn" hiển thị vô lý khi Đăng xuất / Đăng nhập
+- **Mô tả**: Bổ sung điều kiện chặn trong Global Event Listener `auth:unauthorized` của AuthContext. Nếu URL hiện tại đang ở trang Đăng nhập (`/login`) hoặc nếu LocalStorage đã bị xóa token (tức là người dùng chủ động ấn Đăng xuất) thì sẽ BỎ QUA sự kiện lỗi 401, không hiển thị cái Modal yêu cầu đăng nhập lại nữa.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi — Thêm câu lệnh IF chặn luồng `handleUnauthorized`)
+- **Lệnh git commit**: `git commit -m "fix(auth): chặn hiển thị modal phiên hết hạn khi đang ở trang login hoặc khi ấn đăng xuất"`
+
+
+### [2026-08-06 02:30] Fix lỗi "Sai tài khoản hoặc mật khẩu" ở Modal đăng nhập lại
+- **Mô tả**: Bỏ sót logic bóc tách dữ liệu phản hồi trong Modal đăng nhập lại (AuthContext). Dù backend đăng nhập thành công và trả về `token`, `username`, `role` nhưng code cũ lại kiểm tra `if (data.user)` dẫn đến hiểu nhầm là lỗi và chặn đăng nhập. Đã sửa lại khớp với cấu trúc API.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi — Sửa logic parse response `authService.login`)
+- **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi báo sai mật khẩu do đọc sai định dạng phản hồi api tại modal"`
+
+
+- **Mô tả**: Bổ sung icon con mắt (`Eye` / `EyeOff` từ `lucide-react`) cho phép người dùng click để xem/ẩn mật khẩu đang gõ tại Modal đăng nhập lại khi hết hạn phiên, giúp tránh gõ sai mật khẩu.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi — Thêm state `showModalPassword` và icon toggle)
+- **Lệnh git commit**: `git commit -m "feat(auth): thêm icon hiển thị mật khẩu ở modal phiên đăng nhập hết hạn"`
+
+
+- **Mô tả**: Mặc định thư viện `sonner` không có nút tắt (X) trên các thông báo (toast), khiến người dùng phải đợi hết thời gian timeout mới tắt được. Fix: Thêm thuộc tính `closeButton` vào component `<Toaster />` ở root (main.jsx) để bật nút tắt cho toàn cục.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi — thêm `closeButton` vào `<Toaster />`)
+- **Lệnh git commit**: `git commit -m "feat(ui): thêm nút tắt (close button) cho tất cả toast notification"`
+
+
+- **Mô tả**: Khi người dùng nhấn Đăng xuất, thư viện `sonner` tạo ra một toast loading nhưng không được dismiss đúng cách khi chuyển trang, dẫn đến việc toast này quay vô tận ở màn hình Đăng nhập. Fix: Gắn ID cho toast loading và truyền ID đó cho toast success để ghi đè (resolve) nó.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi — truyền `id` vào `toast.success`)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi toast đăng xuất quay vô tận không tự tắt"`
+
+
+- **Mô tả**: `apiClient.js` không tự động gắn `Content-Type: application/json` khi gửi body JSON → backend ASP.NET Core nhận request thiếu header, trả 415. Fix: tự động detect khi `body` là string (kết quả `JSON.stringify`) thì gắn header trước khi fetch.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi — thêm auto Content-Type header)
+- **Lệnh git commit**: `git commit -m "fix(api): tự động gắn Content-Type: application/json khi body là JSON string"`
+
+
+- **Mô tả**: Tìm ra 3 nguyên nhân gốc khiến trang public (WorkSchedule/SearchSchedule) không tự cập nhật khi Admin thêm lịch: (1) `/appHub` bị `RequireRateLimiting("fixed")` → 50 req/10s/IP, nhiều user qua ngrok cùng IP → bị chặn; (2) Frontend dùng `skipNegotiation:true + WebSocket only` → mobile/ngrok thường block WebSocket → không fallback được; (3) Nginx không có `location` riêng cho `/appHub` → đi qua location chung với `proxy_read_timeout 300s` → WebSocket bị đứt sau 5 phút.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Program.cs` (Sửa đổi — xóa `.RequireRateLimiting("fixed")` khỏi `MapHub`)
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi — bỏ skipNegotiation + WebSocket-only, thêm retry delays 2/5/10/30s)
+  - `nginx/conf.d/default.conf` (Sửa đổi — thêm location `/appHub` và `/campha/appHub` với timeout 3600s)
+- **Lệnh git commit**: `git commit -m "fix(notify): sửa SignalR bị đứt do rate limit + WebSocket-only + thiếu nginx location /appHub"`
+
+
+### [2026-08-06 01:50] Refactor TOÀN BỘ Frontend theo chuẩn Bulletproof React / Feature-Sliced Design
+- **Mô tả**: Tái cấu trúc toàn bộ 8 page components (tổng ~2500 dòng) thành cấu trúc Feature-Sliced Design. Mỗi page rút gọn xuống còn ~80-130 dòng bằng cách tách logic render vào `src/features/{feature}/components/`. Bổ sung `PublicLayout` dùng chung cho WorkSchedule & SearchSchedule, tránh duplicate 80+ dòng header/nav/footer. Tách `PasswordStrengthBar` thành component tái sử dụng trong `src/features/auth/components/`.
+
+- **Tệp thay đổi**:
+  - `src/features/accounts/components/AccountForm.jsx` (Mới — Form tài khoản Admin)
+  - `src/features/accounts/components/AccountTable.jsx` (Mới — Bảng danh sách tài khoản)
+  - `src/features/employees/components/EmployeeForm.jsx` (Mới — Form nhân viên với ZaloId)
+  - `src/features/employees/components/EmployeeTable.jsx` (Mới — Bảng nhân viên)
+  - `src/features/departments/components/DepartmentForm.jsx` (Mới — Form phòng ban)
+  - `src/features/departments/components/DepartmentTable.jsx` (Mới — Bảng phòng ban)
+  - `src/features/holidays/components/HolidayComponents.jsx` (Mới — HolidayForm + HolidayTable)
+  - `src/features/notifications/components/NotificationForm.jsx` (Mới — Form thông báo + Jodit)
+  - `src/features/notifications/components/NotificationTable.jsx` (Mới — Bảng + phân trang)
+  - `src/features/auth/components/PasswordStrengthBar.jsx` (Mới — Tách từ AdminChangePassword)
+  - `src/shared/components/PublicLayout.jsx` (Mới — Layout chung header+nav+footer công khai)
+  - `src/pages/AdminAccounts.jsx` (Sửa đổi — 383→120 dòng)
+  - `src/pages/AdminEmployees.jsx` (Sửa đổi — 385→122 dòng)
+  - `src/pages/AdminDepartments.jsx` (Sửa đổi — 249→96 dòng)
+  - `src/pages/AdminHolidays.jsx` (Sửa đổi — 265→103 dòng)
+  - `src/pages/AdminNotifications.jsx` (Sửa đổi — 343→105 dòng)
+  - `src/pages/AdminChangePassword.jsx` (Sửa đổi — 290→172 dòng)
+  - `src/pages/WorkSchedule.jsx` (Sửa đổi — 374→178 dòng)
+  - `src/pages/SearchSchedule.jsx` (Sửa đổi — 402→203 dòng)
+- **Lệnh git commit**: `git commit -m "refactor(fe): tái cấu trúc toàn bộ pages theo Feature-Sliced Design (bulletproof-react)"`
+
 ### [2026-08-06 01:35] Tái cấu trúc AdminSchedules theo Feature-Sliced Design + Hiệu ứng Logout
 - **Mô tả**: Tách file `AdminSchedules.jsx` khổng lồ (722 dòng) thành 3 component con độc lập theo chuẩn Bulletproof React / Feature-Sliced Design. Mỗi component con tự quản lý render của riêng mình, tránh re-render toàn trang khi thay đổi nhỏ. Đồng thời cải thiện UX đăng xuất bằng toast loading 1.5s thay vì chuyển trang đột ngột.
 - **Tệp thay đổi**:

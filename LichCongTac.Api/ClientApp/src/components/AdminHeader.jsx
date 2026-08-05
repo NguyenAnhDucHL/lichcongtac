@@ -14,12 +14,12 @@ export default function AdminHeader() {
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    toast.loading('Đang đăng xuất...', { duration: 1500 })
+    const toastId = toast.loading('Đang đăng xuất...')
     setTimeout(() => {
       logout()
       navigate('/campha/manager/login')
-      toast.success('Hẹn gặp lại!')
-    }, 1500)
+      toast.success('Hẹn gặp lại!', { id: toastId })
+    }, 1000)
   }
 
   const isActive = (href) => {

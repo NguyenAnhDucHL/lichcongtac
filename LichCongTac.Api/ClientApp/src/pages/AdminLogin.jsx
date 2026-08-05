@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
-import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
+import { useNavigate, useSearchParams, Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { authService } from '../services/auth.service'
 
@@ -127,6 +127,16 @@ export default function AdminLogin() {
             >
               {loading ? 'Đang tải...' : 'Đăng nhập'}
             </button>
+          </div>
+
+          <div className="text-center pt-2">
+            <Link 
+              to="/campha/" 
+              className="inline-flex items-center justify-center gap-2 text-sm text-[#5e8b91] hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft size={16} />
+              Quay về xem Lịch công tác
+            </Link>
           </div>
         </form>
       </div>

@@ -318,7 +318,7 @@ if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("fixed");
-app.MapHub<AppHub>("/appHub").RequireRateLimiting("fixed");
+app.MapHub<AppHub>("/appHub"); // ✅ Không rate limit WebSocket hub — kết nối long-lived, rate limiter sẽ làm đứt SignalR
 app.MapFallbackToFile("index.html");
 
 
