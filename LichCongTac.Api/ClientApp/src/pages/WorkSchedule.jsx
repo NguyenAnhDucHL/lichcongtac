@@ -23,6 +23,12 @@ const formatLocation = (loc) => {
   return cleanLoc
 }
 
+const extractTextFromHtml = (html) => {
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
+};
+
 export default function WorkSchedule() {
   const [scheduleData, setScheduleData] = useState([])
   const [notifications, setNotifications] = useState([])
@@ -271,23 +277,19 @@ export default function WorkSchedule() {
                         <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
                           <span>
                             {item.invitationNumber && (
-                              <span className="text-[#b45309] font-bold mr-1">
+                              <span className="text-[#005f6b] font-bold mr-1">
                                 {item.invitationNumber}
                               </span>
                             )}
                             {item.location && (
-                              <span className="text-[#4c1d95] font-bold mr-1">
+                              <span className="text-[#005f6b] font-bold mr-1">
                                 (Tại {formatLocation(item.location)}){' '}
                               </span>
                             )}
                           </span>
                           {item.content && (
                             <span className="text-gray-900">
-                              {item.content
-                                .replace(/<[^>]*>/g, ' ')
-                                .replace(/&nbsp;/g, ' ')
-                                .replace(/\s+/g, ' ')
-                                .trim()}
+                              {extractTextFromHtml(item.content)}
                             </span>
                           )}
                         </div>
@@ -341,23 +343,19 @@ export default function WorkSchedule() {
                           <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
                             <span>
                               {item.invitationNumber && (
-                                <span className="text-[#b45309] font-bold mr-1">
+                                <span className="text-[#005f6b] font-bold mr-1">
                                   {item.invitationNumber}
                                 </span>
                               )}
                               {item.location && (
-                                <span className="text-[#4c1d95] font-bold mr-1">
+                                <span className="text-[#005f6b] font-bold mr-1">
                                   (Tại {formatLocation(item.location)}){' '}
                                 </span>
                               )}
                             </span>
                             {item.content && (
                               <span className="text-gray-900">
-                                {item.content
-                                  .replace(/<[^>]*>/g, ' ')
-                                  .replace(/&nbsp;/g, ' ')
-                                  .replace(/\s+/g, ' ')
-                                  .trim()}
+                                {extractTextFromHtml(item.content)}
                               </span>
                             )}
                           </div>

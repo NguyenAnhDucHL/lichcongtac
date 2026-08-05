@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
 FROM node:22-alpine AS client-build
 WORKDIR /src/LichCongTac.Api/ClientApp
 COPY ["LichCongTac.Api/ClientApp/package.json", "LichCongTac.Api/ClientApp/package-lock.json", "./"]
-RUN npm config set registry https://registry.npmmirror.com && npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 COPY ["LichCongTac.Api/ClientApp/", "./"]
 COPY ["LichCongTac.Api/wwwroot/", "../wwwroot/"]
 RUN npm run build
