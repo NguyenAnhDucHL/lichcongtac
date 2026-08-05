@@ -752,3 +752,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi: Chuyển thẻ `a` sang `<Link>`)
   - `LichCongTac.Api/ClientApp/src/lib/push-notifications.js` (Sửa đổi: Nhận token từ hàm thay vì đọc localStorage trực tiếp)
 - **Lệnh git commit**: `git commit -m "refactor(ui): implement react-router-dom and auth context for spa architecture"`
+
+### [2026-08-05 21:18] Cấu hình chiến lược gộp mã (Merge Strategy) an toàn cho Commit Log
+- **Mô tả**: Thiết lập thuộc tính `merge=union` cho tệp `COMMIT_LOG.md` trong `.gitattributes`. Điều này ngăn chặn vĩnh viễn việc Git tự động xóa bỏ các dòng log khi có hai nhánh cùng ghi thêm văn bản vào cuối tệp. Git sẽ luôn giữ lại cả hai phần bổ sung thay vì ưu tiên nhánh remote.
+- **Tệp thay đổi**:
+  - `.gitattributes` (Sửa đổi: Bổ sung cấu hình merge cho COMMIT_LOG.md)
+- **Lệnh git commit**: `git commit -m "chore(git): configure union merge strategy for COMMIT_LOG.md to prevent append conflicts"`
