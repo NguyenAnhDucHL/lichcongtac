@@ -173,8 +173,11 @@ namespace LichCongTac.Api.Controllers
                 return BadRequest(ApiResponse.Fail("Token không chứa thông tin người dùng."));
 
             var user = await _userManager.FindByNameAsync(username);
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
                 return Unauthorized(ApiResponse.Fail("Refresh Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại."));
+
+            if (user.RefreshToken != refreshToken)
+                return Unauthorized(ApiResponse.Fail("Tài khoản của bạn vừa được đăng nhập trên một thiết bị khác. Vui lòng đăng nhập lại để giành quyền kiểm soát."));
 
             // Sinh Token mới
             var tokenHandler = new JwtSecurityTokenHandler();

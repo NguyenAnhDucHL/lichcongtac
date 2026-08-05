@@ -105,6 +105,7 @@ window.fetch = async function () {
     }
   }
   if (response.status === 401 && !url.includes('/api/auth/refresh')) {
+    let unauthorizedMessage = 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.'
     const token = localStorage.getItem('auth_token')
     if (token) {
       try {
@@ -124,6 +125,11 @@ window.fetch = async function () {
             args[1] = options
             return await window.fetch.apply(window, args)
           }
+        } else {
+          try {
+            const errData = await refreshRes.json()
+            if (errData.message) unauthorizedMessage = errData.message
+          } catch (e) {}
         }
       } catch (err) {
         console.error('Lỗi khi làm mới token:', err)
@@ -133,7 +139,7 @@ window.fetch = async function () {
     // Nếu cả Refresh Token cũng hết hạn -> Hiện Modal Login và đưa Request vào Hàng Đợi (Queue)
     if (!isLoginModalOpen) {
       isLoginModalOpen = true
-      document.dispatchEvent(new CustomEvent('auth:unauthorized'))
+      document.dispatchEvent(new CustomEvent('auth:unauthorized', { detail: { message: unauthorizedMessage } }))
     }
 
     return new Promise((resolve) => {

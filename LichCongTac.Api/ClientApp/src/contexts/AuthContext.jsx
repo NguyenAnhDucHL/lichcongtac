@@ -34,11 +34,11 @@ export const AuthProvider = ({ children }) => {
     setLoading(false)
 
     // Lắng nghe sự kiện đăng xuất từ interceptor 401
-    const handleUnauthorized = () => {
+    const handleUnauthorized = (e) => {
       // Hiển thị modal để user đăng nhập lại tại chỗ thay vì redirect mất form data
       setModalUsername(localStorage.getItem('user_name') || '')
       setModalPassword('')
-      setModalError('')
+      setModalError(e.detail?.message || 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
       setShowExpiredModal(true)
     }
     document.addEventListener('auth:unauthorized', handleUnauthorized)

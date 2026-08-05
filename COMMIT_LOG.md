@@ -809,3 +809,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Gỡ bỏ localStorage.setItem('refresh_token'), gọi API Logout ngầm)
   - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Đọc cookie ngầm, thêm credentials: 'include')
 - **Lệnh git commit**: `git commit -m "security(auth): move refresh token to httponly cookie and revoke token in db on logout/password change"`
+
+### [2026-08-05 23:08] Thêm tính năng Cảnh báo Đăng nhập Đồng thời (Concurrent Login)
+- **Mô tả**: Xử lý kịch bản hai người dùng đăng nhập cùng một tài khoản. Khi người thứ 2 đăng nhập thành công, hệ thống tự động đổi `SecurityStamp` và `RefreshToken` trong DB. Khi người thứ 1 thao tác, Token cũ bị từ chối (401), hệ thống cố gắng chạy Refresh Token nhưng phát hiện Token không khớp trong DB -> Trả về thông báo lỗi cụ thể. Frontend bắt thông báo này và hiển thị lên Modal Đăng nhập tại chỗ để cảnh báo người dùng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: Bắt lỗi RefreshToken không khớp)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Đọc error message từ refresh api và đẩy vào event)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Nhận thông báo linh động từ event detail)
+- **Lệnh git commit**: `git commit -m "feat(auth): display specific warning message on concurrent login via modal"`
