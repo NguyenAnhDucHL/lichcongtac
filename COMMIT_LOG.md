@@ -823,3 +823,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: Đổi nội dung chuỗi trả về)
 - **Lệnh git commit**: `git commit -m "style(auth): update concurrent login message to be friendlier"`
+
+### [2026-08-05 23:13] Tinh chỉnh câu thông báo Concurrent Login
+- **Mô tả**: Rút gọn thông báo "trên máy tính hoặc điện thoại khác" thành "trên thiết bị khác".
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(auth): shorten concurrent login message to thiet bi khac"`

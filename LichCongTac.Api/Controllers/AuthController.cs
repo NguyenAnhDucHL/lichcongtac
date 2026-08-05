@@ -177,7 +177,7 @@ namespace LichCongTac.Api.Controllers
                 return Unauthorized(ApiResponse.Fail("Refresh Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại."));
 
             if (user.RefreshToken != refreshToken)
-                return Unauthorized(ApiResponse.Fail("Tài khoản của bạn vừa được đăng nhập trên một máy tính hoặc điện thoại khác. Vui lòng đăng nhập lại để tiếp tục làm việc ở máy này."));
+                return Unauthorized(ApiResponse.Fail("Tài khoản của bạn vừa được đăng nhập trên thiết bị khác. Vui lòng đăng nhập lại để tiếp tục làm việc ở máy này."));
 
             // Sinh Token mới
             var tokenHandler = new JwtSecurityTokenHandler();
