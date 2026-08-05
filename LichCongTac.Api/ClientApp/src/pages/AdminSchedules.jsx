@@ -155,6 +155,7 @@ export default function AdminSchedules() {
       content: '',
       isPublic: true,
       participants: '',
+      updatedAt: '',
     })
     setSelectedParticipants([])
   }
@@ -183,6 +184,7 @@ export default function AdminSchedules() {
         preparingUnit: formData.department,
         participants: selectedParticipants.join(', '),
         isPublic: formData.isPublic ? 1 : 0,
+        updatedAt: formData.updatedAt || null,
       }
 
       const method = editId ? 'PUT' : 'POST'
@@ -648,6 +650,7 @@ export default function AdminSchedules() {
                                 content: item.content || '',
                                 isPublic: item.isPublic === 1 || item.isPublic === true,
                                 participants: item.participants || '',
+                                updatedAt: item.updatedAt || '',
                               })
                               const parts = item.participants
                                 ? item.participants

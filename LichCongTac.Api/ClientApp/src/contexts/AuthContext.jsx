@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Khởi tạo state từ localStorage
     const storedToken = localStorage.getItem('auth_token')
+    const storedRefreshToken = localStorage.getItem('refresh_token')
     const storedName = localStorage.getItem('user_name')
     const storedRole = localStorage.getItem('user_role')
     const storedFullname = localStorage.getItem('user_fullname')
@@ -34,8 +35,9 @@ export const AuthProvider = ({ children }) => {
     return () => document.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
-  const login = (userData, authToken) => {
+  const login = (userData, authToken, refreshToken) => {
     localStorage.setItem('auth_token', authToken)
+    if (refreshToken) localStorage.setItem('refresh_token', refreshToken)
     if (userData.name) localStorage.setItem('user_name', userData.name)
     if (userData.role) localStorage.setItem('user_role', userData.role)
     if (userData.fullname) localStorage.setItem('user_fullname', userData.fullname)
@@ -46,6 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('auth_token')
+    localStorage.removeItem('refresh_token')
     localStorage.removeItem('user_name')
     localStorage.removeItem('user_role')
     localStorage.removeItem('user_fullname')

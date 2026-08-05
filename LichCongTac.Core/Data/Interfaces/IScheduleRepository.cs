@@ -1,4 +1,5 @@
 using LichCongTac.Models;
+using LichCongTac.Core.Models;
 
 namespace LichCongTac.Core.Data.Interfaces
 {
@@ -8,7 +9,7 @@ namespace LichCongTac.Core.Data.Interfaces
         Task<IEnumerable<Schedule>> GetByDateRangeAsync(string startDate, string endDate, bool includeInternal = false);
         Task<Schedule?> GetByIdAsync(int id);
         Task<int> CreateAsync(Schedule schedule);
-        Task<bool> UpdateAsync(Schedule schedule);
+        Task<UpdateResult> UpdateAsync(Schedule schedule, string? expectedUpdatedAt = null);
         Task<bool> DeleteAsync(int id);
     }
 }

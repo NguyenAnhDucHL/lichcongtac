@@ -1,7 +1,10 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using LichCongTac.Core.Data.Interfaces;
 using LichCongTac.Models;
+using LichCongTac.Core.Models;
 
 namespace LichCongTac.Core.Data.Repositories
 {
@@ -150,7 +153,7 @@ namespace LichCongTac.Core.Data.Repositories
             return Convert.ToInt32(result);
         }
 
-        public async Task<bool> UpdateAsync(Schedule schedule)
+        public async Task<UpdateResult> UpdateAsync(Schedule schedule, string? expectedUpdatedAt = null)
         {
             using var conn = new SqliteConnection(_connectionString);
             await conn.OpenAsync();
@@ -169,7 +172,8 @@ namespace LichCongTac.Core.Data.Repositories
                     Participants = @Participants,
                     IsPublic = @IsPublic,
                     UpdatedAt = datetime('now')
-                WHERE Id = @Id";
+                WHERE Id = @Id 
+                AND (@ExpectedUpdatedAt IS NULL OR UpdatedAt = @ExpectedUpdatedAt OR (UpdatedAt IS NULL AND @ExpectedUpdatedAt = ''))";
 
             cmd.Parameters.AddWithValue("@Id", schedule.Id);
             cmd.Parameters.AddWithValue("@Title", schedule.Title);
@@ -182,9 +186,18 @@ namespace LichCongTac.Core.Data.Repositories
             cmd.Parameters.AddWithValue("@PreparingUnit", schedule.PreparingUnit ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@Participants", schedule.Participants ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@IsPublic", schedule.IsPublic);
+            cmd.Parameters.AddWithValue("@ExpectedUpdatedAt", expectedUpdatedAt ?? (object)DBNull.Value);
 
             var rowsAffected = await cmd.ExecuteNonQueryAsync();
-            return rowsAffected > 0;
+            if (rowsAffected > 0) return UpdateResult.Success;
+
+            // Nếu update không thành công, kiểm tra xem bản ghi còn tồn tại không
+            using var checkCmd = conn.CreateCommand();
+            checkCmd.CommandText = "SELECT COUNT(1) FROM Schedules WHERE Id = @Id";
+            checkCmd.Parameters.AddWithValue("@Id", schedule.Id);
+            var exists = Convert.ToInt32(await checkCmd.ExecuteScalarAsync()) > 0;
+
+            return exists ? UpdateResult.ConcurrencyConflict : UpdateResult.NotFound;
         }
 
         public async Task<bool> DeleteAsync(int id)

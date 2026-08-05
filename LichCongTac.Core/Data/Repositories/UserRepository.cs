@@ -78,6 +78,8 @@ namespace LichCongTac.Core.Data.Repositories
                                         ? Convert.ToInt32(reader["AccessFailedCount"]) : 0,
                 LockoutEnd          = HasColumn(reader, "LockoutEnd")
                                         ? ParseNullableDateTimeOffset(reader["LockoutEnd"]?.ToString()) : null,
+                RefreshToken        = HasColumn(reader, "RefreshToken") ? reader["RefreshToken"]?.ToString() : null,
+                RefreshTokenExpiryTime = HasColumn(reader, "RefreshTokenExpiryTime") ? ParseNullableDateTime(reader["RefreshTokenExpiryTime"]?.ToString()) : null,
             };
 
             if (includeSensitive)
@@ -159,7 +161,8 @@ namespace LichCongTac.Core.Data.Repositories
                 SELECT u.Id, u.Username, u.PasswordHash, u.FullName, u.Email, u.PhoneNumber, u.Role,
                        u.DepartmentId, u.SessionId, u.CreatedAt, u.ZaloId, u.NotificationPreference,
                        u.FailedLoginCount, u.LockoutUntil,
-                       u.SecurityStamp, u.NormalizedUserName, u.LockoutEnabled, u.AccessFailedCount, u.LockoutEnd
+                       u.SecurityStamp, u.NormalizedUserName, u.LockoutEnabled, u.AccessFailedCount, u.LockoutEnd,
+                       u.RefreshToken, u.RefreshTokenExpiryTime
                 FROM Users u 
                 WHERE u.NormalizedUserName = @norm OR u.Username = @raw";
             using var cmd = new SqliteCommand(sql, connection);
@@ -429,11 +432,26 @@ namespace LichCongTac.Core.Data.Repositories
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             using var cmd = new SqliteCommand(@"
-                UPDATE Users SET 
-                    AccessFailedCount = 0, FailedLoginCount = 0,
-                    LockoutEnd        = NULL, LockoutUntil    = NULL
+                UPDATE Users 
+                SET AccessFailedCount = 0, LockoutEnd = NULL, FailedLoginCount = 0, LockoutUntil = NULL 
                 WHERE Id = @id", connection);
             cmd.Parameters.AddWithValue("@id", userId);
+            cmd.ExecuteNonQuery();
+        }
+
+        public void UpdateRefreshToken(int userId, string? refreshToken, DateTime? expiryTime)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+            using var cmd = new SqliteCommand(@"
+                UPDATE Users 
+                SET RefreshToken = @rt, RefreshTokenExpiryTime = @exp 
+                WHERE Id = @id", connection);
+            
+            cmd.Parameters.AddWithValue("@rt", string.IsNullOrEmpty(refreshToken) ? (object)DBNull.Value : refreshToken);
+            cmd.Parameters.AddWithValue("@exp", expiryTime.HasValue ? expiryTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@id", userId);
+            
             cmd.ExecuteNonQuery();
         }
     }

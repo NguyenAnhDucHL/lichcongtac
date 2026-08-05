@@ -44,19 +44,21 @@ export default function AdminLogin() {
       if (res.ok) {
         const data = await res.json()
         // Fallback cho interceptor trả về `data` thay vì object phẳng
-        let token, user_name, role
+        let token, user_name, role, refreshToken
         if (data.token) {
           token = data.token
+          refreshToken = data.refreshToken
           user_name = data.username || data.fullName
           role = data.role
         } else if (data.data && data.data.token) {
           token = data.data.token
+          refreshToken = data.data.refreshToken
           user_name = data.data.username || data.data.fullName
           role = data.data.role
         }
 
         if (token) {
-          login({ name: user_name, role: role }, token)
+          login({ name: user_name, role: role }, token, refreshToken)
           navigate('/campha/manager/schedules', { replace: true })
         } else {
           setError('Đăng nhập thành công nhưng không lấy được token.')

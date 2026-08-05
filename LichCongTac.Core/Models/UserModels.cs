@@ -31,6 +31,10 @@ namespace LichCongTac.Models
         public int AccessFailedCount { get; set; } = 0;
         // LockoutEnd: thời điểm hết lockout (Identity format, đồng bộ với LockoutUntil)
         public DateTimeOffset? LockoutEnd { get; set; }
+        
+        // --- Refresh Token ---
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 
     public class LoginAuditLog

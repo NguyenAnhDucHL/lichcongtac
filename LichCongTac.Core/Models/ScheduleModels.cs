@@ -41,5 +41,6 @@ namespace LichCongTac.Models
 
     public class ScheduleUpdateDto : ScheduleCreateDto
     {
+        public string? UpdatedAt { get; set; }
     }
 }

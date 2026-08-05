@@ -21,5 +21,8 @@ namespace LichCongTac.Core.Data.Interfaces
         void UpdateLockout(int userId, int accessFailedCount, DateTimeOffset? lockoutEnd);
         // Reset bộ đếm sai sau khi đăng nhập thành công
         void ResetAccessFailedCount(int userId);
+        
+        // --- Refresh Token support ---
+        void UpdateRefreshToken(int userId, string? refreshToken, DateTime? expiryTime);
     }
 }

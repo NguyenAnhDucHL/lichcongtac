@@ -79,7 +79,34 @@ window.fetch = async function () {
       // Ignore parsing error
     }
   }
-  if (response.status === 401) {
+  if (response.status === 401 && !url.includes('/api/auth/refresh')) {
+    const token = localStorage.getItem('auth_token')
+    const refreshToken = localStorage.getItem('refresh_token')
+    if (token && refreshToken) {
+      try {
+        const refreshRes = await originalFetch('/api/auth/refresh', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, refreshToken }),
+        })
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json()
+          if (refreshData.success && refreshData.data?.token) {
+            localStorage.setItem('auth_token', refreshData.data.token)
+            if (refreshData.data.refreshToken) {
+              localStorage.setItem('refresh_token', refreshData.data.refreshToken)
+            }
+            // Retry the original request
+            options.headers = options.headers || {}
+            options.headers['Authorization'] = 'Bearer ' + refreshData.data.token
+            args[1] = options
+            return await originalFetch.apply(window, args)
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi khi làm mới token:', err)
+      }
+    }
     document.dispatchEvent(new CustomEvent('auth:unauthorized'))
   }
   return response

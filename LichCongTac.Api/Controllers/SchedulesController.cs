@@ -129,8 +129,17 @@ namespace LichCongTac.Api.Controllers
             existing.Participants = dto.Participants;
             existing.IsPublic = dto.IsPublic;
 
-            var success = await _scheduleRepository.UpdateAsync(existing);
-            if (!success)
+            var updateResult = await _scheduleRepository.UpdateAsync(existing, dto.UpdatedAt);
+            
+            if (updateResult == LichCongTac.Core.Models.UpdateResult.NotFound)
+            {
+                return NotFound(ApiResponse.Fail($"Không tìm thấy lịch công tác #{id}"));
+            }
+            else if (updateResult == LichCongTac.Core.Models.UpdateResult.ConcurrencyConflict)
+            {
+                return StatusCode(409, ApiResponse.Fail("Dữ liệu đã bị thay đổi bởi người khác. Vui lòng tải lại trang."));
+            }
+            else if (updateResult != LichCongTac.Core.Models.UpdateResult.Success)
             {
                 return BadRequest(ApiResponse.Fail("Cập nhật thất bại"));
             }

@@ -758,3 +758,25 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `.gitattributes` (Sửa đổi: Bổ sung cấu hình merge cho COMMIT_LOG.md)
 - **Lệnh git commit**: `git commit -m "chore(git): configure union merge strategy for COMMIT_LOG.md to prevent append conflicts"`
+### [2026-08-05 22:00] Khắc phục 3 Lỗi Ẩn (Hidden Bugs) Nghiêm trọng
+- **Mô tả**: Xử lý triệt để 3 lỗi tiềm ẩn trong kiến trúc có thể gây sập hệ thống:
+  1. Fix `database is locked` của SQLite bằng cách kích hoạt chế độ WAL (Write-Ahead Logging) và đặt Timeout=5.
+  2. Implement cơ chế **Refresh Token** (cả Backend và Frontend) để duy trì phiên đăng nhập mà không bị out đột ngột khi JWT hết hạn (7 ngày cho refresh, 24 giờ cho JWT).
+  3. Implement **Optimistic Concurrency Write** để chống ghi đè dữ liệu. Thêm trường `UpdatedAt` vào quy trình update `Schedules`, check version ở DB bằng `datetime` và tự động trả `409 Conflict` về frontend khi 2 người dùng sửa cùng 1 lúc, hiển thị thông báo yêu cầu tải lại trang.
+- **Tệp thay đổi**:
+  - `data_dump/documents.db` (Sửa đổi: bật chế độ WAL và thêm cột RefreshToken vào bảng Users)
+  - `LichCongTac.Core/Models/UserModels.cs` (Sửa đổi: thêm RefreshToken fields)
+  - `LichCongTac.Core/Data/Interfaces/IUserRepository.cs` (Sửa đổi: thêm UpdateRefreshToken)
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi: thêm logic UpdateRefreshToken)
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: thêm endpoint /refresh và generate refresh token)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: quản lý refresh_token)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: tự động làm mới token trên interceptor khi nhận lỗi 401)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi: lưu trữ refreshToken)
+  - `LichCongTac.Core/Models/ScheduleModels.cs` (Sửa đổi: thêm trường UpdatedAt vào UpdateDto)
+  - `LichCongTac.Core/Models/UpdateResult.cs` (Mới: Enum trả về các trường hợp update)
+  - `LichCongTac.Core/Data/Interfaces/IScheduleRepository.cs` (Sửa đổi: thay đổi return type)
+  - `LichCongTac.Core/Data/Repositories/ScheduleRepository.cs` (Sửa đổi: logic Optimistic Concurrency Check)
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi: trả 409 Conflict)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi: truyền UpdatedAt vào payload update)
+- **Lệnh git commit**: `git commit -m "fix(core): xử lý triệt để lỗi khóa database, bổ sung refresh token và optimistic concurrency"`
+
