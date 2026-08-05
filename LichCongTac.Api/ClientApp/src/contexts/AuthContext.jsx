@@ -83,7 +83,8 @@ export const AuthProvider = ({ children }) => {
           login(json.data.user, json.data.token, json.data.refreshToken)
           setShowExpiredModal(false)
           setModalPassword('')
-          toast.success('Đăng nhập lại thành công! Bạn có thể tiếp tục lưu dữ liệu.')
+          document.dispatchEvent(new CustomEvent('auth:login_success', { detail: { token: json.data.token } }))
+          toast.success('Đăng nhập lại thành công! Dữ liệu đã tự động được lưu.')
         } else {
           setModalError(json.message || 'Sai tài khoản hoặc mật khẩu')
         }
@@ -108,6 +109,7 @@ export const AuthProvider = ({ children }) => {
               onClick={() => {
                 setShowExpiredModal(false)
                 logout()
+                document.dispatchEvent(new CustomEvent('auth:login_cancel'))
                 window.location.href = '/campha/manager/login?reason=expired'
               }}
               className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"

@@ -786,3 +786,15 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Thêm component Modal Đăng nhập nội tuyến)
 - **Lệnh git commit**: `git commit -m "feat(auth): hiển thị modal đăng nhập tại chỗ khi hết hạn phiên thay vì redirect để giữ nguyên dữ liệu form"`
+
+### [2026-08-05 22:25] Nâng cấp cảnh giới Request Queue cho Hệ thống Auth
+- **Mô tả**: Implement tính năng Hàng đợi Request (Request Queue) cho Modal Đăng nhập. Ở phiên bản trước, khi token hết hạn và người dùng đăng nhập lại qua Modal, họ vẫn phải bấm nút "Lưu" thêm một lần nữa. Với bản nâng cấp này:
+  1. Khi gặp lỗi 401, Interceptor sẽ đóng băng luồng `fetch` bằng một `Promise` và tống request bị lỗi vào Hàng đợi.
+  2. Phát sự kiện `auth:unauthorized` để hiện Modal Đăng nhập.
+  3. Sau khi người dùng gõ Pass và ấn Login, Modal phát sự kiện `auth:login_success` kèm theo Token mới.
+  4. Interceptor bắt được sự kiện này, lấy Token mới gắn đè vào Header của các Request đang bị đóng băng và tự động "bung" chúng chạy tiếp.
+  Người dùng hoàn toàn không cần thao tác lại, dữ liệu tự động lưu và báo thành công.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Khởi tạo failedRequestQueue và Promise wrapper)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Bổ sung phát sự kiện auth:login_success và auth:login_cancel)
+- **Lệnh git commit**: `git commit -m "feat(auth): implement request queue to auto retry failed requests after modal login"`

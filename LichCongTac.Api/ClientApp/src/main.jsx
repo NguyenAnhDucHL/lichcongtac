@@ -20,6 +20,31 @@ import { AuthProvider, useAuth } from './contexts/AuthContext.jsx'
 import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
 import './styles/globals.css'
 
+// ─── Global Request Queue for Inline Login Modal ────────────────────────────
+let isLoginModalOpen = false
+let failedRequestQueue = []
+
+const processRequestQueue = (error, token = null) => {
+  failedRequestQueue.forEach((prom) => {
+    if (error) {
+      prom.resolve(prom.originalResponse)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedRequestQueue = []
+}
+
+document.addEventListener('auth:login_success', (e) => {
+  isLoginModalOpen = false
+  processRequestQueue(null, e.detail.token)
+})
+
+document.addEventListener('auth:login_cancel', () => {
+  isLoginModalOpen = false
+  processRequestQueue(new Error('Canceled'))
+})
+
 // ─── Global Fetch Interceptor for standardized ApiResponse ────────────────
 const originalFetch = window.fetch
 window.fetch = async function () {
@@ -96,18 +121,35 @@ window.fetch = async function () {
             if (refreshData.data.refreshToken) {
               localStorage.setItem('refresh_token', refreshData.data.refreshToken)
             }
-            // Retry the original request
+            // Retry the original request using window.fetch to ensure it gets unwrapped
             options.headers = options.headers || {}
             options.headers['Authorization'] = 'Bearer ' + refreshData.data.token
             args[1] = options
-            return await originalFetch.apply(window, args)
+            return await window.fetch.apply(window, args)
           }
         }
       } catch (err) {
         console.error('Lỗi khi làm mới token:', err)
       }
     }
-    document.dispatchEvent(new CustomEvent('auth:unauthorized'))
+    
+    // Nếu cả Refresh Token cũng hết hạn -> Hiện Modal Login và đưa Request vào Hàng Đợi (Queue)
+    if (!isLoginModalOpen) {
+      isLoginModalOpen = true
+      document.dispatchEvent(new CustomEvent('auth:unauthorized'))
+    }
+
+    return new Promise((resolve) => {
+      failedRequestQueue.push({ resolve, originalResponse: response })
+    }).then((newToken) => {
+      if (newToken && typeof newToken === 'string') {
+        options.headers = options.headers || {}
+        options.headers['Authorization'] = 'Bearer ' + newToken
+        args[1] = options
+        return window.fetch.apply(window, args)
+      }
+      return response // Bị hủy đăng nhập thì trả về lỗi 401 gốc
+    })
   }
   return response
 }
