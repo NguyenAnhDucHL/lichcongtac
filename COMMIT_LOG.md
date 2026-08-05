@@ -780,3 +780,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi: truyền UpdatedAt vào payload update)
 - **Lệnh git commit**: `git commit -m "fix(core): xử lý triệt để lỗi khóa database, bổ sung refresh token và optimistic concurrency"`
 
+
+### [2026-08-05 22:05] Cải tiến Trải nghiệm người dùng: Modal Đăng nhập tại chỗ
+- **Mô tả**: Sửa đổi hành vi khi hết hạn toàn bộ token (cả access token và refresh token). Thay vì sử dụng `window.location.href` để điều hướng ép buộc về trang đăng nhập làm mất toàn bộ dữ liệu đang nhập dở trong state, hệ thống nay sẽ hiển thị một Modal đăng nhập (Popup) ngay tại giao diện hiện tại. Người dùng có thể đăng nhập lại ngay lập tức và tiếp tục bấm "Lưu" form mà không bị mất bất kỳ dữ liệu nào.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Thêm component Modal Đăng nhập nội tuyến)
+- **Lệnh git commit**: `git commit -m "feat(auth): hiển thị modal đăng nhập tại chỗ khi hết hạn phiên thay vì redirect để giữ nguyên dữ liệu form"`
