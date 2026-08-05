@@ -4,8 +4,10 @@ import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
 
 import AdminHeader from '../components/AdminHeader'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function AdminAccounts() {
+  const { token, user } = useAuth()
   const [accounts, setAccounts] = useState([])
   const [departments, setDepartments] = useState([])
   const [formData, setFormData] = useState({
@@ -30,7 +32,7 @@ export default function AdminAccounts() {
   const fetchDepartments = async () => {
     try {
       const res = await fetch('/api/departments', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         const json = await res.json()
@@ -44,7 +46,7 @@ export default function AdminAccounts() {
   const fetchAccounts = async () => {
     try {
       const res = await fetch('/api/users', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         const json = await res.json()
@@ -116,7 +118,7 @@ export default function AdminAccounts() {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       })
@@ -161,7 +163,7 @@ export default function AdminAccounts() {
       const res = await fetch(`/api/users/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 

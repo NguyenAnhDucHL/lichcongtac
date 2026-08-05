@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import AdminHeader from '../components/AdminHeader'
+import { useAppSignalR } from '../contexts/SignalRContext'
+
+
 import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
 import { PlusCircle, Loader2 } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function AdminHolidays() {
+  const { token, user } = useAuth()
   const [holidays, setHolidays] = useState([])
   const [formData, setFormData] = useState({ date: '', content: '' })
   const [editId, setEditId] = useState(null)
@@ -15,11 +20,13 @@ export default function AdminHolidays() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  
+  const { lastHolidayUpdate } = useAppSignalR()
 
-  const fetchHolidays = async () => {
+  const fetchHolidays = useCallback(async () => {
     try {
       const res = await fetch('/api/holidays', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         const json = await res.json()
@@ -35,11 +42,11 @@ export default function AdminHolidays() {
     } finally {
       setInitialLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchHolidays()
-  }, [])
+  }, [fetchHolidays, lastHolidayUpdate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -57,7 +64,7 @@ export default function AdminHolidays() {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       })
@@ -98,7 +105,7 @@ export default function AdminHolidays() {
       const res = await fetch(`/api/holidays/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
       const data = await res.json()

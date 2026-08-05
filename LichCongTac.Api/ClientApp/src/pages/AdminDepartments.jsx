@@ -4,8 +4,10 @@ import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
 
 import AdminHeader from '../components/AdminHeader'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function AdminDepartments() {
+  const { token, user } = useAuth()
   const [departments, setDepartments] = useState([])
   const [formData, setFormData] = useState({
     name: '',
@@ -25,7 +27,7 @@ export default function AdminDepartments() {
     try {
       const res = await fetch('/api/departments', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
       if (res.ok) {
@@ -68,7 +70,7 @@ export default function AdminDepartments() {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       })
@@ -111,7 +113,7 @@ export default function AdminDepartments() {
       const res = await fetch(`/api/departments/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
 

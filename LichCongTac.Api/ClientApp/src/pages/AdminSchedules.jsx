@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import JoditEditor from 'jodit-react'
+import { useAppSignalR } from '../contexts/SignalRContext'
 import AdminHeader from '../components/AdminHeader'
 import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
@@ -7,9 +8,13 @@ import DatePicker, { registerLocale } from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { vi } from 'date-fns/locale'
 import { Calendar } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext.jsx'
+import { useNavigate } from 'react-router-dom'
 
 registerLocale('vi', vi)
 export default function AdminSchedules() {
+  const navigate = useNavigate()
+  const { token, user, logout } = useAuth()
   const [schedules, setSchedules] = useState([])
   const [users, setUsers] = useState([])
   const [formData, setFormData] = useState({
@@ -43,12 +48,14 @@ export default function AdminSchedules() {
     'Phòng họp tầng 4 - Trụ sở HĐND và UBND phường',
     'Phòng tiếp công dân - Trụ sở HĐND và UBND phường',
   ]
+  
+  const { lastScheduleUpdate } = useAppSignalR()
 
-  const fetchSchedules = async () => {
+  const fetchSchedules = useCallback(async () => {
     try {
       const res = await fetch('/api/schedules', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
       if (res.ok) {
@@ -62,13 +69,13 @@ export default function AdminSchedules() {
     } catch (err) {
       console.error('Lỗi tải danh sách lịch:', err)
     }
-  }
+  }, [])
 
   const fetchUsers = async () => {
     try {
       const res = await fetch('/api/users', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
       if (res.ok) {
@@ -87,7 +94,7 @@ export default function AdminSchedules() {
   const fetchDepartments = async () => {
     try {
       const res = await fetch('/api/departments', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
         const json = await res.json()
@@ -102,13 +109,13 @@ export default function AdminSchedules() {
     fetchSchedules()
     fetchUsers()
     fetchDepartments()
-  }, [])
+  }, [fetchSchedules, lastScheduleUpdate])
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_name')
     localStorage.removeItem('user_role')
-    window.location.href = '/campha/manager/login'
+    logout(); navigate('/campha/manager/login', {replace: true})
   }
 
   const navItems = [
@@ -179,7 +186,7 @@ export default function AdminSchedules() {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       })
@@ -222,7 +229,7 @@ export default function AdminSchedules() {
       const res = await fetch(`/api/schedules/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
       if (res.ok) {
@@ -629,9 +636,9 @@ export default function AdminSchedules() {
                               })
                               const parts = item.participants
                                 ? item.participants
-                                    .split(',')
-                                    .map((s) => s.trim())
-                                    .filter((s) => s)
+                                  .split(',')
+                                  .map((s) => s.trim())
+                                  .filter((s) => s)
                                 : []
                               setSelectedParticipants(parts)
                               window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -704,11 +711,10 @@ export default function AdminSchedules() {
                   <button
                     key={p}
                     onClick={() => setCurrentPage(p)}
-                    className={`px-3 py-1 text-xs border rounded ${
-                      currentPage === p
-                        ? 'bg-[#337ab7] text-white border-[#337ab7]'
-                        : 'border-gray-300 hover:bg-gray-100'
-                    }`}
+                    className={`px-3 py-1 text-xs border rounded ${currentPage === p
+                      ? 'bg-[#337ab7] text-white border-[#337ab7]'
+                      : 'border-gray-300 hover:bg-gray-100'
+                      }`}
                   >
                     {p}
                   </button>

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Loader2, Menu, Bell } from 'lucide-react'
+import { useAppSignalR } from '../contexts/SignalRContext'
 
 const formatLocation = (loc) => {
   if (!loc) return ''
@@ -28,8 +29,10 @@ export default function WorkSchedule() {
   const [loading, setLoading] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [todayHoliday, setTodayHoliday] = useState(null)
+  
+  const { lastScheduleUpdate, lastHolidayUpdate } = useAppSignalR()
 
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     fetch('/api/schedules/public-schedule')
       .then((res) => res.json())
       .then((json) => {
@@ -115,6 +118,24 @@ export default function WorkSchedule() {
       })
       .catch((err) => console.error('Lỗi tải ngày lễ:', err))
   }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [fetchData, lastScheduleUpdate])
+
+  useEffect(() => {
+    // Fetch today's holiday again if there is an update
+    fetch('/api/holidays/today')
+      .then((res) => res.json())
+      .then((json) => {
+        if (json && json.content) {
+          setTodayHoliday(json)
+        } else if (json.success && json.data) {
+          setTodayHoliday(json.data)
+        }
+      })
+      .catch((err) => console.error('Lỗi tải ngày lễ:', err))
+  }, [lastHolidayUpdate])
 
   const navItems = [
     { label: 'HOME', href: '/' },

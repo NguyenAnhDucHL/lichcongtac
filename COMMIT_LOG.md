@@ -716,3 +716,40 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `.gitignore` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "chore: sua db path va ignore launchSettings.json tranh conflict local"`
 
+
+### [2026-08-05 20:52] Triển khai tính năng Realtime Update với SignalR
+- **Mô tả**: Bổ sung lại cấu hình SignalR trên backend và tích hợp vào frontend qua hook `useSignalR.js`. Tính năng giúp giao diện người dùng và Admin tự động tải lại dữ liệu (Lịch công tác, Ngày lễ) mỗi khi có thay đổi (Create/Update/Delete) mà không cần reload trang.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Hubs/AppHub.cs` (Mới)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi: Thêm AddSignalR và MapHub)
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi: Gọi sự kiện ReceiveScheduleUpdate qua IHubContext)
+  - `LichCongTac.Api/Controllers/HolidaysController.cs` (Sửa đổi: Gọi sự kiện ReceiveHolidayUpdate qua IHubContext)
+  - `LichCongTac.Api/ClientApp/src/hooks/useSignalR.js` (Mới)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi: Lắng nghe SignalR event)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi: Lắng nghe SignalR event)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Sửa đổi: Lắng nghe SignalR event)
+- **Lệnh git commit**: `git commit -m "feat(api, ui): implement real-time data updates via SignalR for schedules and holidays"`
+
+### [2026-08-05 20:56] Tái cấu trúc (Refactor) Real-time Updates bằng React Context
+- **Mô tả**: Áp dụng chuẩn công nghiệp cho tính năng realtime bằng cách sử dụng Global Context (`SignalRProvider`). Thay vì mỗi component tự tạo 1 kết nối (gây nghẽn mạng), nay toàn bộ hệ thống sử dụng chung 1 kết nối duy nhất qua Context. Các components chỉ cần lắng nghe sự thay đổi của biến state (`lastScheduleUpdate`, `lastHolidayUpdate`) để cập nhật UI.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/hooks/useSignalR.js` (Xóa)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Bọc toàn app bằng SignalRProvider)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi: Sử dụng context)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi: Sử dụng context)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Sửa đổi: Sử dụng context)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi: Sử dụng context)
+- **Lệnh git commit**: `git commit -m "refactor(ui): apply global context for signalr connections to optimize performance"`
+
+### [2026-08-05 21:05] Đại tu Kiến trúc Frontend (Best Practice)
+- **Mô tả**: Áp dụng chuẩn công nghiệp (Best Practice) cho Frontend:
+  1. Tích hợp `react-router-dom` v6, thay thế toàn bộ logic điều hướng nguyên thủy bằng `window.location`. Hệ thống đã chính thức trở thành Single Page Application (SPA).
+  2. Áp dụng `AuthContext` (Global State) để quản lý token và thông tin người dùng, loại bỏ việc đọc trực tiếp `localStorage` thủ công ở hàng loạt các component.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Tích hợp Router và AuthProvider)
+  - `LichCongTac.Api/ClientApp/src/pages/*` (Sửa đổi: Dùng useAuth và useNavigate trên toàn bộ trang Admin và Public)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi: Chuyển thẻ `a` sang `<Link>`)
+  - `LichCongTac.Api/ClientApp/src/lib/push-notifications.js` (Sửa đổi: Nhận token từ hàm thay vì đọc localStorage trực tiếp)
+- **Lệnh git commit**: `git commit -m "refactor(ui): implement react-router-dom and auth context for spa architecture"`

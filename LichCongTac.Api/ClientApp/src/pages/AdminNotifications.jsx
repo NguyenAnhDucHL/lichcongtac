@@ -3,8 +3,10 @@ import AdminHeader from '../components/AdminHeader'
 import JoditEditor from 'jodit-react'
 import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function AdminNotifications() {
+  const { token, user } = useAuth()
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -29,7 +31,7 @@ export default function AdminNotifications() {
     try {
       const res = await fetch('/api/notifications', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
       if (res.ok) {
@@ -87,7 +89,7 @@ export default function AdminNotifications() {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
       })
@@ -132,7 +134,7 @@ export default function AdminNotifications() {
       const res = await fetch(`/api/notifications/${itemToDelete}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
       if (res.ok) {

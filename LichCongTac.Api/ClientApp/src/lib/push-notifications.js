@@ -22,23 +22,23 @@ export async function getNotificationPermission() {
   return Notification.permission
 }
 
-export async function requestNotificationPermission() {
+export async function requestNotificationPermission(token) {
   if (!('Notification' in window)) return 'unsupported'
 
   const permission = await Notification.requestPermission()
   if (permission === 'granted') {
-    await subscribeUserToPush()
+    await subscribeUserToPush(token)
   }
   return permission
 }
 
-export async function subscribeUserToPush() {
+export async function subscribeUserToPush(token) {
   try {
     const registration = await navigator.serviceWorker.ready
 
     // Get VAPID public key from server
     const keyResponse = await fetch('/api/notification/vapid-public-key', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
 
     if (!keyResponse.ok) throw new Error('Failed to fetch VAPID key')
@@ -73,7 +73,7 @@ export async function subscribeUserToPush() {
     const response = await fetch('/api/notification/subscribe', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -94,7 +94,7 @@ export async function subscribeUserToPush() {
   }
 }
 
-export async function unsubscribeUserFromPush() {
+export async function unsubscribeUserFromPush(token) {
   try {
     const registration = await navigator.serviceWorker.ready
     const subscription = await registration.pushManager.getSubscription()
@@ -105,7 +105,7 @@ export async function unsubscribeUserFromPush() {
       await fetch('/api/notification/unsubscribe', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ endpoint: subscription.endpoint }),

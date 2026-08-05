@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Eye, EyeOff, KeyRound, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import AdminHeader from '../components/AdminHeader'
+import { useAuth } from '../contexts/AuthContext.jsx'
+import { useNavigate } from 'react-router-dom'
 
 const navItems = [
   { label: 'QUẢN TRỊ', href: '/campha/manager/accounts' },
@@ -68,6 +70,8 @@ function PasswordStrengthBar({ password }) {
 }
 
 export default function AdminChangePassword() {
+  const navigate = useNavigate()
+  const { token, user, logout } = useAuth()
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -82,7 +86,7 @@ export default function AdminChangePassword() {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_name')
     localStorage.removeItem('user_role')
-    window.location.href = '/campha/manager/login'
+    logout(); navigate('/campha/manager/login', {replace: true})
   }
 
   const handleSubmit = async (e) => {
@@ -101,7 +105,7 @@ export default function AdminChangePassword() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ currentPassword: oldPassword, newPassword }),
       })
@@ -128,7 +132,7 @@ export default function AdminChangePassword() {
     }
   }
 
-  const username = localStorage.getItem('user_name') || ''
+  const username = (user?.name || '') || ''
 
   return (
     <div className="min-h-screen bg-white font-sans text-[15px] text-gray-800">

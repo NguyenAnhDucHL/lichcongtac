@@ -1,16 +1,20 @@
 import React, { useState } from 'react'
 import { Menu, ChevronDown, ChevronUp } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function AdminHeader() {
-  const currentPath = window.location.pathname
+  const location = useLocation()
+  const currentPath = location.pathname
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState(null)
+  
+  const { logout } = useAuth()
+  const navigate = useNavigate()
 
   const handleLogout = () => {
-    localStorage.removeItem('auth_token')
-    localStorage.removeItem('user_name')
-    localStorage.removeItem('user_role')
-    window.location.href = '/campha/manager/login'
+    logout()
+    navigate('/campha/manager/login')
   }
 
   const isActive = (href) => {
@@ -112,13 +116,14 @@ export default function AdminHeader() {
                       className={`${isOpen ? 'block' : 'hidden'} md:group-hover:block md:absolute left-0 top-full bg-[#31b0d5] md:bg-white md:shadow-lg border-t border-[#2a9bba] md:border-gray-200 min-w-[200px] md:py-1 z-50 w-full md:w-auto`}
                     >
                       {item.subItems.map((sub, sidx) => (
-                        <a
+                        <Link
                           key={sidx}
-                          href={sub.href}
+                          to={sub.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
                           className={`block px-8 py-3 md:px-4 md:py-2 border-b border-[#2a9bba] md:border-none md:border-t md:border-gray-100 hover:bg-[#2a9bba] md:hover:bg-[#5bc0de] hover:text-white transition-colors ${isActive(sub.href) ? 'bg-[#2a9bba] md:bg-[#5bc0de] text-white font-bold' : 'text-white md:text-gray-800'}`}
                         >
                           {sub.label}
-                        </a>
+                        </Link>
                       ))}
                     </div>
                   </div>
@@ -134,13 +139,14 @@ export default function AdminHeader() {
                   {item.label}
                 </button>
               ) : (
-                <a
+                <Link
                   key={idx}
-                  href={item.href}
+                  to={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={`${baseClass} h-full flex items-center ${isActive(item.href) ? activeClass : ''}`}
                 >
                   {item.label}
-                </a>
+                </Link>
               )
             })}
           </div>

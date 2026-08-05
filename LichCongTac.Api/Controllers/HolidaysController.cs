@@ -4,6 +4,8 @@ using LichCongTac.Core.Data.Repositories;
 using LichCongTac.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using LichCongTac.Api.Hubs;
 
 namespace LichCongTac.Api.Controllers
 {
@@ -12,10 +14,12 @@ namespace LichCongTac.Api.Controllers
     public class HolidaysController : ControllerBase
     {
         private readonly HolidayRepository _holidayRepository;
+        private readonly IHubContext<AppHub> _hubContext;
 
-        public HolidaysController(HolidayRepository holidayRepository)
+        public HolidaysController(HolidayRepository holidayRepository, IHubContext<AppHub> hubContext)
         {
             _holidayRepository = holidayRepository;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -68,6 +72,8 @@ namespace LichCongTac.Api.Controllers
             var newId = await _holidayRepository.CreateAsync(holiday);
             holiday.Id = newId;
 
+            await _hubContext.Clients.All.SendAsync("ReceiveHolidayUpdate");
+
             return Ok(ApiResponse<Holiday>.Ok(holiday));
         }
 
@@ -95,6 +101,8 @@ namespace LichCongTac.Api.Controllers
                 return BadRequest(ApiResponse.Fail("Cập nhật thất bại"));
             }
 
+            await _hubContext.Clients.All.SendAsync("ReceiveHolidayUpdate");
+
             return Ok(ApiResponse<Holiday>.Ok(existing));
         }
 
@@ -113,6 +121,8 @@ namespace LichCongTac.Api.Controllers
             {
                 return BadRequest(ApiResponse.Fail("Xóa thất bại"));
             }
+
+            await _hubContext.Clients.All.SendAsync("ReceiveHolidayUpdate");
 
             return Ok(ApiResponse.Ok("Xóa ngày lễ thành công"));
         }

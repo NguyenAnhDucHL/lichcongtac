@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
+import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
@@ -9,9 +11,12 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
+  const { login, token, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('reason') === 'expired') {
+    if (searchParams.get('reason') === 'expired') {
       toast.error(
         'Phiên đăng nhập đã hết hạn hoặc tài khoản đang được đăng nhập ở nơi khác. Vui lòng đăng nhập lại.',
         {
@@ -19,9 +24,12 @@ export default function AdminLogin() {
         }
       )
       // Xóa query param để không hiện lại khi F5
-      window.history.replaceState({}, document.title, window.location.pathname)
+      setSearchParams({})
     }
-  }, [])
+  }, [searchParams, setSearchParams])
+
+  if (authLoading) return null
+  if (token) return <Navigate to="/campha/manager/schedules" replace />
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -48,10 +56,8 @@ export default function AdminLogin() {
         }
 
         if (token) {
-          localStorage.setItem('auth_token', token)
-          localStorage.setItem('user_name', user_name)
-          localStorage.setItem('user_role', role)
-          window.location.href = '/campha/manager/schedules'
+          login({ name: user_name, role: role }, token)
+          navigate('/campha/manager/schedules', { replace: true })
         } else {
           setError('Đăng nhập thành công nhưng không lấy được token.')
         }

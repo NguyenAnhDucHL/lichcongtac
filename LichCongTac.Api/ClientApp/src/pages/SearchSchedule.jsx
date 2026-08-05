@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Search, FileText, Loader2, Menu } from 'lucide-react'
+import { useAppSignalR } from '../contexts/SignalRContext'
 
 const PAGE_SIZE = 10
 
@@ -51,8 +52,9 @@ export default function SearchSchedule() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [todayHoliday, setTodayHoliday] = useState(null)
+  const { lastHolidayUpdate } = useAppSignalR()
 
-  // Fetch today's holiday on mount
+  // Fetch today's holiday
   useEffect(() => {
     fetch('/api/holidays/today')
       .then((res) => res.json())
@@ -64,7 +66,7 @@ export default function SearchSchedule() {
         }
       })
       .catch((err) => console.error('Lỗi tải ngày lễ:', err))
-  }, [])
+  }, [lastHolidayUpdate])
 
   const handleSearch = async (e) => {
     e.preventDefault()
