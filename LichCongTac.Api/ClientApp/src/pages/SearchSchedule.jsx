@@ -1,9 +1,17 @@
 import { useState, useEffect } from 'react'
 import { Search, FileText, Loader2, Menu } from 'lucide-react'
+import { toast } from 'sonner'
+import { Calendar } from 'lucide-react'
 
 const PAGE_SIZE = 10
 
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
+
+const extractTextFromHtml = (html) => {
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
+};
 
 function formatDateDisplay(dateString) {
   if (!dateString) return { dayName: '', date: '' }
@@ -309,26 +317,20 @@ export default function SearchSchedule() {
                             )}
                             <span>
                               {item.invitationNumber && (
-                                <span className="text-[#b45309] font-bold mr-1">
+                                <span className="text-[#005f6b] font-bold mr-1">
                                   {item.invitationNumber}
                                 </span>
                               )}
                               {item.location && (
-                                <span className="text-[#4c1d95] font-bold mr-1">
+                                <span className="text-[#005f6b] font-bold mr-1">
                                   (Tại {item.location})
                                 </span>
                               )}
                             </span>
                             {item.content && (
-                              <span
-                                className="text-gray-900"
-                                dangerouslySetInnerHTML={{
-                                  __html: item.content
-                                    .replace(/<[^>]*>/g, ' ')
-                                    .replace(/\s+/g, ' ')
-                                    .trim(),
-                                }}
-                              />
+                              <span className="text-gray-900">
+                                {extractTextFromHtml(item.content)}
+                              </span>
                             )}
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3 text-center">

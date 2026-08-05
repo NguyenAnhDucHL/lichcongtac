@@ -26,9 +26,20 @@ services:
     platform: linux/amd64
     container_name: lichcongtac-nginx
     ports:
-      - "8080:80"
+      - "8088:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
       - lichcongtac-backend
     restart: always
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: lichcongtac-ngrok
+    restart: always
+    environment:
+      # BẮT BUỘC: Bạn phải dán mã Authtoken của ngrok vào đây (lấy ở trang web ngrok phần Your Authtoken)
+      - NGROK_AUTHTOKEN=3HIIbb57LwI4h1S4mkUIaJB89VO_QC67b7qrrLQXEniQXeTQ
+    command: "http --url=freewill-problem-reluctant.ngrok-free.dev --pooling-enabled nginx:80"
+    depends_on:
+      - nginx

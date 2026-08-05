@@ -8,6 +8,12 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { vi } from 'date-fns/locale'
 import { Calendar } from 'lucide-react'
 
+const extractTextFromHtml = (html) => {
+  if (!html) return '';
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
+};
+
 registerLocale('vi', vi)
 export default function AdminSchedules() {
   const [schedules, setSchedules] = useState([])
@@ -590,14 +596,23 @@ export default function AdminSchedules() {
                           <div className="text-blue-700 font-bold">{dateInfo.date}</div>
                         </td>
                         <td className="border border-gray-200 py-2.5 px-4 text-left">
-                          <span className="text-red-600 font-bold mr-2">{item.startTime}</span>
-                          <span className="text-gray-800">
-                            {item.content &&
-                              ` ${item.content
-                                .replace(/<[^>]*>/g, ' ')
-                                .replace(/&nbsp;/g, ' ')
-                                .replace(/\s+/g, ' ')
-                                .trim()} `}
+                          <span className="text-red-600 font-bold mr-2">
+                            {item.startTime ? `${item.startTime}:` : ''}
+                          </span>
+                          <span>
+                            {item.invitationNumber && (
+                              <span className="text-[#005f6b] font-bold mr-1">
+                                {item.invitationNumber}
+                              </span>
+                            )}
+                            {item.location && (
+                              <span className="text-[#005f6b] font-bold mr-1">
+                                (Tại {item.location})
+                              </span>
+                            )}
+                            <span className="text-gray-800">
+                              {item.content && ` ${extractTextFromHtml(item.content)} `}
+                            </span>
                           </span>
                         </td>
                         <td className="border border-gray-200 py-2.5 px-4">

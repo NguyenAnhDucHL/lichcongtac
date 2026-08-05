@@ -716,3 +716,20 @@ Tá»‡p nÃ y lÆ°u trá»¯ lá»‹ch sá»­ cÃ¡c thay Ä‘á»•i vÃ  tÃ­nh nÄƒng má»›i Ä‘Æ°á»£
   - `.gitignore` (Sá»­a Ä‘á»•i)
 - **Lá»‡nh git commit**: `git commit -m "chore: sua db path va ignore launchSettings.json tranh conflict local"`
 
+# # #   [ 2 0 2 6 - 0 8 - 0 5   0 8 : 3 7 ]   U p d a t e   s c h e d u l e   d i s p l a y   l a y o u t   t o   i n c l u d e   I n v i t a t i o n   N u m b e r   a n d   L o c a t i o n  
+ -   * * M ô   t £* * :   F o r m a t   c Ùt   N Ùi   d u n g   Ã  h i Ãn   t h Ë  S Ñ  k ý   h i Çu   g i ¥y   m Ýi   v à   Ëa   i Ãm   m à u   x a n h   ­m   ( t e a l )   c h o   g i Ñn g   m «u   t h i ¿t   k ¿  m Ûi   c ça   L ã n h   ¡o .  
+ -   * * T Çp   t h a y   Õi * * :  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / A d m i n S c h e d u l e s . j s x `   ( S ía   Õi )  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x `   ( S ía   Õi )  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / S e a r c h S c h e d u l e . j s x `   ( S ía   Õi )  
+ -   * * L Çn h   g i t   c o m m i t * * :   ` g i t   c o m m i t   - m   " s t y l e ( d o c s ) :   u p d a t e   s c h e d u l e   d i s p l a y   l a y o u t   t o   m a t c h   n e w   d e s i g n " `  
+  
+ # # #   [ 2 0 2 6 - 0 8 - 0 5   0 8 : 4 7 ]   F i x   H T M L   e n t i t y   e n c o d i n g   i n   S c h e d u l e   C o n t e n t  
+ -   * * M ô   t £* * :   S ía   l ×i   k ý   t ñ  ·c   b i Çt   ( V D :   d ¥u   &   b Ë  b i ¿n   t h à n h   & a m p ; )   k h i   h i Ãn   t h Ë  N Ùi   d u n g   l Ëc h   t ë  J o d i t E d i t o r .   ã   t h ê m   l o g i c   d e c o d e   c á c   k ý   t ñ  H T M L   c ¡  b £n .  
+ -   * * T Çp   t h a y   Õi * * :  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / A d m i n S c h e d u l e s . j s x `   ( S ía   Õi )  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x `   ( S ía   Õi )  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / S e a r c h S c h e d u l e . j s x `   ( S ía   Õi )  
+ -   * * L Çn h   g i t   c o m m i t * * :   ` g i t   c o m m i t   - m   " f i x ( d o c s ) :   r e s o l v e   h t m l   e n t i t i e s   e n c o d i n g   i s s u e   i n   s c h e d u l e   c o n t e n t   d i s p l a y " `  
+  
+ 
