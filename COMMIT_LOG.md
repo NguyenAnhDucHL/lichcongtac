@@ -1,8 +1,16 @@
-# Nhật ký Thay đổi Mã Nguồn (Commit Log)
+﻿# Nhật ký Thay đổi Mã Nguồn (Commit Log)
 
 Tệp này lưu trữ lịch sử các thay đổi và tính năng mới được thêm vào hệ thống để AI có thể nhanh chóng nắm bắt ngữ cảnh mà không cần quét lại toàn bộ mã nguồn. Kể từ ngày 26/07/2026, toàn bộ hệ thống đã được tái cấu trúc (pivot) để chuyên biệt phục vụ chức năng **Lịch Công Tác**.
 
-## Lịch sử
+## Lịch sử
+
+### [2026-08-05 10:25] ÄÆ°a NGROK_AUTHTOKEN vÃ  secrets vÃ o biáº¿n mÃ´i trÆ°á»ng .env
+- **MÃ´ táº£**: TÃ¡ch NGROK_AUTHTOKEN vÃ  cÃ¡c JWT secret, public ID secret khá»i file cáº¥u hÃ¬nh `docker-compose.yml` Ä‘á»ƒ trÃ¡nh commit secrets lÃªn Git. Táº¡o file `.env` cá»¥c bá»™ Ä‘á»ƒ lÆ°u trá»¯ vÃ  cáº¥u hÃ¬nh cÃ¡c giÃ¡ trá»‹ thá»±c táº¿ trÃªn mÃ´i trÆ°á»ng cháº¡y.
+- **Tá»‡p thay Ä‘á»•i**:
+  - `docker-compose.yml` (Sá»­a Ä‘á»•i)
+  - `.env` (Má»›i - KhÃ´ng commit)
+- **Lá»‡nh git commit**: `git commit -m "security(infra): Ä‘Æ°a ngrok authtoken vÃ  secrets vÃ o env"`
+
 
 ### [2026-08-02 23:30] Tối ưu hóa truy vấn Database, loại bỏ SELECT *
 - **Mô tả**: Thay thế toàn bộ các câu lệnh `SELECT *` bằng việc liệt kê rõ các cột cụ thể trong các repository (`DepartmentRepository` và `ScheduleRepository`). Điều này giúp cải thiện hiệu năng I/O bộ nhớ và tuân thủ chặt chẽ kiến trúc backend của dự án, tránh load dữ liệu dư thừa.
@@ -717,19 +725,19 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Lệnh git commit**: `git commit -m "chore: sua db path va ignore launchSettings.json tranh conflict local"`
 
 # # #   [ 2 0 2 6 - 0 8 - 0 5   0 8 : 3 7 ]   U p d a t e   s c h e d u l e   d i s p l a y   l a y o u t   t o   i n c l u d e   I n v i t a t i o n   N u m b e r   a n d   L o c a t i o n  
- -   * * M �   t �* * :   F o r m a t   c �t   N �i   d u n g   �  h i �n   t h �  S �  k �   h i �u   g i �y   m �i   v �   �a   i �m   m � u   x a n h   �m   ( t e a l )   c h o   g i �n g   m �u   t h i �t   k �  m �i   c �a   L � n h   �o .  
- -   * * T �p   t h a y   �i * * :  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / A d m i n S c h e d u l e s . j s x `   ( S �a   �i )  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x `   ( S �a   �i )  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / S e a r c h S c h e d u l e . j s x `   ( S �a   �i )  
- -   * * L �n h   g i t   c o m m i t * * :   ` g i t   c o m m i t   - m   " s t y l e ( d o c s ) :   u p d a t e   s c h e d u l e   d i s p l a y   l a y o u t   t o   m a t c h   n e w   d e s i g n " `  
+ -   * * M �   t �* * :   F o r m a t   c �t   N �i   d u n g   �  h i �n   t h �  S �  k �   h i �u   g i �y   m �i   v �   �a   i �m   m � u   x a n h   �m   ( t e a l )   c h o   g i �n g   m �u   t h i �t   k �  m �i   c �a   L � n h   �o .  
+ -   * * T �p   t h a y   �i * * :  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / A d m i n S c h e d u l e s . j s x `   ( S �a   �i )  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x `   ( S �a   �i )  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / S e a r c h S c h e d u l e . j s x `   ( S �a   �i )  
+ -   * * L �n h   g i t   c o m m i t * * :   ` g i t   c o m m i t   - m   " s t y l e ( d o c s ) :   u p d a t e   s c h e d u l e   d i s p l a y   l a y o u t   t o   m a t c h   n e w   d e s i g n " `  
   
  # # #   [ 2 0 2 6 - 0 8 - 0 5   0 8 : 4 7 ]   F i x   H T M L   e n t i t y   e n c o d i n g   i n   S c h e d u l e   C o n t e n t  
- -   * * M �   t �* * :   S �a   l �i   k �   t �  �c   b i �t   ( V D :   d �u   &   b �  b i �n   t h � n h   & a m p ; )   k h i   h i �n   t h �  N �i   d u n g   l �c h   t �  J o d i t E d i t o r .   �   t h � m   l o g i c   d e c o d e   c � c   k �   t �  H T M L   c �  b �n .  
- -   * * T �p   t h a y   �i * * :  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / A d m i n S c h e d u l e s . j s x `   ( S �a   �i )  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x `   ( S �a   �i )  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / S e a r c h S c h e d u l e . j s x `   ( S �a   �i )  
- -   * * L �n h   g i t   c o m m i t * * :   ` g i t   c o m m i t   - m   " f i x ( d o c s ) :   r e s o l v e   h t m l   e n t i t i e s   e n c o d i n g   i s s u e   i n   s c h e d u l e   c o n t e n t   d i s p l a y " `  
+ -   * * M �   t �* * :   S �a   l �i   k �   t �  �c   b i �t   ( V D :   d �u   &   b �  b i �n   t h � n h   & a m p ; )   k h i   h i �n   t h �  N �i   d u n g   l �c h   t �  J o d i t E d i t o r .   �   t h � m   l o g i c   d e c o d e   c � c   k �   t �  H T M L   c �  b �n .  
+ -   * * T �p   t h a y   �i * * :  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / A d m i n S c h e d u l e s . j s x `   ( S �a   �i )  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x `   ( S �a   �i )  
+     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / S e a r c h S c h e d u l e . j s x `   ( S �a   �i )  
+ -   * * L �n h   g i t   c o m m i t * * :   ` g i t   c o m m i t   - m   " f i x ( d o c s ) :   r e s o l v e   h t m l   e n t i t i e s   e n c o d i n g   i s s u e   i n   s c h e d u l e   c o n t e n t   d i s p l a y " `  
   
  

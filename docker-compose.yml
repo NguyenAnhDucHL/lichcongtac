@@ -11,11 +11,11 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - DB_PATH=/app/data/documents.db
-      - TZ=Asia/Ho_Chi_Minh
-      - JWT_SECRET=test_secret_for_local_development_123456
-      - PUBLIC_ID_SECRET=test_public_id_secret_for_local_development_123456
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - DB_PATH=${DB_PATH}
+      - TZ=${TZ}
+      - JWT_SECRET=${JWT_SECRET}
+      - PUBLIC_ID_SECRET=${PUBLIC_ID_SECRET}
     volumes:
       - ./data_dump:/app/data
       - ./LichCongTac.Api/Uploads:/app/Uploads
@@ -38,8 +38,8 @@ services:
     container_name: lichcongtac-ngrok
     restart: always
     environment:
-      # BẮT BUỘC: Bạn phải dán mã Authtoken của ngrok vào đây (lấy ở trang web ngrok phần Your Authtoken)
-      - NGROK_AUTHTOKEN=3HIIbb57LwI4h1S4mkUIaJB89VO_QC67b7qrrLQXEniQXeTQ
+      # Lấy Authtoken từ file .env để bảo mật
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     command: "http --url=freewill-problem-reluctant.ngrok-free.dev --pooling-enabled nginx:80"
     depends_on:
       - nginx
