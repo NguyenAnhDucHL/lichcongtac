@@ -5,6 +5,7 @@ import { ConfirmationModal } from '../components/ui/confirmation-modal'
 
 import AdminHeader from '../components/AdminHeader'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import { adminService } from '../services/admin.service'
 
 export default function AdminEmployees() {
   const { token, user } = useAuth()
@@ -33,27 +34,17 @@ export default function AdminEmployees() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('/api/users', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setUsers(json.data || json || [])
-      }
+      const data = await adminService.getUsers()
+      setUsers(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
-      console.error('Lỗi tải danh sách người dùng:', err)
+      console.error('Lỗi tải danh sách cán bộ:', err)
     }
   }
 
   const fetchDepartments = async () => {
     try {
-      const res = await fetch('/api/departments', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setDepartments(json.data || json || [])
-      }
+      const data = await adminService.getDepartments()
+      setDepartments(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
       console.error('Lỗi tải danh sách phòng ban:', err)
     }
@@ -99,54 +90,30 @@ export default function AdminEmployees() {
     }
 
     try {
-      const url = editId ? `/api/users/${editId}` : `/api/users`
-      const method = editId ? 'PUT' : 'POST'
-
-      const payload = {
-        ...formData,
-        departmentId: formData.departmentId ? parseInt(formData.departmentId) : null,
+      const body = {
+        fullName: formData.fullName,
+        username: formData.username,
+        role: formData.role, // 'Admin', 'CanBo', 'LanhDao', 'VanThu'
+        departmentId: formData.departmentId ? parseInt(formData.departmentId, 10) : null,
+        zaloId: formData.zaloId,
+        notificationPreference: formData.notificationPreference,
       }
-      if (!editId) {
-        payload.role = formData.role
-      } else if (!payload.password) {
-        delete payload.password
-      }
-
-      const bodyData = {
-        fullName: payload.fullName,
-        username: payload.username,
-        role: payload.role,
-        departmentId: payload.departmentId,
-        zaloId: payload.zaloId,
-        notificationPreference: payload.notificationPreference,
-      }
-      if (payload.password) {
-        bodyData.passwordHash = payload.password
+      if (formData.password) {
+        body.passwordHash = formData.password
       }
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(bodyData),
-      })
-
-      const result = await res.json()
-      if (!res.ok || result.success === false) {
-        throw new Error(result.message || 'Lỗi khi lưu nhân viên')
+      if (editId) {
+        await adminService.updateUser(editId, body)
+        toast.success('Cập nhật nhân viên thành công!')
+      } else {
+        await adminService.createUser(body)
+        toast.success('Thêm nhân viên thành công. Lưu ý: Cần Sửa lại để bổ sung Zalo/Phòng ban!')
       }
 
-      toast.success(
-        editId
-          ? 'Cập nhật nhân viên thành công!'
-          : 'Thêm nhân viên thành công. Lưu ý: Cần Sửa lại để bổ sung Zalo/Phòng ban!'
-      )
+      await fetchUsers()
       handleReset()
-      fetchUsers()
     } catch (err) {
-      setError(err.message || 'Lỗi kết nối máy chủ')
+      setError(err.message || 'Lỗi kết nối đến máy chủ.')
     } finally {
       setLoading(false)
     }
@@ -177,22 +144,12 @@ export default function AdminEmployees() {
     setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/users/${itemToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (res.ok) {
-        toast.success('Xóa nhân viên thành công')
-        fetchUsers()
-      } else {
-        const errData = await res.json()
-        toast.error(errData.message || 'Lỗi khi xóa nhân viên')
-      }
+      await adminService.deleteUser(itemToDelete)
+      toast.success('Xóa nhân viên thành công')
+      fetchUsers()
+      if (editId === itemToDelete) handleReset()
     } catch (err) {
-      toast.error('Lỗi kết nối máy chủ')
+      toast.error(err.message || 'Xóa thất bại.')
     } finally {
       setIsDeleting(false)
       setDeleteConfirmOpen(false)

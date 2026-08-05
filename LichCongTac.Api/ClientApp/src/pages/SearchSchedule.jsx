@@ -1,18 +1,22 @@
+/* global DOMParser */
 import { useState, useEffect } from 'react'
-import { Search, FileText, Loader2, Menu } from 'lucide-react'
+import { Search, FileText, Loader2, Menu, Calendar } from 'lucide-react'
 import { useAppSignalR } from '../contexts/SignalRContext'
 import { toast } from 'sonner'
-import { Calendar } from 'lucide-react'
+import { scheduleService } from '../services/schedule.service'
 
 const PAGE_SIZE = 10
 
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
 
 const extractTextFromHtml = (html) => {
-  if (!html) return '';
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-};
+  if (!html) return ''
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  return (doc.body.textContent || '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
 function formatDateDisplay(dateString) {
   if (!dateString) return { dayName: '', date: '' }
@@ -64,14 +68,10 @@ export default function SearchSchedule() {
 
   // Fetch today's holiday
   useEffect(() => {
-    fetch('/api/holidays/today')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json && json.content) {
-          setTodayHoliday(json)
-        } else if (json.success && json.data) {
-          setTodayHoliday(json.data)
-        }
+    scheduleService
+      .getTodayHoliday()
+      .then((data) => {
+        setTodayHoliday(data?.content ? data : data?.data || null)
       })
       .catch((err) => console.error('Lỗi tải ngày lễ:', err))
   }, [lastHolidayUpdate])
@@ -81,17 +81,13 @@ export default function SearchSchedule() {
     setLoading(true)
     setCurrentPage(1)
     try {
-      const params = new URLSearchParams()
-      if (startDate) params.append('startDate', startDate)
-      if (endDate) params.append('endDate', endDate)
+      const searchParams = {}
+      if (startDate) searchParams.startDate = startDate
+      if (endDate) searchParams.endDate = endDate
 
-      const url = `/api/schedules/public-schedule${params.toString() ? '?' + params.toString() : ''}`
-      const res = await fetch(url)
-      const json = await res.json()
+      const dataRes = await scheduleService.getPublicSchedule(searchParams)
 
-      let data = []
-      if (Array.isArray(json)) data = json
-      else if (json.data) data = json.data
+      let data = Array.isArray(dataRes) ? dataRes : dataRes?.data || []
 
       // Filter by keyword on frontend
       if (keyword.trim()) {

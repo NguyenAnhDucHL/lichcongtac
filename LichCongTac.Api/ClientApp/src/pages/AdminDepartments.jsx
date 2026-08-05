@@ -5,6 +5,7 @@ import { ConfirmationModal } from '../components/ui/confirmation-modal'
 
 import AdminHeader from '../components/AdminHeader'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import { adminService } from '../services/admin.service'
 
 export default function AdminDepartments() {
   const { token, user } = useAuth()
@@ -25,15 +26,8 @@ export default function AdminDepartments() {
 
   const fetchDepartments = async () => {
     try {
-      const res = await fetch('/api/departments', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setDepartments(json.data || json || [])
-      }
+      const data = await adminService.getDepartments()
+      setDepartments(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
       console.error('Lỗi tải danh sách phòng ban:', err)
     }
@@ -63,28 +57,17 @@ export default function AdminDepartments() {
     setError('')
 
     try {
-      const url = editId ? `/api/departments/${editId}` : '/api/departments'
-      const method = editId ? 'PUT' : 'POST'
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-
-      if (res.ok) {
-        toast.success(editId ? 'Cập nhật phòng ban thành công!' : 'Thêm phòng ban thành công!')
-        handleReset()
-        fetchDepartments()
+      if (editId) {
+        await adminService.updateDepartment(editId, formData)
+        toast.success('Cập nhật phòng ban thành công!')
       } else {
-        const errData = await res.json()
-        setError(errData.message || 'Lỗi khi lưu phòng ban')
+        await adminService.createDepartment(formData)
+        toast.success('Thêm phòng ban thành công!')
       }
+      handleReset()
+      fetchDepartments()
     } catch (err) {
-      setError('Lỗi kết nối máy chủ')
+      setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
       setLoading(false)
     }
@@ -110,22 +93,11 @@ export default function AdminDepartments() {
     setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/departments/${itemToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (res.ok) {
-        toast.success('Xóa phòng ban thành công')
-        fetchDepartments()
-      } else {
-        const errData = await res.json()
-        toast.error(errData.message || 'Lỗi khi xóa phòng ban')
-      }
+      await adminService.deleteDepartment(itemToDelete)
+      toast.success('Xóa phòng ban thành công')
+      fetchDepartments()
     } catch (err) {
-      toast.error('Lỗi kết nối máy chủ')
+      toast.error(err.message || 'Lỗi khi xóa phòng ban')
     } finally {
       setIsDeleting(false)
       setDeleteConfirmOpen(false)

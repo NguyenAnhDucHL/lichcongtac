@@ -829,3 +829,25 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(auth): shorten concurrent login message to thiet bi khac"`
+
+### [2026-08-06 00:43] Refactor toàn bộ Frontend dùng Services và apiClient
+- **Mô tả**: Loại bỏ toàn bộ `fetch` thủ công trong các components. Áp dụng kiến trúc Repository Pattern cho Frontend, phân tách logic API ra các file services (`admin.service.js`, `schedule.service.js`, `auth.service.js`, `notification.service.js`) dùng chung thư viện `apiClient.js`. Đảm bảo tự động đính kèm token, xử lý refresh token và chuẩn hóa response `ApiResponse<T>`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/services/admin.service.js` (Mới/Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/services/schedule.service.js` (Mới/Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/services/auth.service.js` (Mới/Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/services/notification.service.js` (Mới/Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminEmployees.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminDepartments.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminNotifications.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminChangePassword.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/lib/push-notifications.js` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "refactor(api): chuyển toàn bộ frontend sang dùng apiClient và services pattern"`

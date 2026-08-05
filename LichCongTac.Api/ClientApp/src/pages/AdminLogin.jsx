@@ -3,6 +3,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import { authService } from '../services/auth.service'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
@@ -36,38 +37,29 @@ export default function AdminLogin() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        // Fallback cho interceptor trả về `data` thay vì object phẳng
-        let token, user_name, role, refreshToken
-        if (data.token) {
-          token = data.token
-          refreshToken = data.refreshToken
-          user_name = data.username || data.fullName
-          role = data.role
-        } else if (data.data && data.data.token) {
-          token = data.data.token
-          refreshToken = data.data.refreshToken
-          user_name = data.data.username || data.data.fullName
-          role = data.data.role
-        }
+      const data = await authService.login({ username, password })
 
-        if (token) {
-          login({ name: user_name, role: role }, token, refreshToken)
-          navigate('/campha/manager/schedules', { replace: true })
-        } else {
-          setError('Đăng nhập thành công nhưng không lấy được token.')
-        }
+      let resToken, resUserName, resRole, resRefreshToken
+      if (data.token) {
+        resToken = data.token
+        resRefreshToken = data.refreshToken
+        resUserName = data.username || data.fullName
+        resRole = data.role
+      } else if (data.data && data.data.token) {
+        resToken = data.data.token
+        resRefreshToken = data.data.refreshToken
+        resUserName = data.data.username || data.data.fullName
+        resRole = data.data.role
+      }
+
+      if (resToken) {
+        login({ name: resUserName, role: resRole }, resToken, resRefreshToken)
+        navigate('/campha/manager/schedules', { replace: true })
       } else {
-        setError('Tên đăng nhập hoặc mật khẩu không chính xác')
+        setError('Đăng nhập thành công nhưng không lấy được token.')
       }
     } catch (err) {
-      setError('Lỗi kết nối máy chủ')
+      setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
       setLoading(false)
     }

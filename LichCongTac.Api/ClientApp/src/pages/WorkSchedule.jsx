@@ -1,7 +1,9 @@
+/* global DOMParser */
 import React, { useState, useEffect, useCallback } from 'react'
 import { Loader2, Menu, Bell } from 'lucide-react'
 import { useAppSignalR } from '../contexts/SignalRContext'
-
+import { scheduleService } from '../services/schedule.service'
+import { notificationService } from '../services/notification.service'
 const formatLocation = (loc) => {
   if (!loc) return ''
   let cleanLoc = loc.trim()
@@ -24,10 +26,13 @@ const formatLocation = (loc) => {
 }
 
 const extractTextFromHtml = (html) => {
-  if (!html) return '';
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-};
+  if (!html) return ''
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  return (doc.body.textContent || '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
 export default function WorkSchedule() {
   const [scheduleData, setScheduleData] = useState([])
@@ -35,94 +40,84 @@ export default function WorkSchedule() {
   const [loading, setLoading] = useState(true)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [todayHoliday, setTodayHoliday] = useState(null)
-  
+
   const { lastScheduleUpdate, lastHolidayUpdate } = useAppSignalR()
 
-  const fetchData = useCallback(() => {
-    fetch('/api/schedules/public-schedule')
-      .then((res) => res.json())
-      .then((json) => {
-        let data = []
-        if (Array.isArray(json)) data = json
-        else if (json.data) data = json.data
-        else if (json.success && Array.isArray(json.data)) data = json.data
+  const fetchData = useCallback(async () => {
+    try {
+      const data = await scheduleService.getPublicSchedule()
+      const arrayData = Array.isArray(data) ? data : data?.data || []
 
-        const today = new Date()
-        const yyyy = today.getFullYear()
-        const mm = String(today.getMonth() + 1).padStart(2, '0')
-        const dd = String(today.getDate()).padStart(2, '0')
-        const todayFormatted = `${yyyy}-${mm}-${dd}`
+      const today = new Date()
+      const yyyy = today.getFullYear()
+      const mm = String(today.getMonth() + 1).padStart(2, '0')
+      const dd = String(today.getDate()).padStart(2, '0')
+      const todayFormatted = `${yyyy}-${mm}-${dd}`
 
-        const grouped = {}
-        data.forEach((item) => {
-          if (!item.date) return
-          const dateStr = item.date.split('T')[0]
-          if (!grouped[dateStr]) grouped[dateStr] = []
-          grouped[dateStr].push(item)
+      const grouped = {}
+      arrayData.forEach((item) => {
+        if (!item.date) return
+        const dateStr = item.date.split('T')[0]
+        if (!grouped[dateStr]) grouped[dateStr] = []
+        grouped[dateStr].push(item)
+      })
+
+      const sortedDates = Object.keys(grouped).sort()
+      const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
+
+      const transformedData = sortedDates
+        .map((dateStr) => {
+          const isToday = dateStr === todayFormatted
+          const parts = dateStr.split('-')
+          const d = new Date(
+            parseInt(parts[0], 10),
+            parseInt(parts[1], 10) - 1,
+            parseInt(parts[2], 10)
+          )
+          const dayOfWeek = d.getDay()
+          const dayLabel = isToday ? 'Hôm nay' : days[dayOfWeek]
+          const formattedDate = dateStr.split('-').reverse().join('/')
+
+          return {
+            isToday: isToday,
+            dayLabel: dayLabel,
+            date: formattedDate,
+            originalDate: dateStr,
+            items: grouped[dateStr].sort((a, b) =>
+              (a.startTime || '').localeCompare(b.startTime || '')
+            ),
+          }
+        })
+        .filter((d) => {
+          if (d.originalDate < todayFormatted) return false
+          const maxDate = new Date()
+          maxDate.setDate(maxDate.getDate() + 7)
+          const maxFormatted = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`
+          return d.originalDate <= maxFormatted
         })
 
-        const sortedDates = Object.keys(grouped).sort()
-        const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
-
-        const transformedData = sortedDates
-          .map((dateStr) => {
-            const isToday = dateStr === todayFormatted
-            const parts = dateStr.split('-')
-            const d = new Date(
-              parseInt(parts[0], 10),
-              parseInt(parts[1], 10) - 1,
-              parseInt(parts[2], 10)
-            )
-            const dayOfWeek = d.getDay()
-            const dayLabel = isToday ? 'Hôm nay' : days[dayOfWeek]
-            const formattedDate = dateStr.split('-').reverse().join('/')
-
-            return {
-              isToday: isToday,
-              dayLabel: dayLabel,
-              date: formattedDate,
-              originalDate: dateStr,
-              items: grouped[dateStr].sort((a, b) =>
-                (a.startTime || '').localeCompare(b.startTime || '')
-              ),
-            }
-          })
-          .filter((d) => {
-            if (d.originalDate < todayFormatted) return false
-            const maxDate = new Date()
-            maxDate.setDate(maxDate.getDate() + 7)
-            const maxFormatted = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`
-            return d.originalDate <= maxFormatted
-          })
-
-        setScheduleData(transformedData)
-        setLoading(false)
-      })
-      .catch((err) => {
-        console.error('Lỗi tải dữ liệu lịch:', err)
-        setLoading(false)
-      })
+      setScheduleData(transformedData)
+      setLoading(false)
+    } catch (err) {
+      console.error('Lỗi tải dữ liệu lịch:', err)
+      setLoading(false)
+    }
 
     // Fetch notifications
-    fetch('/api/notifications/visible')
-      .then((res) => res.json())
-      .then((json) => {
-        if (Array.isArray(json)) setNotifications(json)
-        else if (json.data) setNotifications(json.data)
-      })
-      .catch((err) => console.error('Lỗi tải thông báo:', err))
+    try {
+      const data = await notificationService.getVisibleNotifications()
+      setNotifications(Array.isArray(data) ? data : data?.data || [])
+    } catch (err) {
+      console.error('Lỗi tải thông báo:', err)
+    }
 
     // Fetch today's holiday
-    fetch('/api/holidays/today')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json && json.content) {
-          setTodayHoliday(json)
-        } else if (json.success && json.data) {
-          setTodayHoliday(json.data)
-        }
-      })
-      .catch((err) => console.error('Lỗi tải ngày lễ:', err))
+    try {
+      const data = await scheduleService.getTodayHoliday()
+      setTodayHoliday(data?.content ? data : data?.data || null)
+    } catch (err) {
+      console.error('Lỗi tải ngày lễ:', err)
+    }
   }, [])
 
   useEffect(() => {
@@ -131,14 +126,10 @@ export default function WorkSchedule() {
 
   useEffect(() => {
     // Fetch today's holiday again if there is an update
-    fetch('/api/holidays/today')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json && json.content) {
-          setTodayHoliday(json)
-        } else if (json.success && json.data) {
-          setTodayHoliday(json.data)
-        }
+    scheduleService
+      .getTodayHoliday()
+      .then((data) => {
+        setTodayHoliday(data?.content ? data : data?.data || null)
       })
       .catch((err) => console.error('Lỗi tải ngày lễ:', err))
   }, [lastHolidayUpdate])

@@ -5,6 +5,7 @@ import { ConfirmationModal } from '../components/ui/confirmation-modal'
 
 import AdminHeader from '../components/AdminHeader'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import { adminService } from '../services/admin.service'
 
 export default function AdminAccounts() {
   const { token, user } = useAuth()
@@ -31,13 +32,8 @@ export default function AdminAccounts() {
 
   const fetchDepartments = async () => {
     try {
-      const res = await fetch('/api/departments', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setDepartments(json.data || json || [])
-      }
+      const data = await adminService.getDepartments()
+      setDepartments(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
       console.error('Lỗi tải danh sách phòng ban:', err)
     }
@@ -45,13 +41,8 @@ export default function AdminAccounts() {
 
   const fetchAccounts = async () => {
     try {
-      const res = await fetch('/api/users', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setAccounts(json.data || json || [])
-      }
+      const data = await adminService.getUsers()
+      setAccounts(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
       console.error('Lỗi tải danh sách tài khoản:', err)
     }
@@ -100,10 +91,6 @@ export default function AdminAccounts() {
     setError('')
 
     try {
-      const url = editId ? `/api/users/${editId}` : '/api/users'
-      const method = editId ? 'PUT' : 'POST'
-
-      // Payload body mapping
       const body = {
         fullName: formData.fullName,
         username: formData.username,
@@ -114,24 +101,16 @@ export default function AdminAccounts() {
         body.passwordHash = formData.password
       }
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      })
-
-      const result = await res.json()
-      if (res.ok && result.success !== false) {
-        await fetchAccounts()
-        handleReset()
+      if (editId) {
+        await adminService.updateUser(editId, body)
       } else {
-        setError(result.message || 'Có lỗi xảy ra, vui lòng thử lại.')
+        await adminService.createUser(body)
       }
+
+      await fetchAccounts()
+      handleReset()
     } catch (err) {
-      setError('Lỗi kết nối đến máy chủ.')
+      setError(err.message || 'Lỗi kết nối đến máy chủ.')
     } finally {
       setLoading(false)
     }
@@ -160,22 +139,11 @@ export default function AdminAccounts() {
     setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/users/${itemToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (res.ok) {
-        fetchAccounts()
-        if (editId === itemToDelete) handleReset()
-      } else {
-        const result = await res.json()
-        toast.error(result.message || 'Xóa thất bại.')
-      }
+      await adminService.deleteUser(itemToDelete)
+      fetchAccounts()
+      if (editId === itemToDelete) handleReset()
     } catch (err) {
-      toast.error('Lỗi kết nối máy chủ.')
+      toast.error(err.message || 'Xóa thất bại.')
     } finally {
       setIsDeleting(false)
       setDeleteConfirmOpen(false)

@@ -1,3 +1,4 @@
+/* global DOMParser */
 import { useState, useEffect, useRef, useCallback } from 'react'
 import JoditEditor from 'jodit-react'
 import { useAppSignalR } from '../contexts/SignalRContext'
@@ -10,12 +11,16 @@ import { vi } from 'date-fns/locale'
 import { Calendar } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useNavigate } from 'react-router-dom'
+import { adminService } from '../services/admin.service'
 
 const extractTextFromHtml = (html) => {
-  if (!html) return '';
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-};
+  if (!html) return ''
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  return (doc.body.textContent || '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
 registerLocale('vi', vi)
 export default function AdminSchedules() {
@@ -54,24 +59,13 @@ export default function AdminSchedules() {
     'Phòng họp tầng 4 - Trụ sở HĐND và UBND phường',
     'Phòng tiếp công dân - Trụ sở HĐND và UBND phường',
   ]
-  
+
   const { lastScheduleUpdate } = useAppSignalR()
 
   const fetchSchedules = useCallback(async () => {
     try {
-      const res = await fetch('/api/schedules', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        let data = []
-        if (Array.isArray(json)) data = json
-        else if (json.data) data = json.data
-        else if (json.success && Array.isArray(json.data)) data = json.data
-        setSchedules(data)
-      }
+      const data = await adminService.getSchedules()
+      setSchedules(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
       console.error('Lỗi tải danh sách lịch:', err)
     }
@@ -79,19 +73,8 @@ export default function AdminSchedules() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('/api/users', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        let data = []
-        if (Array.isArray(json)) data = json
-        else if (json.data) data = json.data
-        else if (json.success && Array.isArray(json.data)) data = json.data
-        setUsers(data)
-      }
+      const data = await adminService.getUsers()
+      setUsers(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
       console.error('Lỗi tải danh sách người dùng:', err)
     }
@@ -99,13 +82,8 @@ export default function AdminSchedules() {
 
   const fetchDepartments = async () => {
     try {
-      const res = await fetch('/api/departments', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setDepartments(json.data || json || [])
-      }
+      const data = await adminService.getDepartments()
+      setDepartments(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
       console.error('Lỗi tải danh sách phòng ban:', err)
     }
@@ -121,7 +99,8 @@ export default function AdminSchedules() {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_name')
     localStorage.removeItem('user_role')
-    logout(); navigate('/campha/manager/login', {replace: true})
+    logout()
+    navigate('/campha/manager/login', { replace: true })
   }
 
   const navItems = [
@@ -187,38 +166,17 @@ export default function AdminSchedules() {
         updatedAt: formData.updatedAt || null,
       }
 
-      const method = editId ? 'PUT' : 'POST'
-      const url = editId ? `/api/schedules/${editId}` : '/api/schedules'
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (res.ok) {
-        toast.success(
-          editId ? 'Cập nhật lịch công tác thành công!' : 'Thêm lịch công tác thành công!'
-        )
-        handleReset()
-        fetchSchedules()
+      if (editId) {
+        await adminService.updateSchedule(editId, payload)
+        toast.success('Cập nhật lịch công tác thành công!')
       } else {
-        const errData = await res.json()
-        let errMsg = 'Lỗi khi lưu lịch'
-        if (errData.message) {
-          errMsg = errData.message
-        } else if (errData.errors) {
-          errMsg = Object.values(errData.errors).flat().join(', ')
-        } else if (errData.title) {
-          errMsg = errData.title
-        }
-        setError(errMsg)
+        await adminService.createSchedule(payload)
+        toast.success('Thêm lịch công tác thành công!')
       }
+      handleReset()
+      fetchSchedules()
     } catch (err) {
-      setError('Lỗi kết nối máy chủ')
+      setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
       setLoading(false)
     }
@@ -234,20 +192,11 @@ export default function AdminSchedules() {
     setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/schedules/${itemToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (res.ok) {
-        toast.success('Xóa lịch công tác thành công!')
-        fetchSchedules()
-      } else {
-        toast.error('Xóa thất bại')
-      }
+      await adminService.deleteSchedule(itemToDelete)
+      toast.success('Xóa lịch công tác thành công!')
+      fetchSchedules()
     } catch (e) {
-      toast.error('Lỗi kết nối')
+      toast.error(e.message || 'Xóa thất bại')
     } finally {
       setIsDeleting(false)
       setDeleteConfirmOpen(false)
@@ -654,9 +603,9 @@ export default function AdminSchedules() {
                               })
                               const parts = item.participants
                                 ? item.participants
-                                  .split(',')
-                                  .map((s) => s.trim())
-                                  .filter((s) => s)
+                                    .split(',')
+                                    .map((s) => s.trim())
+                                    .filter((s) => s)
                                 : []
                               setSelectedParticipants(parts)
                               window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -729,10 +678,11 @@ export default function AdminSchedules() {
                   <button
                     key={p}
                     onClick={() => setCurrentPage(p)}
-                    className={`px-3 py-1 text-xs border rounded ${currentPage === p
-                      ? 'bg-[#337ab7] text-white border-[#337ab7]'
-                      : 'border-gray-300 hover:bg-gray-100'
-                      }`}
+                    className={`px-3 py-1 text-xs border rounded ${
+                      currentPage === p
+                        ? 'bg-[#337ab7] text-white border-[#337ab7]'
+                        : 'border-gray-300 hover:bg-gray-100'
+                    }`}
                   >
                     {p}
                   </button>

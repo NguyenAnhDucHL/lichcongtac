@@ -3,6 +3,7 @@
  * Utility for handling Web Push Notifications
  */
 /* global Notification, btoa */
+import { notificationService } from '../services/notification.service'
 
 export async function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return null
@@ -37,12 +38,8 @@ export async function subscribeUserToPush(token) {
     const registration = await navigator.serviceWorker.ready
 
     // Get VAPID public key from server
-    const keyResponse = await fetch('/api/notification/vapid-public-key', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-
-    if (!keyResponse.ok) throw new Error('Failed to fetch VAPID key')
-    const { publicKey } = await keyResponse.json()
+    const keyData = await notificationService.getVapidPublicKey()
+    const publicKey = keyData.publicKey
 
     // Check if we already have a subscription with this key
     const existingSubscription = await registration.pushManager.getSubscription()
@@ -70,24 +67,14 @@ export async function subscribeUserToPush(token) {
     const auth = btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth'))))
 
     // Send subscription to server
-    const response = await fetch('/api/notification/subscribe', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        endpoint: subscription.endpoint,
-        p256dh,
-        auth,
-      }),
+    await notificationService.subscribePush({
+      endpoint: subscription.endpoint,
+      p256dh,
+      auth,
     })
 
-    if (response.ok) {
-      localStorage.setItem('push_vapid_key', publicKey)
-    }
-
-    return response.ok
+    localStorage.setItem('push_vapid_key', publicKey)
+    return true
   } catch (error) {
     console.error('[Push] Subscription failed:', error)
     return false
@@ -102,14 +89,7 @@ export async function unsubscribeUserFromPush(token) {
     if (subscription) {
       await subscription.unsubscribe()
       // Optionally notify server to remove subscription
-      await fetch('/api/notification/unsubscribe', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ endpoint: subscription.endpoint }),
-      })
+      await notificationService.unsubscribePush(subscription.endpoint)
     }
     return true
   } catch (error) {

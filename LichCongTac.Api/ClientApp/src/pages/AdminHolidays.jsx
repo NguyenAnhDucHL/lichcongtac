@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import AdminHeader from '../components/AdminHeader'
 import { useAppSignalR } from '../contexts/SignalRContext'
-
+import { adminService } from '../services/admin.service'
 
 import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
@@ -20,22 +20,13 @@ export default function AdminHolidays() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  
+
   const { lastHolidayUpdate } = useAppSignalR()
 
   const fetchHolidays = useCallback(async () => {
     try {
-      const res = await fetch('/api/holidays', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        let data = []
-        if (Array.isArray(json)) data = json
-        else if (json.data) data = json.data
-        else if (json.success && Array.isArray(json.data)) data = json.data
-        setHolidays(data)
-      }
+      const data = await adminService.getHolidays()
+      setHolidays(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
       console.error('Lỗi tải danh sách ngày lễ:', err)
       toast.error('Lỗi tải danh sách ngày lễ')
@@ -56,29 +47,19 @@ export default function AdminHolidays() {
     }
 
     setLoading(true)
-    const url = editId ? `/api/holidays/${editId}` : '/api/holidays'
-    const method = editId ? 'PUT' : 'POST'
-
     try {
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      })
-      const data = await res.json()
-      if (res.ok && (data.success || data.id)) {
-        toast.success(editId ? 'Cập nhật thành công' : 'Thêm mới thành công')
-        setFormData({ date: '', content: '' })
-        setEditId(null)
-        fetchHolidays()
+      if (editId) {
+        await adminService.updateHoliday(editId, formData)
+        toast.success('Cập nhật thành công')
       } else {
-        toast.error(data.message || data.error || 'Có lỗi xảy ra')
+        await adminService.createHoliday(formData)
+        toast.success('Thêm mới thành công')
       }
+      setFormData({ date: '', content: '' })
+      setEditId(null)
+      fetchHolidays()
     } catch (err) {
-      toast.error('Lỗi hệ thống')
+      toast.error(err.message || 'Lỗi hệ thống')
     } finally {
       setLoading(false)
     }
@@ -102,25 +83,15 @@ export default function AdminHolidays() {
     if (!itemToDelete) return
     setIsDeleting(true)
     try {
-      const res = await fetch(`/api/holidays/${itemToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        toast.success('Xóa thành công')
-        fetchHolidays()
-        if (editId === itemToDelete) {
-          setEditId(null)
-          setFormData({ date: '', content: '' })
-        }
-      } else {
-        toast.error(data.message || data.error || 'Lỗi khi xóa')
+      await adminService.deleteHoliday(itemToDelete)
+      toast.success('Xóa thành công')
+      fetchHolidays()
+      if (editId === itemToDelete) {
+        setEditId(null)
+        setFormData({ date: '', content: '' })
       }
     } catch (err) {
-      toast.error('Lỗi hệ thống khi xóa')
+      toast.error(err.message || 'Lỗi hệ thống khi xóa')
     } finally {
       setIsDeleting(false)
       setDeleteConfirmOpen(false)

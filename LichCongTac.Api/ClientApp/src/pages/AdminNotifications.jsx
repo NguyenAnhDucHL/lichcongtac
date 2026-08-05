@@ -4,6 +4,7 @@ import JoditEditor from 'jodit-react'
 import { toast } from 'sonner'
 import { ConfirmationModal } from '../components/ui/confirmation-modal'
 import { useAuth } from '../contexts/AuthContext.jsx'
+import { notificationService } from '../services/notification.service'
 
 export default function AdminNotifications() {
   const { token, user } = useAuth()
@@ -29,19 +30,12 @@ export default function AdminNotifications() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('/api/notifications', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setNotifications(json)
-      } else {
-        if (res.status !== 401) setError('Lỗi khi tải danh sách thông báo')
-      }
+      const data = await notificationService.getNotifications()
+      setNotifications(Array.isArray(data) ? data : data?.data || [])
     } catch (err) {
-      setError('Lỗi kết nối máy chủ')
+      if (err.status !== 401) {
+        setError('Lỗi kết nối máy chủ')
+      }
     }
   }
 
@@ -82,31 +76,17 @@ export default function AdminNotifications() {
         isVisible: formData.isVisible ? 1 : 0,
       }
 
-      const method = editId ? 'PUT' : 'POST'
-      const url = editId ? `/api/notifications/${editId}` : '/api/notifications'
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (res.ok) {
-        toast.success(editId ? 'Cập nhật thông báo thành công!' : 'Thêm thông báo thành công!')
-        handleReset()
-        fetchNotifications()
+      if (editId) {
+        await notificationService.updateNotification(editId, payload)
+        toast.success('Cập nhật thông báo thành công!')
       } else {
-        const errData = await res.json()
-        let errMsg = 'Lỗi khi lưu thông báo'
-        if (errData.message) errMsg = errData.message
-        else if (errData.errors) errMsg = Object.values(errData.errors).flat().join(', ')
-        setError(errMsg)
+        await notificationService.createNotification(payload)
+        toast.success('Thêm thông báo thành công!')
       }
+      handleReset()
+      fetchNotifications()
     } catch (err) {
-      setError('Lỗi kết nối máy chủ')
+      setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
       setLoading(false)
     }
@@ -131,25 +111,14 @@ export default function AdminNotifications() {
     setIsDeleting(true)
 
     try {
-      const res = await fetch(`/api/notifications/${itemToDelete}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      if (res.ok) {
-        toast.success('Xóa thông báo thành công!')
-        // If we delete the last item on current page
-        const newTotal = notifications.length - 1
-        const maxPage = Math.ceil(newTotal / PAGE_SIZE)
-        if (currentPage > maxPage && maxPage > 0) setCurrentPage(maxPage)
-
-        fetchNotifications()
-      } else {
-        toast.error('Có lỗi xảy ra khi xóa')
-      }
+      await notificationService.deleteNotification(itemToDelete)
+      toast.success('Xóa thông báo thành công!')
+      const newTotal = notifications.length - 1
+      const maxPage = Math.ceil(newTotal / PAGE_SIZE)
+      if (currentPage > maxPage && maxPage > 0) setCurrentPage(maxPage)
+      fetchNotifications()
     } catch (err) {
-      toast.error('Lỗi kết nối máy chủ')
+      toast.error(err.message || 'Lỗi kết nối máy chủ')
     } finally {
       setIsDeleting(false)
       setDeleteConfirmOpen(false)

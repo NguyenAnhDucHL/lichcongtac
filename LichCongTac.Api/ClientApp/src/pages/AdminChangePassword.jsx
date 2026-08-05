@@ -3,6 +3,7 @@ import { Eye, EyeOff, KeyRound, CheckCircle2, XCircle, Loader2 } from 'lucide-re
 import AdminHeader from '../components/AdminHeader'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useNavigate } from 'react-router-dom'
+import { authService } from '../services/auth.service'
 
 const navItems = [
   { label: 'QUẢN TRỊ', href: '/campha/manager/accounts' },
@@ -86,7 +87,8 @@ export default function AdminChangePassword() {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_name')
     localStorage.removeItem('user_role')
-    logout(); navigate('/campha/manager/login', {replace: true})
+    logout()
+    navigate('/campha/manager/login', { replace: true })
   }
 
   const handleSubmit = async (e) => {
@@ -101,38 +103,23 @@ export default function AdminChangePassword() {
 
     setLoading(true)
     try {
-      const res = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ currentPassword: oldPassword, newPassword }),
-      })
+      await authService.changePassword({ currentPassword: oldPassword, newPassword })
 
-      const json = await res.json()
-      // Unwrap interceptor
-      const msg = json.message || json.error || (json.data && json.data.message)
-
-      if (res.ok) {
-        setSuccessMsg('Đổi mật khẩu thành công! Bạn sẽ được đăng xuất sau 3 giây...')
-        setOldPassword('')
-        setNewPassword('')
-        setConfirmPassword('')
-        setTimeout(() => {
-          handleLogout()
-        }, 3000)
-      } else {
-        setErrorMsg(msg || 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại.')
-      }
-    } catch {
-      setErrorMsg('Lỗi kết nối máy chủ.')
+      setSuccessMsg('Đổi mật khẩu thành công! Bạn sẽ được đăng xuất sau 3 giây...')
+      setOldPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+      setTimeout(() => {
+        handleLogout()
+      }, 3000)
+    } catch (err) {
+      setErrorMsg(err.message || 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại.')
     } finally {
       setLoading(false)
     }
   }
 
-  const username = (user?.name || '') || ''
+  const username = user?.name || '' || ''
 
   return (
     <div className="min-h-screen bg-white font-sans text-[15px] text-gray-800">

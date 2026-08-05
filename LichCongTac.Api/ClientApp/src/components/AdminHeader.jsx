@@ -8,7 +8,7 @@ export default function AdminHeader() {
   const currentPath = location.pathname
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState(null)
-  
+
   const { logout } = useAuth()
   const navigate = useNavigate()
 

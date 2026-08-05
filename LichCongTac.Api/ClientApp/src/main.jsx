@@ -45,118 +45,6 @@ document.addEventListener('auth:login_cancel', () => {
   processRequestQueue(new Error('Canceled'))
 })
 
-// ─── Global Fetch Interceptor for standardized ApiResponse ────────────────
-const originalFetch = window.fetch
-window.fetch = async function () {
-  var args = Array.prototype.slice.call(arguments)
-
-  var url = args[0]
-  var options = args[1] || {}
-
-  // Cache busting for GET API requests (Fix iOS Safari aggressive caching)
-  if (
-    typeof url === 'string' &&
-    url.startsWith('/api/') &&
-    (!options.method || options.method.toUpperCase() === 'GET')
-  ) {
-    var separator = url.includes('?') ? '&' : '?'
-    args[0] = url + separator + '_t=' + new Date().getTime()
-  }
-
-  // Prevent ngrok browser warning from blocking API requests
-  options.headers = options.headers || {}
-  options.headers['ngrok-skip-browser-warning'] = 'true'
-  args[1] = options
-
-  var response = await originalFetch.apply(window, args)
-  var contentType = response.headers.get('content-type')
-  if (contentType && contentType.includes('application/json')) {
-    var clone = response.clone()
-    try {
-      var json = await clone.json()
-      if (
-        json &&
-        typeof json === 'object' &&
-        'success' in json &&
-        ('data' in json || 'errors' in json)
-      ) {
-        var unwrappedData
-        if (json.success) {
-          unwrappedData = json.data !== null ? json.data : { message: json.message }
-        } else {
-          unwrappedData = {
-            message: json.message,
-            error: json.message,
-            errors: json.errors,
-          }
-        }
-
-        var newResponse = new Response(JSON.stringify(unwrappedData), {
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers,
-        })
-
-        Object.defineProperty(newResponse, 'url', { value: response.url })
-        return newResponse
-      }
-    } catch (e) {
-      // Ignore parsing error
-    }
-  }
-  if (response.status === 401 && !url.includes('/api/auth/refresh')) {
-    let unauthorizedMessage = 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.'
-    const token = localStorage.getItem('auth_token')
-    if (token) {
-      try {
-        const refreshRes = await originalFetch('/api/auth/refresh', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include', // Bắt buộc để gửi HttpOnly Cookie chứa refresh_token
-          body: JSON.stringify({ token }),
-        })
-        if (refreshRes.ok) {
-          const refreshData = await refreshRes.json()
-          if (refreshData.success && refreshData.data?.token) {
-            localStorage.setItem('auth_token', refreshData.data.token)
-            // Retry the original request using window.fetch to ensure it gets unwrapped
-            options.headers = options.headers || {}
-            options.headers['Authorization'] = 'Bearer ' + refreshData.data.token
-            args[1] = options
-            return await window.fetch.apply(window, args)
-          }
-        } else {
-          try {
-            const errData = await refreshRes.json()
-            if (errData.message) unauthorizedMessage = errData.message
-          } catch (e) {}
-        }
-      } catch (err) {
-        console.error('Lỗi khi làm mới token:', err)
-      }
-    }
-    
-    // Nếu cả Refresh Token cũng hết hạn -> Hiện Modal Login và đưa Request vào Hàng Đợi (Queue)
-    if (!isLoginModalOpen) {
-      isLoginModalOpen = true
-      document.dispatchEvent(new CustomEvent('auth:unauthorized', { detail: { message: unauthorizedMessage } }))
-    }
-
-    return new Promise((resolve) => {
-      failedRequestQueue.push({ resolve, originalResponse: response })
-    }).then((newToken) => {
-      if (newToken && typeof newToken === 'string') {
-        options.headers = options.headers || {}
-        options.headers['Authorization'] = 'Bearer ' + newToken
-        args[1] = options
-        return window.fetch.apply(window, args)
-      }
-      return response // Bị hủy đăng nhập thì trả về lỗi 401 gốc
-    })
-  }
-  return response
-}
-
 // ─── Error Boundary ─────────────────────────────────────────────────────────
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -298,13 +186,13 @@ const router = createBrowserRouter([
       {
         path: '*',
         element: <Navigate to="/campha/manager/schedules" replace />,
-      }
-    ]
+      },
+    ],
   },
   {
     path: '*',
-    element: <Navigate to="/campha/" replace />
-  }
+    element: <Navigate to="/campha/" replace />,
+  },
 ])
 
 createRoot(document.getElementById('root')).render(

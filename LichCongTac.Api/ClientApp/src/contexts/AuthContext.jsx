@@ -1,7 +1,9 @@
+/* global CustomEvent */
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { toast } from 'sonner'
 import { KeyRound, Loader2, X } from 'lucide-react'
+import { authService } from '../services/auth.service'
 
 const AuthContext = createContext(null)
 
@@ -58,10 +60,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     // Fire and forget logout to backend to revoke RefreshToken and clear HttpOnly cookies
     if (token) {
-      fetch('/api/auth/logout', { 
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` }
-      }).catch(err => console.error('Lỗi khi đăng xuất:', err))
+      authService.logout().catch((err) => console.error('Lỗi khi đăng xuất:', err))
     }
 
     localStorage.removeItem('auth_token')
@@ -77,28 +76,20 @@ export const AuthProvider = ({ children }) => {
     setModalLoading(true)
     setModalError('')
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: modalUsername, password: modalPassword })
-      })
-      if (res.ok) {
-        const json = await res.json()
-        if (json.success && json.data) {
-          login(json.data.user, json.data.token)
-          setShowExpiredModal(false)
-          setModalPassword('')
-          document.dispatchEvent(new CustomEvent('auth:login_success', { detail: { token: json.data.token } }))
-          toast.success('Đăng nhập lại thành công! Dữ liệu đã tự động được lưu.')
-        } else {
-          setModalError(json.message || 'Sai tài khoản hoặc mật khẩu')
-        }
+      const data = await authService.login({ username: modalUsername, password: modalPassword })
+      if (data && data.user) {
+        login(data.user, data.token)
+        setShowExpiredModal(false)
+        setModalPassword('')
+        document.dispatchEvent(
+          new CustomEvent('auth:login_success', { detail: { token: data.token } })
+        )
+        toast.success('Đăng nhập lại thành công! Dữ liệu đã tự động được lưu.')
       } else {
-        const err = await res.json()
-        setModalError(err.message || 'Sai tài khoản hoặc mật khẩu')
+        setModalError('Sai tài khoản hoặc mật khẩu')
       }
     } catch (error) {
-      setModalError('Lỗi kết nối máy chủ')
+      setModalError(error.message || 'Lỗi kết nối máy chủ')
     } finally {
       setModalLoading(false)
     }
@@ -110,7 +101,7 @@ export const AuthProvider = ({ children }) => {
       {showExpiredModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
-            <button 
+            <button
               onClick={() => {
                 setShowExpiredModal(false)
                 logout()
@@ -127,7 +118,8 @@ export const AuthProvider = ({ children }) => {
               </div>
               <h2 className="text-xl font-bold text-gray-900">Phiên đăng nhập hết hạn</h2>
               <p className="mt-2 text-sm text-gray-500">
-                Vui lòng đăng nhập lại để tiếp tục công việc mà không làm mất dữ liệu bạn đang nhập dở.
+                Vui lòng đăng nhập lại để tiếp tục công việc mà không làm mất dữ liệu bạn đang nhập
+                dở.
               </p>
             </div>
             {modalError && (
@@ -137,7 +129,9 @@ export const AuthProvider = ({ children }) => {
             )}
             <form onSubmit={handleModalLogin} className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">Tên đăng nhập</label>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Tên đăng nhập
+                </label>
                 <input
                   type="text"
                   required
