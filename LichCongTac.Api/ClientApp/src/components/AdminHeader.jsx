@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Menu, ChevronDown, ChevronUp } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function AdminHeader() {
@@ -13,8 +14,12 @@ export default function AdminHeader() {
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    logout()
-    navigate('/campha/manager/login')
+    toast.loading('Đang đăng xuất...', { duration: 1500 })
+    setTimeout(() => {
+      logout()
+      navigate('/campha/manager/login')
+      toast.success('Hẹn gặp lại!')
+    }, 1500)
   }
 
   const isActive = (href) => {

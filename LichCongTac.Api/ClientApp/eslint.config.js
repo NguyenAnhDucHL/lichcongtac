@@ -65,6 +65,8 @@ export default [
     rules: {
       // ─── React Rules ─────────────────────────────────────────────────────────
       'react/react-in-jsx-scope': 'off', // Không cần import React (React 17+)
+      'react/jsx-uses-react': 'off', // Không cần import React
+      'react/jsx-uses-vars': 'error', // Đánh dấu JSX component là "used"
       'react/prop-types': 'warn', // Cảnh báo nếu thiếu PropTypes
       'react/jsx-key': 'error', // Bắt buộc có key trong list render
       'react/no-array-index-key': 'warn', // Hạn chế dùng index làm key

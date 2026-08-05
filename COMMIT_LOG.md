@@ -4,6 +4,16 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-06 01:35] Tái cấu trúc AdminSchedules theo Feature-Sliced Design + Hiệu ứng Logout
+- **Mô tả**: Tách file `AdminSchedules.jsx` khổng lồ (722 dòng) thành 3 component con độc lập theo chuẩn Bulletproof React / Feature-Sliced Design. Mỗi component con tự quản lý render của riêng mình, tránh re-render toàn trang khi thay đổi nhỏ. Đồng thời cải thiện UX đăng xuất bằng toast loading 1.5s thay vì chuyển trang đột ngột.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/ScheduleForm.jsx` (Mới — Form thêm/sửa lịch, ~230 dòng)
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/ScheduleTable.jsx` (Mới — Bảng danh sách, ~110 dòng)
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/SchedulePagination.jsx` (Mới — Phân trang, ~70 dòng)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi — Rút gọn từ 722 → ~170 dòng)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi — Thêm toast loading khi logout)
+- **Lệnh git commit**: `git commit -m "refactor(docs): tách AdminSchedules thành Feature-Sliced components + logout UX"`
+
 ### [2026-08-02 23:30] Tối ưu hóa truy vấn Database, loại bỏ SELECT *
 - **Mô tả**: Thay thế toàn bộ các câu lệnh `SELECT *` bằng việc liệt kê rõ các cột cụ thể trong các repository (`DepartmentRepository` và `ScheduleRepository`). Điều này giúp cải thiện hiệu năng I/O bộ nhớ và tuân thủ chặt chẽ kiến trúc backend của dự án, tránh load dữ liệu dư thừa.
 - **Tệp thay đổi**:
