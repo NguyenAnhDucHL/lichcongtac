@@ -106,21 +106,18 @@ window.fetch = async function () {
   }
   if (response.status === 401 && !url.includes('/api/auth/refresh')) {
     const token = localStorage.getItem('auth_token')
-    const refreshToken = localStorage.getItem('refresh_token')
-    if (token && refreshToken) {
+    if (token) {
       try {
         const refreshRes = await originalFetch('/api/auth/refresh', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, refreshToken }),
+          credentials: 'include', // Bắt buộc để gửi HttpOnly Cookie chứa refresh_token
+          body: JSON.stringify({ token }),
         })
         if (refreshRes.ok) {
           const refreshData = await refreshRes.json()
           if (refreshData.success && refreshData.data?.token) {
             localStorage.setItem('auth_token', refreshData.data.token)
-            if (refreshData.data.refreshToken) {
-              localStorage.setItem('refresh_token', refreshData.data.refreshToken)
-            }
             // Retry the original request using window.fetch to ensure it gets unwrapped
             options.headers = options.headers || {}
             options.headers['Authorization'] = 'Bearer ' + refreshData.data.token

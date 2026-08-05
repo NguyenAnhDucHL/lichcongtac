@@ -138,10 +138,18 @@ namespace LichCongTac.Api.Controllers
                 Expires  = DateTime.UtcNow.AddHours(24)
             });
 
+            // Gắn Refresh Token vào HttpOnly Cookie (Chuẩn Enterprise)
+            Response.Cookies.Append("refresh_cookie", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure   = true,
+                SameSite = SameSiteMode.Strict,
+                Expires  = refreshTokenExpiryTime
+            });
+
             return Ok(ApiResponse.Ok(new
             {
                 token    = tokenString,
-                refreshToken = refreshToken,
                 username = user.Username,
                 fullName = user.FullName ?? user.Username,
                 role     = user.Role,
@@ -152,7 +160,8 @@ namespace LichCongTac.Api.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(request.RefreshToken))
+            var refreshToken = Request.Cookies["refresh_cookie"];
+            if (string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(refreshToken))
                 return BadRequest(ApiResponse.Fail("Token không hợp lệ."));
 
             var principal = GetPrincipalFromExpiredToken(request.Token);
@@ -164,7 +173,7 @@ namespace LichCongTac.Api.Controllers
                 return BadRequest(ApiResponse.Fail("Token không chứa thông tin người dùng."));
 
             var user = await _userManager.FindByNameAsync(username);
-            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
                 return Unauthorized(ApiResponse.Fail("Refresh Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại."));
 
             // Sinh Token mới
@@ -181,19 +190,25 @@ namespace LichCongTac.Api.Controllers
 
             var newToken = tokenHandler.CreateToken(tokenDescriptor);
             var newTokenString = tokenHandler.WriteToken(newToken);
+            
             var newRefreshToken = GenerateRefreshToken();
+            var newRefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
 
-            _userRepository.UpdateRefreshToken(user.Id, newRefreshToken, DateTime.UtcNow.AddDays(7));
+            _userRepository.UpdateRefreshToken(user.Id, newRefreshToken, newRefreshTokenExpiryTime);
 
             Response.Cookies.Append("jwt_cookie", newTokenString, new CookieOptions
             {
                 HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = DateTime.UtcNow.AddHours(24)
             });
 
+            Response.Cookies.Append("refresh_cookie", newRefreshToken, new CookieOptions
+            {
+                HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = newRefreshTokenExpiryTime
+            });
+
             return Ok(ApiResponse.Ok(new
             {
-                token = newTokenString,
-                refreshToken = newRefreshToken
+                token = newTokenString
             }));
         }
 
@@ -237,9 +252,17 @@ namespace LichCongTac.Api.Controllers
         // ─── LOGOUT ──────────────────────────────────────────────────────────────
 
         [HttpPost("logout")]
+        [Authorize]
         public IActionResult Logout()
         {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdStr, out int userId))
+            {
+                _userRepository.UpdateRefreshToken(userId, null, null);
+            }
+
             Response.Cookies.Delete("jwt_cookie");
+            Response.Cookies.Delete("refresh_cookie");
             return Ok(ApiResponse.Ok("Đăng xuất thành công"));
         }
 
@@ -290,6 +313,9 @@ namespace LichCongTac.Api.Controllers
                 var cache = HttpContext.RequestServices.GetService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
                 cache?.Remove($"UserSession_{userId}");
 
+                // Thu hồi Refresh Token
+                _userRepository.UpdateRefreshToken(userId, null, null);
+
                 return Ok(ApiResponse.Ok("Đổi mật khẩu thành công. Vui lòng đăng nhập lại."));
             }
 
@@ -313,7 +339,6 @@ namespace LichCongTac.Api.Controllers
     public class RefreshTokenRequest
     {
         public string Token { get; set; } = "";
-        public string RefreshToken { get; set; } = "";
     }
 }
 

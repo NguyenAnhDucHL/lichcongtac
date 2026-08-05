@@ -798,3 +798,14 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Khởi tạo failedRequestQueue và Promise wrapper)
   - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Bổ sung phát sự kiện auth:login_success và auth:login_cancel)
 - **Lệnh git commit**: `git commit -m "feat(auth): implement request queue to auto retry failed requests after modal login"`
+
+### [2026-08-05 23:05] Nâng cấp Bảo mật Session (HttpOnly Refresh Token & Token Revocation)
+- **Mô tả**: Vá hoàn toàn lỗ hổng bảo mật liên quan đến vòng đời của Refresh Token:
+  1. Gắn Refresh Token vào HttpOnly Cookie thay vì trả về qua JSON (Chống tấn công XSS).
+  2. Bổ sung cơ chế Revoke Token: Thu hồi (xóa) Refresh Token trong DB khi người dùng gọi API Đăng xuất hoặc Đổi mật khẩu. Chống lỗ hổng "Ghost Session" khi mật khẩu đã đổi nhưng Token cũ vẫn sống.
+  3. Cập nhật Interceptor trên Frontend: Tự động đính kèm HttpOnly Cookie khi gọi `/api/auth/refresh` và loại bỏ hoàn toàn `localStorage` cho refresh token.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: Đổi luồng trả cookie, thêm [Authorize] và logic Revoke cho Logout/ChangePassword)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Gỡ bỏ localStorage.setItem('refresh_token'), gọi API Logout ngầm)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Đọc cookie ngầm, thêm credentials: 'include')
+- **Lệnh git commit**: `git commit -m "security(auth): move refresh token to httponly cookie and revoke token in db on logout/password change"`

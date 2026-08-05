@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Khởi tạo state từ localStorage
     const storedToken = localStorage.getItem('auth_token')
-    const storedRefreshToken = localStorage.getItem('refresh_token')
     const storedName = localStorage.getItem('user_name')
     const storedRole = localStorage.getItem('user_role')
     const storedFullname = localStorage.getItem('user_fullname')
@@ -46,9 +45,8 @@ export const AuthProvider = ({ children }) => {
     return () => document.removeEventListener('auth:unauthorized', handleUnauthorized)
   }, [])
 
-  const login = (userData, authToken, refreshToken) => {
+  const login = (userData, authToken) => {
     localStorage.setItem('auth_token', authToken)
-    if (refreshToken) localStorage.setItem('refresh_token', refreshToken)
     if (userData.name) localStorage.setItem('user_name', userData.name)
     if (userData.role) localStorage.setItem('user_role', userData.role)
     if (userData.fullname) localStorage.setItem('user_fullname', userData.fullname)
@@ -58,8 +56,15 @@ export const AuthProvider = ({ children }) => {
   }
 
   const logout = () => {
+    // Fire and forget logout to backend to revoke RefreshToken and clear HttpOnly cookies
+    if (token) {
+      fetch('/api/auth/logout', { 
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).catch(err => console.error('Lỗi khi đăng xuất:', err))
+    }
+
     localStorage.removeItem('auth_token')
-    localStorage.removeItem('refresh_token')
     localStorage.removeItem('user_name')
     localStorage.removeItem('user_role')
     localStorage.removeItem('user_fullname')
@@ -80,7 +85,7 @@ export const AuthProvider = ({ children }) => {
       if (res.ok) {
         const json = await res.json()
         if (json.success && json.data) {
-          login(json.data.user, json.data.token, json.data.refreshToken)
+          login(json.data.user, json.data.token)
           setShowExpiredModal(false)
           setModalPassword('')
           document.dispatchEvent(new CustomEvent('auth:login_success', { detail: { token: json.data.token } }))
