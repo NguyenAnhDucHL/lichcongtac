@@ -1,4 +1,5 @@
 /* global DOMParser */
+import { useState, useEffect } from 'react'
 import { Calendar } from 'lucide-react'
 import JoditEditor from 'jodit-react'
 import DatePicker, { registerLocale } from 'react-datepicker'
@@ -76,6 +77,14 @@ export function ScheduleForm({
   onSubmit,
   onReset,
 }) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
@@ -128,6 +137,18 @@ export function ScheduleForm({
               wrapperClassName="w-full"
               className="w-full min-w-0 border border-[#5cb85c] rounded pl-3 pr-10 py-1.5 outline-none focus:ring-1 focus:ring-[#5cb85c] text-gray-700"
               required
+              withPortal={isMobile}
+              popperPlacement="bottom-start"
+              popperModifiers={[
+                {
+                  name: 'preventOverflow',
+                  options: { boundary: 'viewport', altAxis: true, padding: 8 },
+                },
+                {
+                  name: 'flip',
+                  options: { fallbackPlacements: ['top-start', 'bottom-start'] },
+                },
+              ]}
             />
             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
           </div>

@@ -32,15 +32,24 @@ export function AccountTable({ accounts, departments, onEdit, onDelete }) {
                 <td className="border border-gray-200 py-2.5 px-4 font-bold">{index + 1}</td>
                 <td className="border border-gray-200 py-2.5 px-4">{acc.fullName}</td>
                 <td className="border border-gray-200 py-2.5 px-4">{acc.username}</td>
-                <td className="border border-gray-200 py-2.5 px-4">{getDeptName(acc.departmentId)}</td>
+                <td className="border border-gray-200 py-2.5 px-4">
+                  {getDeptName(acc.departmentId)}
+                </td>
                 <td className="border border-gray-200 py-2.5 px-4">
                   {acc.role === 'Admin' ? 'Có' : 'Không'}
                 </td>
                 <td className="border border-gray-200 py-2.5 px-4">
-                  <button onClick={() => onEdit(acc)} className="text-[#337ab7] hover:underline">Sửa</button>
+                  <button onClick={() => onEdit(acc)} className="text-[#337ab7] hover:underline">
+                    Sửa
+                  </button>
                 </td>
                 <td className="border border-gray-200 py-2.5 px-4">
-                  <button onClick={() => onDelete(acc.id)} className="text-[#337ab7] hover:underline">Xóa</button>
+                  <button
+                    onClick={() => onDelete(acc.id)}
+                    className="text-[#337ab7] hover:underline"
+                  >
+                    Xóa
+                  </button>
                 </td>
               </tr>
             ))

@@ -28,13 +28,20 @@ export default function AdminNotifications() {
     }
   }
 
-  useEffect(() => { fetchNotifications() }, [])
+  useEffect(() => {
+    fetchNotifications()
+  }, [])
 
-  const handleReset = () => { setEditId(null); setFormData(INITIAL_FORM); setError(null) }
+  const handleReset = () => {
+    setEditId(null)
+    setFormData(INITIAL_FORM)
+    setError(null)
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true); setError(null)
+    setLoading(true)
+    setError(null)
     const plainContent = formData.content.replace(/<[^>]*>?/gm, '').trim()
     if (!plainContent && !formData.content.includes('<img')) {
       setError('Nội dung không được để trống')
@@ -50,7 +57,8 @@ export default function AdminNotifications() {
         await notificationService.createNotification(payload)
         toast.success('Thêm thông báo thành công!')
       }
-      handleReset(); fetchNotifications()
+      handleReset()
+      fetchNotifications()
     } catch (err) {
       setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
@@ -74,7 +82,9 @@ export default function AdminNotifications() {
     } catch (err) {
       toast.error(err.message || 'Lỗi kết nối máy chủ')
     } finally {
-      setIsDeleting(false); setDeleteConfirmOpen(false); setItemToDelete(null)
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -84,21 +94,32 @@ export default function AdminNotifications() {
       <main className="max-w-[1000px] mx-auto px-4 py-6">
         <h2 className="text-[#c8102e] font-bold text-lg mb-6">Thông báo</h2>
         <NotificationForm
-          formData={formData} setFormData={setFormData} editId={editId}
-          loading={loading} error={error} onSubmit={handleSubmit} onReset={handleReset}
+          formData={formData}
+          setFormData={setFormData}
+          editId={editId}
+          loading={loading}
+          error={error}
+          onSubmit={handleSubmit}
+          onReset={handleReset}
         />
         <NotificationTable
-          notifications={notifications} currentPage={currentPage}
+          notifications={notifications}
+          currentPage={currentPage}
           onEdit={handleEdit}
-          onDelete={(id) => { setItemToDelete(id); setDeleteConfirmOpen(true) }}
+          onDelete={(id) => {
+            setItemToDelete(id)
+            setDeleteConfirmOpen(true)
+          }}
           onPageChange={setCurrentPage}
         />
       </main>
       <ConfirmationModal
-        open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
         title="Xác nhận xóa"
         description="Bạn có chắc chắn muốn xóa thông báo này? Thao tác này không thể hoàn tác."
-        onConfirm={handleDeleteConfirm} isLoading={isDeleting}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
       />
     </div>
   )

@@ -29,7 +29,8 @@ export default function AdminChangePassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setSuccessMsg(''); setErrorMsg('')
+    setSuccessMsg('')
+    setErrorMsg('')
     if (newPassword !== confirmPassword) {
       setErrorMsg('Mật khẩu xác nhận không khớp.')
       return
@@ -38,7 +39,9 @@ export default function AdminChangePassword() {
     try {
       await authService.changePassword({ currentPassword: oldPassword, newPassword })
       setSuccessMsg('Đổi mật khẩu thành công! Bạn sẽ được đăng xuất sau 3 giây...')
-      setOldPassword(''); setNewPassword(''); setConfirmPassword('')
+      setOldPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
       setTimeout(handleLogout, 3000)
     } catch (err) {
       setErrorMsg(err.message || 'Đổi mật khẩu thất bại. Vui lòng kiểm tra lại.')
@@ -48,7 +51,9 @@ export default function AdminChangePassword() {
   }
 
   const confirmMatchState = confirmPassword
-    ? confirmPassword === newPassword ? 'match' : 'mismatch'
+    ? confirmPassword === newPassword
+      ? 'match'
+      : 'mismatch'
     : 'empty'
 
   const borderClass = {
@@ -92,12 +97,19 @@ export default function AdminChangePassword() {
                     Mật khẩu hiện tại <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <input type={showOld ? 'text' : 'password'} value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)} required
+                    <input
+                      type={showOld ? 'text' : 'password'}
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      required
                       placeholder="Nhập mật khẩu hiện tại"
-                      className="w-full border border-gray-300 rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30 transition" />
-                    <button type="button" onClick={() => setShowOld(!showOld)}
-                      className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition">
+                      className="w-full border border-gray-300 rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30 transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowOld(!showOld)}
+                      className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition"
+                    >
                       {showOld ? <EyeOff size={17} /> : <Eye size={17} />}
                     </button>
                   </div>
@@ -111,12 +123,19 @@ export default function AdminChangePassword() {
                     Mật khẩu mới <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <input type={showNew ? 'text' : 'password'} value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)} required
+                    <input
+                      type={showNew ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
                       placeholder="Nhập mật khẩu mới"
-                      className="w-full border border-gray-300 rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30 transition" />
-                    <button type="button" onClick={() => setShowNew(!showNew)}
-                      className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition">
+                      className="w-full border border-gray-300 rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none focus:border-[#5bc0de] focus:ring-1 focus:ring-[#5bc0de]/30 transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNew(!showNew)}
+                      className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition"
+                    >
                       {showNew ? <EyeOff size={17} /> : <Eye size={17} />}
                     </button>
                   </div>
@@ -129,12 +148,19 @@ export default function AdminChangePassword() {
                     Xác nhận mật khẩu mới <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <input type={showConfirm ? 'text' : 'password'} value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)} required
+                    <input
+                      type={showConfirm ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
                       placeholder="Nhập lại mật khẩu mới"
-                      className={`w-full border rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none transition ${borderClass}`} />
-                    <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition">
+                      className={`w-full border rounded-lg px-3.5 pr-10 py-2.5 text-[15px] outline-none transition ${borderClass}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm(!showConfirm)}
+                      className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition"
+                    >
                       {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
                     </button>
                   </div>
@@ -151,12 +177,20 @@ export default function AdminChangePassword() {
                 </div>
 
                 <div className="pt-2">
-                  <button type="submit" disabled={loading || !!successMsg}
-                    className="w-full bg-[#5cb85c] hover:bg-[#4cae4c] disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-lg text-[15px] font-bold transition-colors shadow-sm flex items-center justify-center gap-2">
-                    {loading
-                      ? <><Loader2 size={15} className="animate-spin" /> Đang xử lý...</>
-                      : <><KeyRound size={15} /> Đổi mật khẩu</>
-                    }
+                  <button
+                    type="submit"
+                    disabled={loading || !!successMsg}
+                    className="w-full bg-[#5cb85c] hover:bg-[#4cae4c] disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-lg text-[15px] font-bold transition-colors shadow-sm flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 size={15} className="animate-spin" /> Đang xử lý...
+                      </>
+                    ) : (
+                      <>
+                        <KeyRound size={15} /> Đổi mật khẩu
+                      </>
+                    )}
                   </button>
                 </div>
               </form>

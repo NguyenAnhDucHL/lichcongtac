@@ -130,9 +130,9 @@ export default function AdminLogin() {
           </div>
 
           <div className="text-center pt-2">
-            <Link 
-              to="/campha/" 
-              className="inline-flex items-center justify-center gap-2 text-sm text-[#5e8b91] hover:text-gray-900 transition-colors"
+            <Link
+              to="/campha/"
+              className="inline-flex items-center justify-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft size={16} />
               Quay về xem Lịch công tác

@@ -1,5 +1,5 @@
 /* global CustomEvent */
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { toast } from 'sonner'
 import { KeyRound, Loader2, X, Eye, EyeOff } from 'lucide-react'
@@ -18,6 +18,9 @@ export const AuthProvider = ({ children }) => {
   const [modalLoading, setModalLoading] = useState(false)
   const [modalError, setModalError] = useState('')
   const [showModalPassword, setShowModalPassword] = useState(false)
+
+  // Ref để debounce - tránh bắn sự kiện unauthorized nhiều lần cùng lúc
+  const unauthorizedTimerRef = useRef(null)
 
   useEffect(() => {
     // Khởi tạo state từ localStorage
@@ -38,19 +41,47 @@ export const AuthProvider = ({ children }) => {
 
     // Lắng nghe sự kiện đăng xuất từ interceptor 401
     const handleUnauthorized = (e) => {
-      // Bỏ qua nếu đang ở trang login hoặc nếu token đã bị xóa (người dùng chủ động bấm Đăng xuất)
-      if (window.location.pathname.includes('/login') || !localStorage.getItem('auth_token')) {
-        return
-      }
+      // Bỏ qua nếu token đã bị xóa (người dùng chủ động bấm Đăng xuất)
+      if (!localStorage.getItem('auth_token')) return
 
-      // Hiển thị modal để user đăng nhập lại tại chỗ thay vì redirect mất form data
-      setModalUsername(localStorage.getItem('user_name') || '')
-      setModalPassword('')
-      setModalError(e.detail?.message || 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
-      setShowExpiredModal(true)
+      // Bỏ qua nếu đang ở trang login
+      if (window.location.pathname.includes('/login')) return
+
+      // Debounce: nếu đã có timer đang chạy thì bỏ qua, tránh spam modal
+      if (unauthorizedTimerRef.current) return
+      unauthorizedTimerRef.current = setTimeout(() => {
+        unauthorizedTimerRef.current = null
+      }, 3000)
+
+      // Nếu người dùng đang thực sự làm việc trong trang Admin (không phải lần đầu vào)
+      // → hiện Modal tại chỗ để không mất form data đang nhập
+      const isInsideAdmin =
+        window.location.pathname.startsWith('/campha/manager') &&
+        !window.location.pathname.includes('/campha/manager/login')
+
+      if (isInsideAdmin) {
+        // Đang làm việc dở → hiện modal để đăng nhập lại không mất dữ liệu
+        setModalUsername(localStorage.getItem('user_name') || '')
+        setModalPassword('')
+        setModalError(e.detail?.message || 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
+        setShowExpiredModal(true)
+      } else {
+        // Đang ở trang công khai hoặc vừa mới điều hướng vào Admin → redirect sạch về Login
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user_name')
+        localStorage.removeItem('user_role')
+        localStorage.removeItem('user_fullname')
+        setToken(null)
+        setUser(null)
+        toast.info('Phiên làm việc đã hết hạn, vui lòng đăng nhập lại.')
+        window.location.href = '/campha/manager/login'
+      }
     }
     document.addEventListener('auth:unauthorized', handleUnauthorized)
-    return () => document.removeEventListener('auth:unauthorized', handleUnauthorized)
+    return () => {
+      document.removeEventListener('auth:unauthorized', handleUnauthorized)
+      if (unauthorizedTimerRef.current) clearTimeout(unauthorizedTimerRef.current)
+    }
   }, [])
 
   const login = (userData, authToken) => {
@@ -87,7 +118,7 @@ export const AuthProvider = ({ children }) => {
         const userData = {
           name: data.username || data.fullName,
           role: data.role,
-          fullname: data.fullName
+          fullname: data.fullName,
         }
         login(userData, data.token)
         setShowExpiredModal(false)
@@ -166,7 +197,11 @@ export const AuthProvider = ({ children }) => {
                     onClick={() => setShowModalPassword(!showModalPassword)}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
                   >
-                    {showModalPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showModalPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </div>

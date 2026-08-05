@@ -27,13 +27,20 @@ export default function AdminDepartments() {
     }
   }
 
-  useEffect(() => { fetchDepartments() }, [])
+  useEffect(() => {
+    fetchDepartments()
+  }, [])
 
-  const handleReset = () => { setFormData(INITIAL_FORM); setEditId(null); setError('') }
+  const handleReset = () => {
+    setFormData(INITIAL_FORM)
+    setEditId(null)
+    setError('')
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true); setError('')
+    setLoading(true)
+    setError('')
     try {
       if (editId) {
         await adminService.updateDepartment(editId, formData)
@@ -42,7 +49,8 @@ export default function AdminDepartments() {
         await adminService.createDepartment(formData)
         toast.success('Thêm phòng ban thành công!')
       }
-      handleReset(); fetchDepartments()
+      handleReset()
+      fetchDepartments()
     } catch (err) {
       setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
@@ -66,7 +74,9 @@ export default function AdminDepartments() {
     } catch (err) {
       toast.error(err.message || 'Lỗi khi xóa phòng ban')
     } finally {
-      setIsDeleting(false); setDeleteConfirmOpen(false); setItemToDelete(null)
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -76,20 +86,31 @@ export default function AdminDepartments() {
       <main className="max-w-[1000px] mx-auto px-4 py-6">
         <h2 className="text-[#c8102e] font-bold text-lg mb-6">Quản trị phòng ban</h2>
         <DepartmentForm
-          formData={formData} setFormData={setFormData} editId={editId}
-          loading={loading} error={error} onSubmit={handleSubmit} onReset={handleReset}
+          formData={formData}
+          setFormData={setFormData}
+          editId={editId}
+          loading={loading}
+          error={error}
+          onSubmit={handleSubmit}
+          onReset={handleReset}
         />
         <div className="text-gray-500 mb-2">Danh sách phòng ban</div>
         <DepartmentTable
-          departments={departments} onEdit={handleEdit}
-          onDelete={(id) => { setItemToDelete(id); setDeleteConfirmOpen(true) }}
+          departments={departments}
+          onEdit={handleEdit}
+          onDelete={(id) => {
+            setItemToDelete(id)
+            setDeleteConfirmOpen(true)
+          }}
         />
       </main>
       <ConfirmationModal
-        open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
         title="Xác nhận xóa"
         description="Bạn có chắc chắn muốn xóa phòng ban này? Thao tác này không thể hoàn tác."
-        onConfirm={handleDeleteConfirm} isLoading={isDeleting}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
       />
     </div>
   )

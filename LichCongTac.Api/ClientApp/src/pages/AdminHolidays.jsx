@@ -29,7 +29,9 @@ export default function AdminHolidays() {
     }
   }, [])
 
-  useEffect(() => { fetchHolidays() }, [fetchHolidays, lastHolidayUpdate])
+  useEffect(() => {
+    fetchHolidays()
+  }, [fetchHolidays, lastHolidayUpdate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -46,7 +48,9 @@ export default function AdminHolidays() {
         await adminService.createHoliday(formData)
         toast.success('Thêm mới thành công')
       }
-      setFormData({ date: '', content: '' }); setEditId(null); fetchHolidays()
+      setFormData({ date: '', content: '' })
+      setEditId(null)
+      fetchHolidays()
     } catch (err) {
       toast.error(err.message || 'Lỗi hệ thống')
     } finally {
@@ -65,12 +69,18 @@ export default function AdminHolidays() {
     setIsDeleting(true)
     try {
       await adminService.deleteHoliday(itemToDelete)
-      toast.success('Xóa thành công'); fetchHolidays()
-      if (editId === itemToDelete) { setEditId(null); setFormData({ date: '', content: '' }) }
+      toast.success('Xóa thành công')
+      fetchHolidays()
+      if (editId === itemToDelete) {
+        setEditId(null)
+        setFormData({ date: '', content: '' })
+      }
     } catch (err) {
       toast.error(err.message || 'Lỗi hệ thống khi xóa')
     } finally {
-      setIsDeleting(false); setDeleteConfirmOpen(false); setItemToDelete(null)
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -82,21 +92,33 @@ export default function AdminHolidays() {
           Quản lý ngày lễ
         </h2>
         <HolidayForm
-          formData={formData} setFormData={setFormData} editId={editId}
-          loading={loading} onSubmit={handleSubmit}
+          formData={formData}
+          setFormData={setFormData}
+          editId={editId}
+          loading={loading}
+          onSubmit={handleSubmit}
         />
         <p className="text-sm text-gray-600 mb-2">Danh sách ngày lễ</p>
         <HolidayTable
-          holidays={holidays} initialLoading={initialLoading}
+          holidays={holidays}
+          initialLoading={initialLoading}
           onEdit={handleEdit}
-          onDelete={(id) => { setItemToDelete(id); setDeleteConfirmOpen(true) }}
+          onDelete={(id) => {
+            setItemToDelete(id)
+            setDeleteConfirmOpen(true)
+          }}
         />
       </main>
       <ConfirmationModal
-        isOpen={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}
-        onConfirm={handleDeleteConfirm} title="Xác nhận xóa"
+        isOpen={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title="Xác nhận xóa"
         message="Bạn có chắc chắn muốn xóa ngày lễ này không?"
-        confirmText="Xóa" cancelText="Hủy" type="danger" isLoading={isDeleting}
+        confirmText="Xóa"
+        cancelText="Hủy"
+        type="danger"
+        isLoading={isDeleting}
       />
     </div>
   )

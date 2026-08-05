@@ -25,10 +25,17 @@ export function DepartmentTable({ departments, onEdit, onDelete }) {
                 <td className="border border-gray-200 py-2.5 px-4">{dept.id}</td>
                 <td className="border border-gray-200 py-2.5 px-4 text-left">{dept.name}</td>
                 <td className="border border-gray-200 py-2.5 px-4">
-                  <button onClick={() => onEdit(dept)} className="text-[#337ab7] hover:underline">Sửa</button>
+                  <button onClick={() => onEdit(dept)} className="text-[#337ab7] hover:underline">
+                    Sửa
+                  </button>
                 </td>
                 <td className="border border-gray-200 py-2.5 px-4">
-                  <button onClick={() => onDelete(dept.id)} className="text-[#c8102e] hover:underline">Xóa</button>
+                  <button
+                    onClick={() => onDelete(dept.id)}
+                    className="text-[#c8102e] hover:underline"
+                  >
+                    Xóa
+                  </button>
                 </td>
               </tr>
             ))

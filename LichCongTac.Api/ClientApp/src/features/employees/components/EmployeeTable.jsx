@@ -22,10 +22,17 @@ export function EmployeeTable({ users, onEdit, onDelete }) {
               <td className="border border-gray-200 py-2.5 px-4">{user.departmentName || '---'}</td>
               <td className="border border-gray-200 py-2.5 px-4">{user.zaloId || '---'}</td>
               <td className="border border-gray-200 py-2.5 px-4">
-                <button onClick={() => onEdit(user)} className="text-[#337ab7] hover:underline">Sửa</button>
+                <button onClick={() => onEdit(user)} className="text-[#337ab7] hover:underline">
+                  Sửa
+                </button>
               </td>
               <td className="border border-gray-200 py-2.5 px-4">
-                <button onClick={() => onDelete(user.id)} className="text-[#c8102e] hover:underline">Xóa</button>
+                <button
+                  onClick={() => onDelete(user.id)}
+                  className="text-[#c8102e] hover:underline"
+                >
+                  Xóa
+                </button>
               </td>
             </tr>
           ))}

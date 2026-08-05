@@ -6,6 +6,12 @@ export async function apiClient(url, options = {}) {
     headers['Content-Type'] = 'application/json'
   }
 
+  // Tự động đính JWT token từ localStorage vào header Authorization
+  const token = localStorage.getItem('auth_token')
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
   // Ensure credentials are sent (for HttpOnly cookies)
   const fetchOptions = {
     ...options,
@@ -15,11 +21,12 @@ export async function apiClient(url, options = {}) {
 
   let response = await fetch(url, fetchOptions)
 
-  // Xử lý 401: Thử refresh token
+  // Xử lý 401: Thử refresh token (chỉ cho các API thông thường, không phải auth endpoints)
   if (response.status === 401) {
-    if (url.includes('/api/auth/refresh')) {
-      document.dispatchEvent(new CustomEvent('auth:unauthorized'))
-      throw new Error('Unauthorized')
+    // Auth endpoints: 401 là sai mật khẩu / hết hạn thông thường, không refresh
+    if (url.includes('/api/auth/')) {
+      const errData = await response.json().catch(() => ({}))
+      throw new Error(errData.message || 'Sai tài khoản hoặc mật khẩu')
     }
 
     try {
@@ -45,8 +52,11 @@ export async function apiClient(url, options = {}) {
         throw new Error('Session expired')
       }
     } catch (err) {
-      console.error('[Auth] Silent refresh failed', err)
-      document.dispatchEvent(new CustomEvent('auth:unauthorized'))
+      // Chỉ bắn unauthorized nếu chưa bắn ở trên (tránh duplicate)
+      if (err.message !== 'Session expired') {
+        console.error('[Auth] Silent refresh failed', err)
+        document.dispatchEvent(new CustomEvent('auth:unauthorized'))
+      }
       throw err
     }
   }

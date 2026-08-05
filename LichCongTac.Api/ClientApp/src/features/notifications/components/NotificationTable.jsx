@@ -34,8 +34,10 @@ export function NotificationTable({ notifications, currentPage, onEdit, onDelete
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="border border-gray-200 py-2.5 px-4 font-bold">{globalIndex}</td>
                     <td className="border border-gray-200 py-2.5 px-4 text-left">
-                      <span className="text-gray-800 line-clamp-3"
-                        dangerouslySetInnerHTML={{ __html: item.content }} />
+                      <span
+                        className="text-gray-800 line-clamp-3"
+                        dangerouslySetInnerHTML={{ __html: item.content }}
+                      />
                     </td>
                     <td className="border border-gray-200 py-2.5 px-4">
                       <span className={item.isVisible === 1 ? 'text-[#337ab7]' : 'text-gray-400'}>
@@ -43,10 +45,20 @@ export function NotificationTable({ notifications, currentPage, onEdit, onDelete
                       </span>
                     </td>
                     <td className="border border-gray-200 py-2.5 px-4">
-                      <button onClick={() => onEdit(item)} className="text-[#337ab7] hover:underline">Sửa</button>
+                      <button
+                        onClick={() => onEdit(item)}
+                        className="text-[#337ab7] hover:underline"
+                      >
+                        Sửa
+                      </button>
                     </td>
                     <td className="border border-gray-200 py-2.5 px-4">
-                      <button onClick={() => onDelete(item.id)} className="text-[#337ab7] hover:underline">Xóa</button>
+                      <button
+                        onClick={() => onDelete(item.id)}
+                        className="text-[#337ab7] hover:underline"
+                      >
+                        Xóa
+                      </button>
                     </td>
                   </tr>
                 )
@@ -64,13 +76,21 @@ export function NotificationTable({ notifications, currentPage, onEdit, onDelete
 
       {notifications.length > PAGE_SIZE && (
         <div className="flex justify-center mt-6 gap-2">
-          <button onClick={() => onPageChange((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
-            className="px-3 py-1 border border-gray-300 rounded text-gray-600 disabled:opacity-50 hover:bg-gray-50">
+          <button
+            onClick={() => onPageChange((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border border-gray-300 rounded text-gray-600 disabled:opacity-50 hover:bg-gray-50"
+          >
             Trước
           </button>
-          <span className="px-3 py-1 text-gray-600">{currentPage} / {totalPages}</span>
-          <button onClick={() => onPageChange((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
-            className="px-3 py-1 border border-gray-300 rounded text-gray-600 disabled:opacity-50 hover:bg-gray-50">
+          <span className="px-3 py-1 text-gray-600">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            onClick={() => onPageChange((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border border-gray-300 rounded text-gray-600 disabled:opacity-50 hover:bg-gray-50"
+          >
             Sau
           </button>
         </div>

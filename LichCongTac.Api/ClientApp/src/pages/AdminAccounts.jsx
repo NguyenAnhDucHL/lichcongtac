@@ -7,8 +7,12 @@ import { AccountForm } from '../features/accounts/components/AccountForm'
 import { AccountTable } from '../features/accounts/components/AccountTable'
 
 const INITIAL_FORM = {
-  fullName: '', departmentId: '', username: '',
-  password: '', confirmPassword: '', isAdmin: false,
+  fullName: '',
+  departmentId: '',
+  username: '',
+  password: '',
+  confirmPassword: '',
+  isAdmin: false,
 }
 
 export default function AdminAccounts() {
@@ -35,9 +39,15 @@ export default function AdminAccounts() {
     }
   }
 
-  useEffect(() => { fetchAll() }, [])
+  useEffect(() => {
+    fetchAll()
+  }, [])
 
-  const handleReset = () => { setFormData(INITIAL_FORM); setEditId(null); setError('') }
+  const handleReset = () => {
+    setFormData(INITIAL_FORM)
+    setEditId(null)
+    setError('')
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -49,17 +59,20 @@ export default function AdminAccounts() {
       setError('Vui lòng nhập mật khẩu cho tài khoản mới.')
       return
     }
-    setLoading(true); setError('')
+    setLoading(true)
+    setError('')
     try {
       const body = {
-        fullName: formData.fullName, username: formData.username,
+        fullName: formData.fullName,
+        username: formData.username,
         role: formData.isAdmin ? 'Admin' : 'CanBo',
         departmentId: formData.departmentId ? parseInt(formData.departmentId, 10) : null,
       }
       if (formData.password) body.passwordHash = formData.password
       if (editId) await adminService.updateUser(editId, body)
       else await adminService.createUser(body)
-      await fetchAll(); handleReset()
+      await fetchAll()
+      handleReset()
     } catch (err) {
       setError(err.message || 'Lỗi kết nối đến máy chủ.')
     } finally {
@@ -70,8 +83,11 @@ export default function AdminAccounts() {
   const handleEdit = (acc) => {
     setEditId(acc.id)
     setFormData({
-      fullName: acc.fullName || '', departmentId: acc.departmentId || '',
-      username: acc.username || '', password: '', confirmPassword: '',
+      fullName: acc.fullName || '',
+      departmentId: acc.departmentId || '',
+      username: acc.username || '',
+      password: '',
+      confirmPassword: '',
       isAdmin: acc.role === 'Admin',
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -87,7 +103,9 @@ export default function AdminAccounts() {
     } catch (err) {
       toast.error(err.message || 'Xóa thất bại.')
     } finally {
-      setIsDeleting(false); setDeleteConfirmOpen(false); setItemToDelete(null)
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -99,21 +117,33 @@ export default function AdminAccounts() {
           {editId ? 'Sửa thông tin tài khoản' : 'Quản trị tài khoản'}
         </h2>
         <AccountForm
-          formData={formData} setFormData={setFormData} editId={editId}
-          loading={loading} error={error} departments={departments}
-          onSubmit={handleSubmit} onReset={handleReset}
+          formData={formData}
+          setFormData={setFormData}
+          editId={editId}
+          loading={loading}
+          error={error}
+          departments={departments}
+          onSubmit={handleSubmit}
+          onReset={handleReset}
         />
         <div className="text-gray-500 mb-2">Danh sách tài khoản</div>
         <AccountTable
-          accounts={accounts} departments={departments}
-          onEdit={handleEdit} onDelete={(id) => { setItemToDelete(id); setDeleteConfirmOpen(true) }}
+          accounts={accounts}
+          departments={departments}
+          onEdit={handleEdit}
+          onDelete={(id) => {
+            setItemToDelete(id)
+            setDeleteConfirmOpen(true)
+          }}
         />
       </main>
       <ConfirmationModal
-        open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
         title="Xác nhận xóa"
         description="Bạn có chắc chắn muốn xóa tài khoản này không? Thao tác này không thể hoàn tác."
-        onConfirm={handleDeleteConfirm} isLoading={isDeleting}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
       />
     </div>
   )

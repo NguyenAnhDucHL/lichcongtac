@@ -7,9 +7,14 @@ import { EmployeeForm } from '../features/employees/components/EmployeeForm'
 import { EmployeeTable } from '../features/employees/components/EmployeeTable'
 
 const INITIAL_FORM = {
-  fullName: '', departmentId: '', username: '',
-  password: '', confirmPassword: '', role: 'CanBo',
-  zaloId: '', notificationPreference: '',
+  fullName: '',
+  departmentId: '',
+  username: '',
+  password: '',
+  confirmPassword: '',
+  role: 'CanBo',
+  zaloId: '',
+  notificationPreference: '',
 }
 
 export default function AdminEmployees() {
@@ -36,9 +41,15 @@ export default function AdminEmployees() {
     }
   }
 
-  useEffect(() => { fetchAll() }, [])
+  useEffect(() => {
+    fetchAll()
+  }, [])
 
-  const handleReset = () => { setFormData(INITIAL_FORM); setEditId(null); setError('') }
+  const handleReset = () => {
+    setFormData(INITIAL_FORM)
+    setEditId(null)
+    setError('')
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -46,12 +57,16 @@ export default function AdminEmployees() {
       setError('Mật khẩu xác nhận không khớp')
       return
     }
-    setLoading(true); setError('')
+    setLoading(true)
+    setError('')
     try {
       const body = {
-        fullName: formData.fullName, username: formData.username, role: formData.role,
+        fullName: formData.fullName,
+        username: formData.username,
+        role: formData.role,
         departmentId: formData.departmentId ? parseInt(formData.departmentId, 10) : null,
-        zaloId: formData.zaloId, notificationPreference: formData.notificationPreference,
+        zaloId: formData.zaloId,
+        notificationPreference: formData.notificationPreference,
       }
       if (formData.password) body.passwordHash = formData.password
       if (editId) {
@@ -61,7 +76,8 @@ export default function AdminEmployees() {
         await adminService.createUser(body)
         toast.success('Thêm nhân viên thành công!')
       }
-      await fetchAll(); handleReset()
+      await fetchAll()
+      handleReset()
     } catch (err) {
       setError(err.message || 'Lỗi kết nối đến máy chủ.')
     } finally {
@@ -72,9 +88,13 @@ export default function AdminEmployees() {
   const handleEdit = (user) => {
     setEditId(user.id)
     setFormData({
-      fullName: user.fullName || '', departmentId: user.departmentId || '',
-      username: user.username || '', password: '', confirmPassword: '',
-      role: user.role || 'CanBo', zaloId: user.zaloId || '',
+      fullName: user.fullName || '',
+      departmentId: user.departmentId || '',
+      username: user.username || '',
+      password: '',
+      confirmPassword: '',
+      role: user.role || 'CanBo',
+      zaloId: user.zaloId || '',
       notificationPreference: user.notificationPreference || '',
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -91,7 +111,9 @@ export default function AdminEmployees() {
     } catch (err) {
       toast.error(err.message || 'Xóa thất bại.')
     } finally {
-      setIsDeleting(false); setDeleteConfirmOpen(false); setItemToDelete(null)
+      setIsDeleting(false)
+      setDeleteConfirmOpen(false)
+      setItemToDelete(null)
     }
   }
 
@@ -101,21 +123,32 @@ export default function AdminEmployees() {
       <main className="max-w-[1000px] mx-auto px-4 py-6">
         <h2 className="text-[#c8102e] font-bold text-lg mb-6">Quản trị nhân viên</h2>
         <EmployeeForm
-          formData={formData} setFormData={setFormData} editId={editId}
-          loading={loading} error={error} departments={departments}
-          onSubmit={handleSubmit} onReset={handleReset}
+          formData={formData}
+          setFormData={setFormData}
+          editId={editId}
+          loading={loading}
+          error={error}
+          departments={departments}
+          onSubmit={handleSubmit}
+          onReset={handleReset}
         />
         <div className="text-gray-500 mb-2">Danh sách nhân viên</div>
         <EmployeeTable
-          users={users} onEdit={handleEdit}
-          onDelete={(id) => { setItemToDelete(id); setDeleteConfirmOpen(true) }}
+          users={users}
+          onEdit={handleEdit}
+          onDelete={(id) => {
+            setItemToDelete(id)
+            setDeleteConfirmOpen(true)
+          }}
         />
       </main>
       <ConfirmationModal
-        open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
         title="Xác nhận xóa"
         description="Bạn có chắc chắn muốn xóa nhân viên này? Thao tác này không thể hoàn tác."
-        onConfirm={handleDeleteConfirm} isLoading={isDeleting}
+        onConfirm={handleDeleteConfirm}
+        isLoading={isDeleting}
       />
     </div>
   )

@@ -20,7 +20,10 @@ const formatLocation = (loc) => {
 const extractText = (html) => {
   if (!html) return ''
   const doc = new DOMParser().parseFromString(html, 'text/html')
-  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim()
+  return (doc.body.textContent || '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
@@ -39,17 +42,21 @@ const groupAndTransform = (arrayData) => {
   maxDate.setDate(maxDate.getDate() + 7)
   const maxStr = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`
 
-  return Object.keys(grouped).sort()
+  return Object.keys(grouped)
+    .sort()
     .filter((d) => d >= todayStr && d <= maxStr)
     .map((dateStr) => {
       const parts = dateStr.split('-')
       const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
       const isToday = dateStr === todayStr
       return {
-        isToday, originalDate: dateStr,
+        isToday,
+        originalDate: dateStr,
         dayLabel: isToday ? 'Hôm nay' : DAYS[d.getDay()],
         date: dateStr.split('-').reverse().join('/'),
-        items: grouped[dateStr].sort((a, b) => (a.startTime || '').localeCompare(b.startTime || '')),
+        items: grouped[dateStr].sort((a, b) =>
+          (a.startTime || '').localeCompare(b.startTime || '')
+        ),
       }
     })
 }
@@ -64,8 +71,14 @@ function ScheduleItem({ item }) {
         </span>
       )}
       <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
-        {item.invitationNumber && <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>}
-        {item.location && <span className="text-[#005f6b] font-bold mr-1">(Tại {formatLocation(item.location)}){' '}</span>}
+        {item.invitationNumber && (
+          <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>
+        )}
+        {item.location && (
+          <span className="text-[#005f6b] font-bold mr-1">
+            (Tại {formatLocation(item.location)}){' '}
+          </span>
+        )}
         {item.content && <span className="text-gray-900">{extractText(item.content)}</span>}
       </div>
     </div>
@@ -92,24 +105,35 @@ export default function WorkSchedule() {
     try {
       const notifRaw = await notificationService.getVisibleNotifications()
       setNotifications(Array.isArray(notifRaw) ? notifRaw : notifRaw?.data || [])
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
     try {
       const hol = await scheduleService.getTodayHoliday()
       setTodayHoliday(hol?.content ? hol : hol?.data || null)
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }, [])
 
-  useEffect(() => { fetchData() }, [fetchData, lastScheduleUpdate])
+  useEffect(() => {
+    fetchData()
+  }, [fetchData, lastScheduleUpdate])
 
   useEffect(() => {
-    scheduleService.getTodayHoliday()
+    scheduleService
+      .getTodayHoliday()
       .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
       .catch(() => {})
   }, [lastHolidayUpdate])
 
   const todayData = scheduleData.find((d) => d.isToday) || {
     dayLabel: 'Hôm nay',
-    date: new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+    date: new Date().toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }),
     items: [],
   }
   const upcoming = scheduleData.filter((d) => !d.isToday)
@@ -130,7 +154,9 @@ export default function WorkSchedule() {
               </h3>
               {todayData.items.length > 0 ? (
                 <div className="space-y-6 px-4">
-                  {todayData.items.map((item, idx) => <ScheduleItem key={idx} item={item} />)}
+                  {todayData.items.map((item, idx) => (
+                    <ScheduleItem key={idx} item={item} />
+                  ))}
                 </div>
               ) : (
                 <p className="text-center text-gray-500 italic py-4">Không có lịch công tác</p>
@@ -143,8 +169,10 @@ export default function WorkSchedule() {
                     </h4>
                     <div className="space-y-3">
                       {notifications.map((notif, idx) => (
-                        <div key={notif.id || idx}
-                          className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0">
+                        <div
+                          key={notif.id || idx}
+                          className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0"
+                        >
                           <div dangerouslySetInnerHTML={{ __html: notif.content }} />
                         </div>
                       ))}
@@ -162,7 +190,9 @@ export default function WorkSchedule() {
                       {day.dayLabel}, ngày {day.date}:
                     </h3>
                     <div className="space-y-5">
-                      {day.items.map((item, i) => <ScheduleItem key={i} item={item} />)}
+                      {day.items.map((item, i) => (
+                        <ScheduleItem key={i} item={item} />
+                      ))}
                     </div>
                   </div>
                 ))

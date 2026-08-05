@@ -4,7 +4,26 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
-### [2026-08-06 02:37] Thêm nút "Quay về xem Lịch công tác" tại trang Đăng nhập
+### [2026-08-06 03:08] Đồng bộ DatePicker Tiếng Việt cho toàn bộ form
+- **Mô tả**: Trên mobile (đặc biệt iOS Safari), thẻ `<input type="date">` mặc định sẽ hiển thị lịch theo ngôn ngữ của hệ điều hành (thường là Tiếng Anh) và không có icon rõ ràng. Đã thay thế toàn bộ `<input type="date">` còn sót lại ở trang Tìm kiếm Lịch (`SearchSchedule.jsx`) và Quản lý Ngày lễ (`HolidayComponents.jsx`) bằng thư viện `react-datepicker` để ép buộc hiển thị Tiếng Việt, có icon lịch, và hỗ trợ popup overlay ở giữa màn hình cho mobile.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi — Thay input native bằng DatePicker)
+  - `LichCongTac.Api/ClientApp/src/features/holidays/components/HolidayComponents.jsx` (Sửa đổi — Thay input native bằng DatePicker)
+- **Lệnh git commit**: `git commit -m "style(ui): đồng bộ sử dụng react-datepicker tiếng việt cho mọi trường ngày tháng"`
+
+
+- **Mô tả**: Phát hiện lỗi nghiêm trọng — `apiClient` không bao giờ đính token từ `localStorage` vào header `Authorization: Bearer`. Tất cả API calls đều chỉ dựa vào cookie nên bị 401 ngay từ đầu, kể cả sau khi login thành công. Đây là nguyên nhân gốc rễ khiến modal "Phiên hết hạn" hiện ra ngay sau khi đăng nhập. Đã sửa: tự động đọc `auth_token` từ `localStorage` và gắn vào mọi request.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi — Thêm `Authorization: Bearer` header tự động từ localStorage)
+- **Lệnh git commit**: `git commit -m "fix(api): thêm authorization bearer header tự động vào mọi api request từ localstorage"`
+
+
+- **Mô tả**: Trước đây modal "Phiên hết hạn" hiện ra cả khi người dùng vừa mới click vào khu vực Admin từ trang công khai, gây khó chịu. Nay phân biệt 2 tình huống: (1) Đang làm việc dở trong Admin → hiện Modal tại chỗ để không mất form data. (2) Đang ở trang công khai hoặc vừa vào Admin lần đầu → redirect thẳng về trang Login. Thêm debounce 3 giây để tránh spam nhiều popup cùng lúc.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi — Logic phân luồng `handleUnauthorized` + debounce ref)
+- **Lệnh git commit**: `git commit -m "feat(auth): cải tiến ux xử lý phiên hết hạn phân biệt theo context người dùng"`
+
+
 - **Mô tả**: Khi người dùng cài đặt ứng dụng web ra màn hình chính (PWA/Standalone mode) trên điện thoại, trình duyệt sẽ ẩn đi thanh địa chỉ và nút Back. Điều này khiến họ bị kẹt ở trang Đăng nhập nếu lỡ tay ấn Đăng xuất. Bổ sung nút quay về trang public bên dưới form đăng nhập.
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi — Thêm Link điều hướng về `/campha/`)
