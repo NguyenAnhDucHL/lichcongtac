@@ -817,3 +817,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Đọc error message từ refresh api và đẩy vào event)
   - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Nhận thông báo linh động từ event detail)
 - **Lệnh git commit**: `git commit -m "feat(auth): display specific warning message on concurrent login via modal"`
+
+### [2026-08-05 23:11] Tinh chỉnh câu thông báo Concurrent Login
+- **Mô tả**: Thay đổi câu chữ cảnh báo đăng nhập đồng thời thành ngôn ngữ thân thiện, dễ hiểu hơn dành cho người lớn tuổi ("Tài khoản của bạn vừa được đăng nhập trên một máy tính hoặc điện thoại khác. Vui lòng đăng nhập lại để tiếp tục làm việc ở máy này.").
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: Đổi nội dung chuỗi trả về)
+- **Lệnh git commit**: `git commit -m "style(auth): update concurrent login message to be friendlier"`
