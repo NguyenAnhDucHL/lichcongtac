@@ -17,6 +17,7 @@ export async function apiClient(url, options = {}) {
     ...options,
     headers,
     credentials: options.credentials || 'include',
+    cache: options.cache || 'no-store',
   }
 
   let response = await fetch(url, fetchOptions)

@@ -54,9 +54,11 @@ const groupAndTransform = (arrayData) => {
         originalDate: dateStr,
         dayLabel: isToday ? 'Hôm nay' : DAYS[d.getDay()],
         date: dateStr.split('-').reverse().join('/'),
-        items: grouped[dateStr].sort((a, b) =>
-          (a.startTime || '').localeCompare(b.startTime || '')
-        ),
+        items: grouped[dateStr].sort((a, b) => {
+          const timeCmp = (a.startTime || '').localeCompare(b.startTime || '')
+          if (timeCmp !== 0) return timeCmp
+          return (a.id || 0) - (b.id || 0)
+        }),
       }
     })
 }

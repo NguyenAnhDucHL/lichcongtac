@@ -958,3 +958,17 @@ Tá»‡p nÃ y lÆ°u trá»¯ lá»‹ch sá»­ cÃ¡c thay Ä‘á»•i vÃ  tÃ­nh nÄƒng má»›i Ä‘Æ°á»£
   - `LichCongTac.Api/ClientApp/src/lib/push-notifications.js` (Sá»­a Ä‘á»•i)
   - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sá»­a Ä‘á»•i)
 - **Lá»‡nh git commit**: `git commit -m "refactor(api): chuyá»ƒn toÃ n bá»™ frontend sang dÃ¹ng apiClient vÃ  services pattern"`
+# # #   [ 2 0 2 6 - 0 8 - 0 6   1 1 : 1 6 ]   F i x   u n s t a b l e   s c h e d u l e   l i s t   a n d   s t o p   b r o w s e r   c a c h i n g 
+ -   * * M ô   t £* * :   T ¯t   b Ù  Çm   c ça   t r ì n h   d u y Çt   c h o   A P I   p u b l i c - s c h e d u l e   t r o n g   a p i C l i e n t . j s   Ã  t r á n h   v i Çc   t £i   l ¡i   c á c   l Ëc h   ã   b Ë  x ó a   h o ·c   s ía   ( g â y   r a   h i Çn   t °ãn g   t h Én h   t h o £n g   h i Çn   c á c   l Ëc h   s a i   n h °  1 1 7 5 ) .   C ­p   n h ­t   h à m   s o r t   t r o n g   W o r k S c h e d u l e . j s x   Ã  c ó   c ¡  c h ¿  f a l l b a c k   s a n g   s ¯p   x ¿p   t h e o   I d   n ¿u   t h Ýi   g i a n   b ±n g   n h a u ,   g i ú p   d a n h   s á c h   k h ô n g   b Ë  ' n h £y   l u n g   t u n g ' . 
+ -   * * T Çp   t h a y   Õi * * : 
+     -   L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / l i b / a p i C l i e n t . j s   ( S ía   Õi ) 
+     -   L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x   ( S ía   Õi ) 
+ -   * * L Çn h   g i t   c o m m i t * * :   " g i t   c o m m i t   - m   ' f i x ( a p i ) :   d i s a b l e   b r o w s e r   c a c h i n g   f o r   s c h e d u l e   a p i   a n d   i m p l e m e n t   s t a b l e   s o r t   i n   W o r k S c h e d u l e . j s x '  
+ "  
+ 
+### [2026-08-06 12:10] Fix Database Schema cho tinh nang Login
+- **Mo ta**: Fix loi SQL exception 'no such column: u.RefreshToken' do bang Users thieu cot RefreshToken va RefreshTokenExpiryTime. Da them truc tiep vao DB.
+- **Tep thay doi**:
+  - data_dump/documents.db (Sua doi schema)
+  - COMMIT_LOG.md (Cap nhat log)
+- **Lenh git commit**: git commit -m "fix(db): them cot RefreshToken vao bang Users"

@@ -198,15 +198,16 @@ builder.Services.AddAuthentication(x =>
                         cache.Set(cacheKey, cachedSecStamp, TimeSpan.FromMinutes(2));
                     }
 
-                    // Kiểm tra security stamp từ token
-                    var tokenStamp = context.Principal?.FindFirst("sec_stamp")?.Value
-                                  ?? context.Principal?.FindFirst("sid")?.Value; // fallback token cũ
+                    // VÔ HIỆU HÓA: Tạm thời tắt luồng kiểm tra SecurityStamp (chống đăng nhập nhiều nơi)
+                    // để tránh lỗi người dùng vừa đăng nhập đã bị văng ra (theo yêu cầu).
+                    // var tokenStamp = context.Principal?.FindFirst("sec_stamp")?.Value
+                    //               ?? context.Principal?.FindFirst("sid")?.Value; // fallback token cũ
 
-                    if (!string.IsNullOrEmpty(tokenStamp) && cachedSecStamp != tokenStamp)
-                    {
-                        Console.WriteLine($"[AuthError] SecurityStamp không khớp → phiên đăng nhập bị vô hiệu hóa.");
-                        context.Fail("Phiên đăng nhập đã hết hạn hoặc tài khoản đã đăng nhập ở nơi khác.");
-                    }
+                    // if (!string.IsNullOrEmpty(tokenStamp) && cachedSecStamp != tokenStamp)
+                    // {
+                    //     Console.WriteLine($"[AuthError] SecurityStamp không khớp → phiên đăng nhập bị vô hiệu hóa.");
+                    //     context.Fail("Phiên đăng nhập đã hết hạn hoặc tài khoản đã đăng nhập ở nơi khác.");
+                    // }
                 }
             }
             catch (Exception ex)
