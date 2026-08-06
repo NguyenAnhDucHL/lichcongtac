@@ -236,8 +236,16 @@ export function RichTextEditor({ value, onChange }) {
   })
 
   React.useEffect(() => {
-    if (editor && value && value !== editor.getHTML()) {
-      editor.commands.setContent(value)
+    if (!editor) return
+
+    const val = value || ''
+    const currentHtml = editor.getHTML()
+    const isEditorEmpty = currentHtml === '<p></p>' || currentHtml === ''
+
+    if (val === '' && !isEditorEmpty) {
+      editor.commands.setContent('')
+    } else if (val !== '' && val !== currentHtml) {
+      editor.commands.setContent(val)
     }
   }, [value, editor])
 

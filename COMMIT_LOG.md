@@ -4,6 +4,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-06 23:01] Fix lỗi không xoá trắng khung soạn thảo TipTap
+- **Mô tả**: Sửa lỗi khung soạn thảo TipTap không tự reset (xoá trắng) khi React thay đổi giá trị `value` thành chuỗi rỗng (`''`), do điều kiện kiểm tra bên trong `useEffect` bị thiếu. Lỗi này làm các ô nhập liệu cũ vẫn còn khi thêm lịch công tác mới.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/ui/rich-text-editor.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi tiptap editor không xoá trắng dữ liệu khi reset form"`
+
 ### [2026-08-06 22:55] Tích hợp bộ soạn thảo TipTap thay thế Jodit
 - **Mô tả**: Xoá bỏ Jodit Editor, tích hợp TipTap editor với đầy đủ tính năng chuẩn Word (Font Family, Font Size, Màu sắc, Highlight, Heading, Danh sách...). Đã việt hoá 100% Tooltip khi hover và tối ưu hoá cho mobile. Xoá các file rác như seed_db.sql, config cũ.
 - **Tệp thay đổi**:
