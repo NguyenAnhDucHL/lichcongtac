@@ -1,16 +1,115 @@
-﻿# Nhật ký Thay đổi Mã Nguồn (Commit Log)
+# Nhật ký Thay đổi Mã Nguồn (Commit Log)
 
 Tệp này lưu trữ lịch sử các thay đổi và tính năng mới được thêm vào hệ thống để AI có thể nhanh chóng nắm bắt ngữ cảnh mà không cần quét lại toàn bộ mã nguồn. Kể từ ngày 26/07/2026, toàn bộ hệ thống đã được tái cấu trúc (pivot) để chuyên biệt phục vụ chức năng **Lịch Công Tác**.
 
-## Lịch sử
+## Lịch sử
 
-### [2026-08-05 10:25] ÄÆ°a NGROK_AUTHTOKEN vÃ  secrets vÃ o biáº¿n mÃ´i trÆ°á»ng .env
-- **MÃ´ táº£**: TÃ¡ch NGROK_AUTHTOKEN vÃ  cÃ¡c JWT secret, public ID secret khá»i file cáº¥u hÃ¬nh `docker-compose.yml` Ä‘á»ƒ trÃ¡nh commit secrets lÃªn Git. Táº¡o file `.env` cá»¥c bá»™ Ä‘á»ƒ lÆ°u trá»¯ vÃ  cáº¥u hÃ¬nh cÃ¡c giÃ¡ trá»‹ thá»±c táº¿ trÃªn mÃ´i trÆ°á»ng cháº¡y.
-- **Tá»‡p thay Ä‘á»•i**:
-  - `docker-compose.yml` (Sá»­a Ä‘á»•i)
-  - `.env` (Má»›i - KhÃ´ng commit)
-- **Lá»‡nh git commit**: `git commit -m "security(infra): Ä‘Æ°a ngrok authtoken vÃ  secrets vÃ o env"`
+### [2026-08-06 03:08] Đồng bộ DatePicker Tiếng Việt cho toàn bộ form
+- **Mô tả**: Trên mobile (đặc biệt iOS Safari), thẻ `<input type="date">` mặc định sẽ hiển thị lịch theo ngôn ngữ của hệ điều hành (thường là Tiếng Anh) và không có icon rõ ràng. Đã thay thế toàn bộ `<input type="date">` còn sót lại ở trang Tìm kiếm Lịch (`SearchSchedule.jsx`) và Quản lý Ngày lễ (`HolidayComponents.jsx`) bằng thư viện `react-datepicker` để ép buộc hiển thị Tiếng Việt, có icon lịch, và hỗ trợ popup overlay ở giữa màn hình cho mobile.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi — Thay input native bằng DatePicker)
+  - `LichCongTac.Api/ClientApp/src/features/holidays/components/HolidayComponents.jsx` (Sửa đổi — Thay input native bằng DatePicker)
+- **Lệnh git commit**: `git commit -m "style(ui): đồng bộ sử dụng react-datepicker tiếng việt cho mọi trường ngày tháng"`
 
+
+- **Mô tả**: Phát hiện lỗi nghiêm trọng — `apiClient` không bao giờ đính token từ `localStorage` vào header `Authorization: Bearer`. Tất cả API calls đều chỉ dựa vào cookie nên bị 401 ngay từ đầu, kể cả sau khi login thành công. Đây là nguyên nhân gốc rễ khiến modal "Phiên hết hạn" hiện ra ngay sau khi đăng nhập. Đã sửa: tự động đọc `auth_token` từ `localStorage` và gắn vào mọi request.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi — Thêm `Authorization: Bearer` header tự động từ localStorage)
+- **Lệnh git commit**: `git commit -m "fix(api): thêm authorization bearer header tự động vào mọi api request từ localstorage"`
+
+
+- **Mô tả**: Trước đây modal "Phiên hết hạn" hiện ra cả khi người dùng vừa mới click vào khu vực Admin từ trang công khai, gây khó chịu. Nay phân biệt 2 tình huống: (1) Đang làm việc dở trong Admin → hiện Modal tại chỗ để không mất form data. (2) Đang ở trang công khai hoặc vừa vào Admin lần đầu → redirect thẳng về trang Login. Thêm debounce 3 giây để tránh spam nhiều popup cùng lúc.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi — Logic phân luồng `handleUnauthorized` + debounce ref)
+- **Lệnh git commit**: `git commit -m "feat(auth): cải tiến ux xử lý phiên hết hạn phân biệt theo context người dùng"`
+
+
+- **Mô tả**: Khi người dùng cài đặt ứng dụng web ra màn hình chính (PWA/Standalone mode) trên điện thoại, trình duyệt sẽ ẩn đi thanh địa chỉ và nút Back. Điều này khiến họ bị kẹt ở trang Đăng nhập nếu lỡ tay ấn Đăng xuất. Bổ sung nút quay về trang public bên dưới form đăng nhập.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi — Thêm Link điều hướng về `/campha/`)
+- **Lệnh git commit**: `git commit -m "feat(auth): thêm nút quay về lịch công tác ở trang đăng nhập hỗ trợ pwa"`
+
+
+### [2026-08-06 02:35] Fix lỗi Modal "Phiên hết hạn" hiển thị vô lý khi Đăng xuất / Đăng nhập
+- **Mô tả**: Bổ sung điều kiện chặn trong Global Event Listener `auth:unauthorized` của AuthContext. Nếu URL hiện tại đang ở trang Đăng nhập (`/login`) hoặc nếu LocalStorage đã bị xóa token (tức là người dùng chủ động ấn Đăng xuất) thì sẽ BỎ QUA sự kiện lỗi 401, không hiển thị cái Modal yêu cầu đăng nhập lại nữa.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi — Thêm câu lệnh IF chặn luồng `handleUnauthorized`)
+- **Lệnh git commit**: `git commit -m "fix(auth): chặn hiển thị modal phiên hết hạn khi đang ở trang login hoặc khi ấn đăng xuất"`
+
+
+### [2026-08-06 02:30] Fix lỗi "Sai tài khoản hoặc mật khẩu" ở Modal đăng nhập lại
+- **Mô tả**: Bỏ sót logic bóc tách dữ liệu phản hồi trong Modal đăng nhập lại (AuthContext). Dù backend đăng nhập thành công và trả về `token`, `username`, `role` nhưng code cũ lại kiểm tra `if (data.user)` dẫn đến hiểu nhầm là lỗi và chặn đăng nhập. Đã sửa lại khớp với cấu trúc API.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi — Sửa logic parse response `authService.login`)
+- **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi báo sai mật khẩu do đọc sai định dạng phản hồi api tại modal"`
+
+
+- **Mô tả**: Bổ sung icon con mắt (`Eye` / `EyeOff` từ `lucide-react`) cho phép người dùng click để xem/ẩn mật khẩu đang gõ tại Modal đăng nhập lại khi hết hạn phiên, giúp tránh gõ sai mật khẩu.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi — Thêm state `showModalPassword` và icon toggle)
+- **Lệnh git commit**: `git commit -m "feat(auth): thêm icon hiển thị mật khẩu ở modal phiên đăng nhập hết hạn"`
+
+
+- **Mô tả**: Mặc định thư viện `sonner` không có nút tắt (X) trên các thông báo (toast), khiến người dùng phải đợi hết thời gian timeout mới tắt được. Fix: Thêm thuộc tính `closeButton` vào component `<Toaster />` ở root (main.jsx) để bật nút tắt cho toàn cục.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi — thêm `closeButton` vào `<Toaster />`)
+- **Lệnh git commit**: `git commit -m "feat(ui): thêm nút tắt (close button) cho tất cả toast notification"`
+
+
+- **Mô tả**: Khi người dùng nhấn Đăng xuất, thư viện `sonner` tạo ra một toast loading nhưng không được dismiss đúng cách khi chuyển trang, dẫn đến việc toast này quay vô tận ở màn hình Đăng nhập. Fix: Gắn ID cho toast loading và truyền ID đó cho toast success để ghi đè (resolve) nó.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi — truyền `id` vào `toast.success`)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi toast đăng xuất quay vô tận không tự tắt"`
+
+
+- **Mô tả**: `apiClient.js` không tự động gắn `Content-Type: application/json` khi gửi body JSON → backend ASP.NET Core nhận request thiếu header, trả 415. Fix: tự động detect khi `body` là string (kết quả `JSON.stringify`) thì gắn header trước khi fetch.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi — thêm auto Content-Type header)
+- **Lệnh git commit**: `git commit -m "fix(api): tự động gắn Content-Type: application/json khi body là JSON string"`
+
+
+- **Mô tả**: Tìm ra 3 nguyên nhân gốc khiến trang public (WorkSchedule/SearchSchedule) không tự cập nhật khi Admin thêm lịch: (1) `/appHub` bị `RequireRateLimiting("fixed")` → 50 req/10s/IP, nhiều user qua ngrok cùng IP → bị chặn; (2) Frontend dùng `skipNegotiation:true + WebSocket only` → mobile/ngrok thường block WebSocket → không fallback được; (3) Nginx không có `location` riêng cho `/appHub` → đi qua location chung với `proxy_read_timeout 300s` → WebSocket bị đứt sau 5 phút.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Program.cs` (Sửa đổi — xóa `.RequireRateLimiting("fixed")` khỏi `MapHub`)
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi — bỏ skipNegotiation + WebSocket-only, thêm retry delays 2/5/10/30s)
+  - `nginx/conf.d/default.conf` (Sửa đổi — thêm location `/appHub` và `/campha/appHub` với timeout 3600s)
+- **Lệnh git commit**: `git commit -m "fix(notify): sửa SignalR bị đứt do rate limit + WebSocket-only + thiếu nginx location /appHub"`
+
+
+### [2026-08-06 01:50] Refactor TOÀN BỘ Frontend theo chuẩn Bulletproof React / Feature-Sliced Design
+- **Mô tả**: Tái cấu trúc toàn bộ 8 page components (tổng ~2500 dòng) thành cấu trúc Feature-Sliced Design. Mỗi page rút gọn xuống còn ~80-130 dòng bằng cách tách logic render vào `src/features/{feature}/components/`. Bổ sung `PublicLayout` dùng chung cho WorkSchedule & SearchSchedule, tránh duplicate 80+ dòng header/nav/footer. Tách `PasswordStrengthBar` thành component tái sử dụng trong `src/features/auth/components/`.
+
+- **Tệp thay đổi**:
+  - `src/features/accounts/components/AccountForm.jsx` (Mới — Form tài khoản Admin)
+  - `src/features/accounts/components/AccountTable.jsx` (Mới — Bảng danh sách tài khoản)
+  - `src/features/employees/components/EmployeeForm.jsx` (Mới — Form nhân viên với ZaloId)
+  - `src/features/employees/components/EmployeeTable.jsx` (Mới — Bảng nhân viên)
+  - `src/features/departments/components/DepartmentForm.jsx` (Mới — Form phòng ban)
+  - `src/features/departments/components/DepartmentTable.jsx` (Mới — Bảng phòng ban)
+  - `src/features/holidays/components/HolidayComponents.jsx` (Mới — HolidayForm + HolidayTable)
+  - `src/features/notifications/components/NotificationForm.jsx` (Mới — Form thông báo + Jodit)
+  - `src/features/notifications/components/NotificationTable.jsx` (Mới — Bảng + phân trang)
+  - `src/features/auth/components/PasswordStrengthBar.jsx` (Mới — Tách từ AdminChangePassword)
+  - `src/shared/components/PublicLayout.jsx` (Mới — Layout chung header+nav+footer công khai)
+  - `src/pages/AdminAccounts.jsx` (Sửa đổi — 383→120 dòng)
+  - `src/pages/AdminEmployees.jsx` (Sửa đổi — 385→122 dòng)
+  - `src/pages/AdminDepartments.jsx` (Sửa đổi — 249→96 dòng)
+  - `src/pages/AdminHolidays.jsx` (Sửa đổi — 265→103 dòng)
+  - `src/pages/AdminNotifications.jsx` (Sửa đổi — 343→105 dòng)
+  - `src/pages/AdminChangePassword.jsx` (Sửa đổi — 290→172 dòng)
+  - `src/pages/WorkSchedule.jsx` (Sửa đổi — 374→178 dòng)
+  - `src/pages/SearchSchedule.jsx` (Sửa đổi — 402→203 dòng)
+- **Lệnh git commit**: `git commit -m "refactor(fe): tái cấu trúc toàn bộ pages theo Feature-Sliced Design (bulletproof-react)"`
+
+### [2026-08-06 01:35] Tái cấu trúc AdminSchedules theo Feature-Sliced Design + Hiệu ứng Logout
+- **Mô tả**: Tách file `AdminSchedules.jsx` khổng lồ (722 dòng) thành 3 component con độc lập theo chuẩn Bulletproof React / Feature-Sliced Design. Mỗi component con tự quản lý render của riêng mình, tránh re-render toàn trang khi thay đổi nhỏ. Đồng thời cải thiện UX đăng xuất bằng toast loading 1.5s thay vì chuyển trang đột ngột.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/ScheduleForm.jsx` (Mới — Form thêm/sửa lịch, ~230 dòng)
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/ScheduleTable.jsx` (Mới — Bảng danh sách, ~110 dòng)
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/SchedulePagination.jsx` (Mới — Phân trang, ~70 dòng)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi — Rút gọn từ 722 → ~170 dòng)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi — Thêm toast loading khi logout)
+- **Lệnh git commit**: `git commit -m "refactor(docs): tách AdminSchedules thành Feature-Sliced components + logout UX"`
 
 ### [2026-08-02 23:30] Tối ưu hóa truy vấn Database, loại bỏ SELECT *
 - **Mô tả**: Thay thế toàn bộ các câu lệnh `SELECT *` bằng việc liệt kê rõ các cột cụ thể trong các repository (`DepartmentRepository` và `ScheduleRepository`). Điều này giúp cải thiện hiệu năng I/O bộ nhớ và tuân thủ chặt chẽ kiến trúc backend của dự án, tránh load dữ liệu dư thừa.
@@ -724,20 +823,138 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `.gitignore` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "chore: sua db path va ignore launchSettings.json tranh conflict local"`
 
-# # #   [ 2 0 2 6 - 0 8 - 0 5   0 8 : 3 7 ]   U p d a t e   s c h e d u l e   d i s p l a y   l a y o u t   t o   i n c l u d e   I n v i t a t i o n   N u m b e r   a n d   L o c a t i o n  
- -   * * M �   t �* * :   F o r m a t   c �t   N �i   d u n g   �  h i �n   t h �  S �  k �   h i �u   g i �y   m �i   v �   �a   i �m   m � u   x a n h   �m   ( t e a l )   c h o   g i �n g   m �u   t h i �t   k �  m �i   c �a   L � n h   �o .  
- -   * * T �p   t h a y   �i * * :  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / A d m i n S c h e d u l e s . j s x `   ( S �a   �i )  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x `   ( S �a   �i )  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / S e a r c h S c h e d u l e . j s x `   ( S �a   �i )  
- -   * * L �n h   g i t   c o m m i t * * :   ` g i t   c o m m i t   - m   " s t y l e ( d o c s ) :   u p d a t e   s c h e d u l e   d i s p l a y   l a y o u t   t o   m a t c h   n e w   d e s i g n " `  
-  
- # # #   [ 2 0 2 6 - 0 8 - 0 5   0 8 : 4 7 ]   F i x   H T M L   e n t i t y   e n c o d i n g   i n   S c h e d u l e   C o n t e n t  
- -   * * M �   t �* * :   S �a   l �i   k �   t �  �c   b i �t   ( V D :   d �u   &   b �  b i �n   t h � n h   & a m p ; )   k h i   h i �n   t h �  N �i   d u n g   l �c h   t �  J o d i t E d i t o r .   �   t h � m   l o g i c   d e c o d e   c � c   k �   t �  H T M L   c �  b �n .  
- -   * * T �p   t h a y   �i * * :  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / A d m i n S c h e d u l e s . j s x `   ( S �a   �i )  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x `   ( S �a   �i )  
-     -   ` L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / S e a r c h S c h e d u l e . j s x `   ( S �a   �i )  
- -   * * L �n h   g i t   c o m m i t * * :   ` g i t   c o m m i t   - m   " f i x ( d o c s ) :   r e s o l v e   h t m l   e n t i t i e s   e n c o d i n g   i s s u e   i n   s c h e d u l e   c o n t e n t   d i s p l a y " `  
-  
- 
+### [2026-08-05 20:52] Triển khai tính năng Realtime Update với SignalR
+- **Mô tả**: Bổ sung lại cấu hình SignalR trên backend và tích hợp vào frontend qua hook `useSignalR.js`. Tính năng giúp giao diện người dùng và Admin tự động tải lại dữ liệu (Lịch công tác, Ngày lễ) mỗi khi có thay đổi (Create/Update/Delete) mà không cần reload trang.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Hubs/AppHub.cs` (Mới)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi: Thêm AddSignalR và MapHub)
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi: Gọi sự kiện ReceiveScheduleUpdate qua IHubContext)
+  - `LichCongTac.Api/Controllers/HolidaysController.cs` (Sửa đổi: Gọi sự kiện ReceiveHolidayUpdate qua IHubContext)
+  - `LichCongTac.Api/ClientApp/src/hooks/useSignalR.js` (Mới)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi: Lắng nghe SignalR event)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi: Lắng nghe SignalR event)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Sửa đổi: Lắng nghe SignalR event)
+- **Lệnh git commit**: `git commit -m "feat(api, ui): implement real-time data updates via SignalR for schedules and holidays"`
+
+### [2026-08-05 20:56] Tái cấu trúc (Refactor) Real-time Updates bằng React Context
+- **Mô tả**: Áp dụng chuẩn công nghiệp cho tính năng realtime bằng cách sử dụng Global Context (`SignalRProvider`). Thay vì mỗi component tự tạo 1 kết nối (gây nghẽn mạng), nay toàn bộ hệ thống sử dụng chung 1 kết nối duy nhất qua Context. Các components chỉ cần lắng nghe sự thay đổi của biến state (`lastScheduleUpdate`, `lastHolidayUpdate`) để cập nhật UI.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/hooks/useSignalR.js` (Xóa)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Bọc toàn app bằng SignalRProvider)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi: Sử dụng context)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi: Sử dụng context)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Sửa đổi: Sử dụng context)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi: Sử dụng context)
+- **Lệnh git commit**: `git commit -m "refactor(ui): apply global context for signalr connections to optimize performance"`
+
+### [2026-08-05 21:05] Đại tu Kiến trúc Frontend (Best Practice)
+- **Mô tả**: Áp dụng chuẩn công nghiệp (Best Practice) cho Frontend:
+  1. Tích hợp `react-router-dom` v6, thay thế toàn bộ logic điều hướng nguyên thủy bằng `window.location`. Hệ thống đã chính thức trở thành Single Page Application (SPA).
+  2. Áp dụng `AuthContext` (Global State) để quản lý token và thông tin người dùng, loại bỏ việc đọc trực tiếp `localStorage` thủ công ở hàng loạt các component.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Tích hợp Router và AuthProvider)
+  - `LichCongTac.Api/ClientApp/src/pages/*` (Sửa đổi: Dùng useAuth và useNavigate trên toàn bộ trang Admin và Public)
+  - `LichCongTac.Api/ClientApp/src/components/AdminHeader.jsx` (Sửa đổi: Chuyển thẻ `a` sang `<Link>`)
+  - `LichCongTac.Api/ClientApp/src/lib/push-notifications.js` (Sửa đổi: Nhận token từ hàm thay vì đọc localStorage trực tiếp)
+- **Lệnh git commit**: `git commit -m "refactor(ui): implement react-router-dom and auth context for spa architecture"`
+
+### [2026-08-05 21:18] Cấu hình chiến lược gộp mã (Merge Strategy) an toàn cho Commit Log
+- **Mô tả**: Thiết lập thuộc tính `merge=union` cho tệp `COMMIT_LOG.md` trong `.gitattributes`. Điều này ngăn chặn vĩnh viễn việc Git tự động xóa bỏ các dòng log khi có hai nhánh cùng ghi thêm văn bản vào cuối tệp. Git sẽ luôn giữ lại cả hai phần bổ sung thay vì ưu tiên nhánh remote.
+- **Tệp thay đổi**:
+  - `.gitattributes` (Sửa đổi: Bổ sung cấu hình merge cho COMMIT_LOG.md)
+- **Lệnh git commit**: `git commit -m "chore(git): configure union merge strategy for COMMIT_LOG.md to prevent append conflicts"`
+### [2026-08-05 22:00] Khắc phục 3 Lỗi Ẩn (Hidden Bugs) Nghiêm trọng
+- **Mô tả**: Xử lý triệt để 3 lỗi tiềm ẩn trong kiến trúc có thể gây sập hệ thống:
+  1. Fix `database is locked` của SQLite bằng cách kích hoạt chế độ WAL (Write-Ahead Logging) và đặt Timeout=5.
+  2. Implement cơ chế **Refresh Token** (cả Backend và Frontend) để duy trì phiên đăng nhập mà không bị out đột ngột khi JWT hết hạn (7 ngày cho refresh, 24 giờ cho JWT).
+  3. Implement **Optimistic Concurrency Write** để chống ghi đè dữ liệu. Thêm trường `UpdatedAt` vào quy trình update `Schedules`, check version ở DB bằng `datetime` và tự động trả `409 Conflict` về frontend khi 2 người dùng sửa cùng 1 lúc, hiển thị thông báo yêu cầu tải lại trang.
+- **Tệp thay đổi**:
+  - `data_dump/documents.db` (Sửa đổi: bật chế độ WAL và thêm cột RefreshToken vào bảng Users)
+  - `LichCongTac.Core/Models/UserModels.cs` (Sửa đổi: thêm RefreshToken fields)
+  - `LichCongTac.Core/Data/Interfaces/IUserRepository.cs` (Sửa đổi: thêm UpdateRefreshToken)
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi: thêm logic UpdateRefreshToken)
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: thêm endpoint /refresh và generate refresh token)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: quản lý refresh_token)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: tự động làm mới token trên interceptor khi nhận lỗi 401)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi: lưu trữ refreshToken)
+  - `LichCongTac.Core/Models/ScheduleModels.cs` (Sửa đổi: thêm trường UpdatedAt vào UpdateDto)
+  - `LichCongTac.Core/Models/UpdateResult.cs` (Mới: Enum trả về các trường hợp update)
+  - `LichCongTac.Core/Data/Interfaces/IScheduleRepository.cs` (Sửa đổi: thay đổi return type)
+  - `LichCongTac.Core/Data/Repositories/ScheduleRepository.cs` (Sửa đổi: logic Optimistic Concurrency Check)
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi: trả 409 Conflict)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi: truyền UpdatedAt vào payload update)
+- **Lệnh git commit**: `git commit -m "fix(core): xử lý triệt để lỗi khóa database, bổ sung refresh token và optimistic concurrency"`
+
+
+### [2026-08-05 22:05] Cải tiến Trải nghiệm người dùng: Modal Đăng nhập tại chỗ
+- **Mô tả**: Sửa đổi hành vi khi hết hạn toàn bộ token (cả access token và refresh token). Thay vì sử dụng `window.location.href` để điều hướng ép buộc về trang đăng nhập làm mất toàn bộ dữ liệu đang nhập dở trong state, hệ thống nay sẽ hiển thị một Modal đăng nhập (Popup) ngay tại giao diện hiện tại. Người dùng có thể đăng nhập lại ngay lập tức và tiếp tục bấm "Lưu" form mà không bị mất bất kỳ dữ liệu nào.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Thêm component Modal Đăng nhập nội tuyến)
+- **Lệnh git commit**: `git commit -m "feat(auth): hiển thị modal đăng nhập tại chỗ khi hết hạn phiên thay vì redirect để giữ nguyên dữ liệu form"`
+
+### [2026-08-05 22:25] Nâng cấp cảnh giới Request Queue cho Hệ thống Auth
+- **Mô tả**: Implement tính năng Hàng đợi Request (Request Queue) cho Modal Đăng nhập. Ở phiên bản trước, khi token hết hạn và người dùng đăng nhập lại qua Modal, họ vẫn phải bấm nút "Lưu" thêm một lần nữa. Với bản nâng cấp này:
+  1. Khi gặp lỗi 401, Interceptor sẽ đóng băng luồng `fetch` bằng một `Promise` và tống request bị lỗi vào Hàng đợi.
+  2. Phát sự kiện `auth:unauthorized` để hiện Modal Đăng nhập.
+  3. Sau khi người dùng gõ Pass và ấn Login, Modal phát sự kiện `auth:login_success` kèm theo Token mới.
+  4. Interceptor bắt được sự kiện này, lấy Token mới gắn đè vào Header của các Request đang bị đóng băng và tự động "bung" chúng chạy tiếp.
+  Người dùng hoàn toàn không cần thao tác lại, dữ liệu tự động lưu và báo thành công.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Khởi tạo failedRequestQueue và Promise wrapper)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Bổ sung phát sự kiện auth:login_success và auth:login_cancel)
+- **Lệnh git commit**: `git commit -m "feat(auth): implement request queue to auto retry failed requests after modal login"`
+
+### [2026-08-05 23:05] Nâng cấp Bảo mật Session (HttpOnly Refresh Token & Token Revocation)
+- **Mô tả**: Vá hoàn toàn lỗ hổng bảo mật liên quan đến vòng đời của Refresh Token:
+  1. Gắn Refresh Token vào HttpOnly Cookie thay vì trả về qua JSON (Chống tấn công XSS).
+  2. Bổ sung cơ chế Revoke Token: Thu hồi (xóa) Refresh Token trong DB khi người dùng gọi API Đăng xuất hoặc Đổi mật khẩu. Chống lỗ hổng "Ghost Session" khi mật khẩu đã đổi nhưng Token cũ vẫn sống.
+  3. Cập nhật Interceptor trên Frontend: Tự động đính kèm HttpOnly Cookie khi gọi `/api/auth/refresh` và loại bỏ hoàn toàn `localStorage` cho refresh token.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: Đổi luồng trả cookie, thêm [Authorize] và logic Revoke cho Logout/ChangePassword)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Gỡ bỏ localStorage.setItem('refresh_token'), gọi API Logout ngầm)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Đọc cookie ngầm, thêm credentials: 'include')
+- **Lệnh git commit**: `git commit -m "security(auth): move refresh token to httponly cookie and revoke token in db on logout/password change"`
+
+### [2026-08-05 23:08] Thêm tính năng Cảnh báo Đăng nhập Đồng thời (Concurrent Login)
+- **Mô tả**: Xử lý kịch bản hai người dùng đăng nhập cùng một tài khoản. Khi người thứ 2 đăng nhập thành công, hệ thống tự động đổi `SecurityStamp` và `RefreshToken` trong DB. Khi người thứ 1 thao tác, Token cũ bị từ chối (401), hệ thống cố gắng chạy Refresh Token nhưng phát hiện Token không khớp trong DB -> Trả về thông báo lỗi cụ thể. Frontend bắt thông báo này và hiển thị lên Modal Đăng nhập tại chỗ để cảnh báo người dùng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: Bắt lỗi RefreshToken không khớp)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi: Đọc error message từ refresh api và đẩy vào event)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi: Nhận thông báo linh động từ event detail)
+- **Lệnh git commit**: `git commit -m "feat(auth): display specific warning message on concurrent login via modal"`
+
+### [2026-08-05 23:11] Tinh chỉnh câu thông báo Concurrent Login
+- **Mô tả**: Thay đổi câu chữ cảnh báo đăng nhập đồng thời thành ngôn ngữ thân thiện, dễ hiểu hơn dành cho người lớn tuổi ("Tài khoản của bạn vừa được đăng nhập trên một máy tính hoặc điện thoại khác. Vui lòng đăng nhập lại để tiếp tục làm việc ở máy này.").
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi: Đổi nội dung chuỗi trả về)
+- **Lệnh git commit**: `git commit -m "style(auth): update concurrent login message to be friendlier"`
+
+### [2026-08-05 23:13] Tinh chỉnh câu thông báo Concurrent Login
+- **Mô tả**: Rút gọn thông báo "trên máy tính hoặc điện thoại khác" thành "trên thiết bị khác".
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(auth): shorten concurrent login message to thiet bi khac"`
+
+### [2026-08-06 00:43] Refactor toàn bộ Frontend dùng Services và apiClient
+- **Mô tả**: Loại bỏ toàn bộ `fetch` thủ công trong các components. Áp dụng kiến trúc Repository Pattern cho Frontend, phân tách logic API ra các file services (`admin.service.js`, `schedule.service.js`, `auth.service.js`, `notification.service.js`) dùng chung thư viện `apiClient.js`. Đảm bảo tự động đính kèm token, xử lý refresh token và chuẩn hóa response `ApiResponse<T>`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/services/admin.service.js` (Mới/Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/services/schedule.service.js` (Mới/Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/services/auth.service.js` (Mới/Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/services/notification.service.js` (Mới/Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminAccounts.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminEmployees.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminDepartments.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminNotifications.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminChangePassword.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/lib/push-notifications.js` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "refactor(api): chuyển toàn bộ frontend sang dùng apiClient và services pattern"`

@@ -15,6 +15,7 @@ using System.Threading.RateLimiting;
 using LichCongTac.Middleware;   // ✅ FileAccessSecurityMiddleware
 using LichCongTac.Policies;    // ✅ AppPolicies (phân quyền tập trung)
 using Microsoft.Extensions.Caching.Memory; // ✅ IMemoryCache extension methods
+using LichCongTac.Api.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache(); // ✅ Dashboard stats caching
+builder.Services.AddSignalR();
 
 
 
@@ -315,8 +317,8 @@ if (!Directory.Exists(uploadsPath)) Directory.CreateDirectory(uploadsPath);
 
 app.UseAuthentication();
 app.UseAuthorization();
-// Áp dụng Rate Limiter "fixed" làm mặc định cho tất cả Controllers và Hub
 app.MapControllers().RequireRateLimiting("fixed");
+app.MapHub<AppHub>("/appHub"); // ✅ Không rate limit WebSocket hub — kết nối long-lived, rate limiter sẽ làm đứt SignalR
 app.MapFallbackToFile("index.html");
 
 

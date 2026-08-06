@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
+import { useNavigate, useSearchParams, Navigate, Link } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext.jsx'
+import { authService } from '../services/auth.service'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
@@ -9,9 +12,12 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
+  const { login, token, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('reason') === 'expired') {
+    if (searchParams.get('reason') === 'expired') {
       toast.error(
         'Phiên đăng nhập đã hết hạn hoặc tài khoản đang được đăng nhập ở nơi khác. Vui lòng đăng nhập lại.',
         {
@@ -19,47 +25,41 @@ export default function AdminLogin() {
         }
       )
       // Xóa query param để không hiện lại khi F5
-      window.history.replaceState({}, document.title, window.location.pathname)
+      setSearchParams({})
     }
-  }, [])
+  }, [searchParams, setSearchParams])
+
+  if (authLoading) return null
+  if (token) return <Navigate to="/campha/manager/schedules" replace />
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        // Fallback cho interceptor trả về `data` thay vì object phẳng
-        let token, user_name, role
-        if (data.token) {
-          token = data.token
-          user_name = data.username || data.fullName
-          role = data.role
-        } else if (data.data && data.data.token) {
-          token = data.data.token
-          user_name = data.data.username || data.data.fullName
-          role = data.data.role
-        }
+      const data = await authService.login({ username, password })
 
-        if (token) {
-          localStorage.setItem('auth_token', token)
-          localStorage.setItem('user_name', user_name)
-          localStorage.setItem('user_role', role)
-          window.location.href = '/campha/manager/schedules'
-        } else {
-          setError('Đăng nhập thành công nhưng không lấy được token.')
-        }
+      let resToken, resUserName, resRole, resRefreshToken
+      if (data.token) {
+        resToken = data.token
+        resRefreshToken = data.refreshToken
+        resUserName = data.username || data.fullName
+        resRole = data.role
+      } else if (data.data && data.data.token) {
+        resToken = data.data.token
+        resRefreshToken = data.data.refreshToken
+        resUserName = data.data.username || data.data.fullName
+        resRole = data.data.role
+      }
+
+      if (resToken) {
+        login({ name: resUserName, role: resRole }, resToken, resRefreshToken)
+        navigate('/campha/manager/schedules', { replace: true })
       } else {
-        setError('Tên đăng nhập hoặc mật khẩu không chính xác')
+        setError('Đăng nhập thành công nhưng không lấy được token.')
       }
     } catch (err) {
-      setError('Lỗi kết nối máy chủ')
+      setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
       setLoading(false)
     }
@@ -127,6 +127,16 @@ export default function AdminLogin() {
             >
               {loading ? 'Đang tải...' : 'Đăng nhập'}
             </button>
+          </div>
+
+          <div className="text-center pt-2">
+            <Link
+              to="/campha/"
+              className="inline-flex items-center justify-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeft size={16} />
+              Quay về xem Lịch công tác
+            </Link>
           </div>
         </form>
       </div>

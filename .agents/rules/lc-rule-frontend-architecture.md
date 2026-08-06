@@ -7,28 +7,34 @@ description: "Quy tắc kiến trúc Frontend React — Global Fetch Interceptor
 
 Quy tắc này định nghĩa các ràng buộc bắt buộc cho layer Frontend React của LichCongTac.
 
-## 1. HTTP Client — Chỉ dùng `fetch` Native
+## 1. HTTP Client — Custom Fetch Wrapper & Repository Pattern
 
 > [!IMPORTANT]
-> Dự án này KHÔNG dùng Axios. Mọi API call phải dùng `fetch` native với Global Fetch Interceptor đã được thiết lập trong `main.jsx`.
+> Dự án này KHÔNG dùng Axios. Mọi API call phải dùng hàm `apiClient` tự định nghĩa (wrapper của fetch) tại `src/lib/apiClient.js` và tuân thủ **Repository Pattern**. KHÔNG được ghi đè (monkey patch) `window.fetch`.
 
-### Global Fetch Interceptor (đã có trong `main.jsx`)
+### Custom Fetch Wrapper (`apiClient.js`)
 
-Interceptor xử lý tự động:
+Interceptor xử lý tự động bên trong `apiClient.js`:
 - **Unwrap response**: Tự động lấy `.data` từ `ApiResponse<T>`.
-- **Error handling**: Tự động xử lý lỗi 401 (redirect login), 403, 500.
-- **Token injection**: Tự động thêm `Authorization: Bearer <token>` header.
+- **Error handling**: Tự động xử lý lỗi 401 (âm thầm gọi /api/auth/refresh). Nếu refresh lỗi thì dispatch event `auth:unauthorized`.
+- **Credential**: Tự động gởi HTTPOnly cookie.
 
-### Cách gọi API đúng:
+### Cách gọi API đúng (Repository Pattern):
 ```js
-// ✅ Chỉ cần gọi fetch — interceptor lo phần còn lại
-const data = await fetch('/api/documents').then(r => r.json());
+// 1. Định nghĩa service trong thư mục src/services/
+import apiClient from '@/lib/apiClient';
 
-// ✅ POST với body
-const result = await fetch('/api/documents/upload', {
-  method: 'POST',
-  body: formData
-}).then(r => r.json());
+export const documentApi = {
+  getDocs: () => apiClient('/api/documents'),
+  uploadDoc: (formData) => apiClient('/api/documents/upload', {
+    method: 'POST',
+    body: formData
+  })
+};
+
+// 2. Sử dụng trong component
+import { documentApi } from '@/services/document.service';
+const data = await documentApi.getDocs();
 ```
 
 ### Cách sai:
@@ -37,8 +43,11 @@ const result = await fetch('/api/documents/upload', {
 import axios from 'axios';
 axios.get('/api/documents');
 
-// ❌ Không tự thêm Authorization header thủ công (interceptor đã làm)
-fetch('/api/users', { headers: { Authorization: `Bearer ${token}` } });
+// ❌ Không tự gọi fetch thẳng trong Component
+fetch('/api/users');
+
+// ❌ Không ghi đè window.fetch trong main.jsx
+window.fetch = async (...args) => {};
 ```
 
 ---

@@ -1,97 +1,76 @@
+/* global DOMParser */
 import { useState, useEffect } from 'react'
-import { Search, FileText, Loader2, Menu } from 'lucide-react'
-import { toast } from 'sonner'
+import { useAppSignalR } from '../contexts/SignalRContext'
+import { scheduleService } from '../services/schedule.service'
+import { PublicLayout } from '../shared/components/PublicLayout'
 import { Calendar } from 'lucide-react'
+import DatePicker, { registerLocale } from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import { vi } from 'date-fns/locale'
+
+registerLocale('vi', vi)
 
 const PAGE_SIZE = 10
-
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
 
-const extractTextFromHtml = (html) => {
-  if (!html) return '';
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  return (doc.body.textContent || '').replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
-};
+const extractText = (html) => {
+  if (!html) return ''
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  return (doc.body.textContent || '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
-function formatDateDisplay(dateString) {
+const formatDateDisplay = (dateString) => {
   if (!dateString) return { dayName: '', date: '' }
   try {
     const parts = dateString.split('T')[0].split('-')
     const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
-    const dayName = DAYS[d.getDay()]
-    const dd = String(d.getDate()).padStart(2, '0')
-    const mm = String(d.getMonth() + 1).padStart(2, '0')
-    const yyyy = d.getFullYear()
-    return { dayName, date: `${dd}/${mm}/${yyyy}` }
+    return {
+      dayName: DAYS[d.getDay()],
+      date: `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`,
+    }
   } catch {
     return { dayName: '', date: dateString }
   }
 }
 
-const navItems = [
-  { label: 'HOME', href: '/campha/' },
-  {
-    label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH',
-    href: 'https://congchuc.quangninh.gov.vn/sso/Login.aspx',
-    target: '_blank',
-  },
-  {
-    label: 'CỔNG THÔNG TIN',
-    href: 'https://quangninh.gov.vn/Trang/Default.aspx',
-    target: '_blank',
-  },
-  {
-    label: 'THƯ ĐIỆN TỬ',
-    href: 'https://mail.quangninh.gov.vn/owa/auth/logon.aspx?replaceCurrent=1&url=https%3a%2f%2fmail.quangninh.gov.vn%2fowa%2f',
-    target: '_blank',
-  },
-  { label: 'TÌM KIẾM', href: '/campha/search' },
-  { label: 'QUẢN TRỊ', href: '/campha/manager/login' },
-]
-
 export default function SearchSchedule() {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [keyword, setKeyword] = useState('')
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
   const [results, setResults] = useState([])
   const [searched, setSearched] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [todayHoliday, setTodayHoliday] = useState(null)
+  const { lastHolidayUpdate } = useAppSignalR()
 
-  // Fetch today's holiday on mount
   useEffect(() => {
-    fetch('/api/holidays/today')
-      .then((res) => res.json())
-      .then((json) => {
-        if (json && json.content) {
-          setTodayHoliday(json)
-        } else if (json.success && json.data) {
-          setTodayHoliday(json.data)
-        }
-      })
-      .catch((err) => console.error('Lỗi tải ngày lễ:', err))
-  }, [])
+    scheduleService
+      .getTodayHoliday()
+      .then((data) => setTodayHoliday(data?.content ? data : data?.data || null))
+      .catch(() => {})
+  }, [lastHolidayUpdate])
 
   const handleSearch = async (e) => {
     e.preventDefault()
     setLoading(true)
     setCurrentPage(1)
     try {
-      const params = new URLSearchParams()
-      if (startDate) params.append('startDate', startDate)
-      if (endDate) params.append('endDate', endDate)
-
-      const url = `/api/schedules/public-schedule${params.toString() ? '?' + params.toString() : ''}`
-      const res = await fetch(url)
-      const json = await res.json()
-
-      let data = []
-      if (Array.isArray(json)) data = json
-      else if (json.data) data = json.data
-
-      // Filter by keyword on frontend
+      const params = {}
+      if (startDate) params.startDate = startDate
+      if (endDate) params.endDate = endDate
+      const raw = await scheduleService.getPublicSchedule(params)
+      let data = Array.isArray(raw) ? raw : raw?.data || []
       if (keyword.trim()) {
         const kw = keyword.trim().toLowerCase()
         data = data.filter(
@@ -101,19 +80,14 @@ export default function SearchSchedule() {
             (item.invitationNumber && item.invitationNumber.toLowerCase().includes(kw))
         )
       }
-
-      // Sort by date descending
       data.sort((a, b) => {
         const da = (a.date || '').split('T')[0]
         const db = (b.date || '').split('T')[0]
-        if (db > da) return 1
-        if (db < da) return -1
-        return (b.startTime || '').localeCompare(a.startTime || '')
+        return db > da ? 1 : db < da ? -1 : (b.startTime || '').localeCompare(a.startTime || '')
       })
-
       setResults(data)
       setSearched(true)
-    } catch (err) {
+    } catch {
       setResults([])
       setSearched(true)
     } finally {
@@ -123,7 +97,6 @@ export default function SearchSchedule() {
 
   const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE))
   const paginated = results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1)
     .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
     .reduce((acc, p, idx, arr) => {
@@ -133,119 +106,91 @@ export default function SearchSchedule() {
     }, [])
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[16px] text-gray-800">
-      {/* Header */}
-      <div className="max-w-6xl mx-auto bg-white relative flex flex-col justify-center min-h-[86px] overflow-hidden">
-        <div className="absolute inset-0 z-0 flex justify-start">
-          <img
-            src="/assets/header-banner.jpg"
-            alt="Lịch Công Tác UBND Phường Cẩm Phả"
-            className="h-full w-auto max-h-[86px] object-contain"
-            onError={(e) => {
-              e.target.style.display = 'none'
-            }}
-          />
-        </div>
-        <div className="relative z-10 pl-[90px] md:pl-[130px] py-2 pr-2">
-          <h1 className="text-[18px] sm:text-[20px] md:text-[24px] font-bold text-[#1d5792] uppercase m-0 leading-tight tracking-wide">
-            LỊCH CÔNG TÁC
-          </h1>
-          <h1 className="text-[13px] sm:text-[15px] md:text-[18px] font-bold text-[#c8102e] uppercase m-0 leading-tight tracking-wide mt-1">
-            UBND PHƯỜNG CẨM PHẢ
-          </h1>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <div className="max-w-6xl mx-auto">
-        <nav className="bg-[#1d5792] shadow-md relative z-20">
-          <div className="flex flex-col md:flex-row md:items-center">
-            {/* Mobile Menu Toggle */}
-            <div
-              className="md:hidden flex justify-between items-center px-4 py-3 cursor-pointer"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <span className="text-white font-serif font-bold uppercase text-base tracking-wide">
-                MENU
-              </span>
-              <Menu className="text-white w-7 h-7" />
-            </div>
-
-            {/* Nav Items */}
-            <div
-              className={`${isMobileMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row w-full`}
-            >
-              {navItems.map((item, idx) => (
-                <a
-                  key={idx}
-                  href={item.href}
-                  target={item.target || '_self'}
-                  rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
-                  className={`px-6 py-3 border-t border-[#154374] md:border-none text-white text-[15px] font-bold uppercase hover:bg-[#154374] transition-colors ${item.href === '/campha/search' ? 'bg-[#154374]' : ''}`}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </div>
-          </div>
-        </nav>
-      </div>
-
-      {/* Holiday Marquee */}
-      {todayHoliday && (
-        <div className="max-w-6xl mx-auto">
-          <div className="bg-[#fcf8e3] text-[#c8102e] py-1.5 border-b border-[#faebcc] overflow-hidden whitespace-nowrap relative">
-            <marquee scrollamount="6" className="text-[13px] font-semibold tracking-wide">
-              ⚛ {todayHoliday.content} ⚛
-            </marquee>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-6">
+    <PublicLayout activeHref="/campha/search" todayHoliday={todayHoliday}>
+      <main className="max-w-6xl mx-auto px-4 py-6 text-[16px]">
         {/* Search box */}
         <div className="bg-[#e8f0f7] border border-[#c0d4e8] p-4 md:p-6 mb-6">
           <h2 className="text-[#1d5792] font-bold text-base mb-4">Tìm kiếm</h2>
-          <form onSubmit={handleSearch} className="flex flex-col gap-4 max-w-[550px]">
+          <form
+            onSubmit={handleSearch}
+            className="flex flex-col gap-4 w-full max-w-[550px] overflow-hidden"
+          >
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
               <label className="text-gray-700 font-medium md:w-[160px] shrink-0">
                 Thời gian bắt đầu
               </label>
-              <div className="relative w-full max-w-[280px] md:max-w-none md:w-[200px] group">
-                {!startDate && (
-                  <div className="absolute inset-0 px-3 py-1.5 pointer-events-none text-gray-400 text-sm flex items-center group-focus-within:hidden">
-                    dd/mm/yyyy
-                  </div>
-                )}
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className={`border border-gray-300 px-3 py-1.5 rounded text-[16px] w-full outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] bg-transparent ${!startDate ? 'empty-date' : 'text-gray-700'}`}
+              <div className="relative w-full md:w-[200px] group flex items-center">
+                <DatePicker
+                  selected={startDate ? new Date(startDate) : null}
+                  onChange={(date) => {
+                    if (date) {
+                      const yyyy = date.getFullYear()
+                      const mm = String(date.getMonth() + 1).padStart(2, '0')
+                      const dd = String(date.getDate()).padStart(2, '0')
+                      setStartDate(`${yyyy}-${mm}-${dd}`)
+                    } else {
+                      setStartDate('')
+                    }
+                  }}
+                  dateFormat="dd/MM/yyyy"
+                  locale="vi"
+                  placeholderText="Ngày/Tháng/Năm"
+                  wrapperClassName="w-full"
+                  className="border border-gray-300 px-3 py-1.5 rounded min-w-0 w-full outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] bg-white pr-10"
+                  withPortal={isMobile}
+                  popperPlacement="bottom-start"
+                  popperModifiers={[
+                    {
+                      name: 'preventOverflow',
+                      options: { boundary: 'viewport', altAxis: true, padding: 8 },
+                    },
+                    {
+                      name: 'flip',
+                      options: { fallbackPlacements: ['top-start', 'bottom-start'] },
+                    },
+                  ]}
                 />
+                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
               </div>
             </div>
-
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
               <label className="text-gray-700 font-medium md:w-[160px] shrink-0">
                 Thời gian kết thúc
               </label>
-              <div className="relative w-full max-w-[280px] md:max-w-none md:w-[200px] group">
-                {!endDate && (
-                  <div className="absolute inset-0 px-3 py-1.5 pointer-events-none text-gray-400 text-sm flex items-center group-focus-within:hidden">
-                    dd/mm/yyyy
-                  </div>
-                )}
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className={`border border-gray-300 px-3 py-1.5 rounded text-[16px] w-full outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] bg-transparent ${!endDate ? 'empty-date' : 'text-gray-700'}`}
+              <div className="relative w-full md:w-[200px] group flex items-center">
+                <DatePicker
+                  selected={endDate ? new Date(endDate) : null}
+                  onChange={(date) => {
+                    if (date) {
+                      const yyyy = date.getFullYear()
+                      const mm = String(date.getMonth() + 1).padStart(2, '0')
+                      const dd = String(date.getDate()).padStart(2, '0')
+                      setEndDate(`${yyyy}-${mm}-${dd}`)
+                    } else {
+                      setEndDate('')
+                    }
+                  }}
+                  dateFormat="dd/MM/yyyy"
+                  locale="vi"
+                  placeholderText="Ngày/Tháng/Năm"
+                  wrapperClassName="w-full"
+                  className="border border-gray-300 px-3 py-1.5 rounded min-w-0 w-full outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] bg-white pr-10"
+                  withPortal={isMobile}
+                  popperPlacement="bottom-start"
+                  popperModifiers={[
+                    {
+                      name: 'preventOverflow',
+                      options: { boundary: 'viewport', altAxis: true, padding: 8 },
+                    },
+                    {
+                      name: 'flip',
+                      options: { fallbackPlacements: ['top-start', 'bottom-start'] },
+                    },
+                  ]}
                 />
+                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
               </div>
             </div>
-
             <div className="flex flex-col md:flex-row gap-1 md:gap-4">
               <label className="text-gray-700 font-medium md:w-[160px] shrink-0 pt-1">
                 Nội dung
@@ -254,16 +199,15 @@ export default function SearchSchedule() {
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 rows={3}
-                className="border border-gray-300 px-3 py-2 rounded text-gray-700 text-[16px] w-full md:w-[300px] outline-none focus:border-[#1d5792] focus:ring-1 focus:ring-[#1d5792] resize-y"
+                className="border border-gray-300 px-3 py-2 rounded text-gray-700 w-full md:w-[300px] outline-none focus:border-[#1d5792] resize-y"
               />
             </div>
-
-            <div className="flex flex-col md:flex-row gap-1 md:gap-4 mt-2">
+            <div className="flex md:gap-4">
               <div className="hidden md:block md:w-[160px] shrink-0" />
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-2 rounded text-[16px] font-medium transition-colors disabled:opacity-50 w-full md:w-auto shadow-sm"
+                className="bg-[#5cb85c] hover:bg-[#4cae4c] text-white px-8 py-2 rounded font-medium transition-colors disabled:opacity-50 shadow-sm"
               >
                 {loading ? 'Đang tìm...' : 'Tìm kiếm'}
               </button>
@@ -298,39 +242,34 @@ export default function SearchSchedule() {
                 <tbody>
                   {paginated.length > 0 ? (
                     paginated.map((item, index) => {
-                      const globalIndex = (currentPage - 1) * PAGE_SIZE + index + 1
-                      const dateInfo = formatDateDisplay(item.date)
+                      const di = formatDateDisplay(item.date)
                       return (
                         <tr key={item.id} className="hover:bg-gray-50">
                           <td className="border border-gray-300 py-2.5 px-3 text-center font-bold">
-                            {globalIndex}
+                            {(currentPage - 1) * PAGE_SIZE + index + 1}
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3 text-center leading-tight">
-                            <div>{dateInfo.dayName}</div>
-                            <div className="text-[#1d5792] font-bold">{dateInfo.date}</div>
+                            <div>{di.dayName}</div>
+                            <div className="text-[#1d5792] font-bold">{di.date}</div>
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3">
-                            {item.startTime && item.startTime.trim() !== '' && (
-                              <span className="text-[#c8102e] font-bold text-[16px] mr-2">
+                            {item.startTime?.trim() && (
+                              <span className="text-[#c8102e] font-bold mr-2">
                                 {item.startTime.trim()}:
                               </span>
                             )}
-                            <span>
-                              {item.invitationNumber && (
-                                <span className="text-[#005f6b] font-bold mr-1">
-                                  {item.invitationNumber}
-                                </span>
-                              )}
-                              {item.location && (
-                                <span className="text-[#005f6b] font-bold mr-1">
-                                  (Tại {item.location})
-                                </span>
-                              )}
-                            </span>
-                            {item.content && (
-                              <span className="text-gray-900">
-                                {extractTextFromHtml(item.content)}
+                            {item.invitationNumber && (
+                              <span className="text-[#005f6b] font-bold mr-1">
+                                {item.invitationNumber}
                               </span>
+                            )}
+                            {item.location && (
+                              <span className="text-[#005f6b] font-bold mr-1">
+                                (Tại {item.location})
+                              </span>
+                            )}
+                            {item.content && (
+                              <span className="text-gray-900">{extractText(item.content)}</span>
                             )}
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3 text-center">
@@ -352,7 +291,6 @@ export default function SearchSchedule() {
                 </tbody>
               </table>
             </div>
-
             {/* Pagination */}
             {results.length > PAGE_SIZE && (
               <div className="flex items-center justify-center gap-0.5 mt-4 text-xs flex-wrap">
@@ -375,7 +313,7 @@ export default function SearchSchedule() {
                       onClick={() => setCurrentPage(p)}
                       className={`px-1.5 ${currentPage === p ? 'font-bold text-gray-800' : 'text-[#1d5792] hover:underline'}`}
                     >
-                      {currentPage === p ? p : <span>{p}</span>}
+                      {p}
                     </button>
                   )
                 )}
@@ -392,13 +330,6 @@ export default function SearchSchedule() {
           </>
         )}
       </main>
-
-      {/* Footer */}
-      <div className="max-w-6xl mx-auto">
-        <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs mt-8">
-          Bản quyền thuộc về UBND phường Cẩm Phả
-        </footer>
-      </div>
-    </div>
+    </PublicLayout>
   )
 }

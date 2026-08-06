@@ -15,79 +15,34 @@ import AdminEmployees from './pages/AdminEmployees.jsx'
 import AdminNotifications from './pages/AdminNotifications.jsx'
 import AdminHolidays from './pages/AdminHolidays.jsx'
 import SearchSchedule from './pages/SearchSchedule.jsx'
+import { SignalRProvider } from './contexts/SignalRContext.jsx'
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx'
+import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
 import './styles/globals.css'
 
-// ─── Global Fetch Interceptor for standardized ApiResponse ────────────────
-const originalFetch = window.fetch
-window.fetch = async function () {
-  var args = Array.prototype.slice.call(arguments)
+// ─── Global Request Queue for Inline Login Modal ────────────────────────────
+let isLoginModalOpen = false
+let failedRequestQueue = []
 
-  var url = args[0]
-  var options = args[1] || {}
-
-  // Cache busting for GET API requests (Fix iOS Safari aggressive caching)
-  if (
-    typeof url === 'string' &&
-    url.startsWith('/api/') &&
-    (!options.method || options.method.toUpperCase() === 'GET')
-  ) {
-    var separator = url.includes('?') ? '&' : '?'
-    args[0] = url + separator + '_t=' + new Date().getTime()
-  }
-
-  // Prevent ngrok browser warning from blocking API requests
-  options.headers = options.headers || {}
-  options.headers['ngrok-skip-browser-warning'] = 'true'
-  args[1] = options
-
-  var response = await originalFetch.apply(window, args)
-  var contentType = response.headers.get('content-type')
-  if (contentType && contentType.includes('application/json')) {
-    var clone = response.clone()
-    try {
-      var json = await clone.json()
-      if (
-        json &&
-        typeof json === 'object' &&
-        'success' in json &&
-        ('data' in json || 'errors' in json)
-      ) {
-        var unwrappedData
-        if (json.success) {
-          unwrappedData = json.data !== null ? json.data : { message: json.message }
-        } else {
-          unwrappedData = {
-            message: json.message,
-            error: json.message,
-            errors: json.errors,
-          }
-        }
-
-        var newResponse = new Response(JSON.stringify(unwrappedData), {
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers,
-        })
-
-        Object.defineProperty(newResponse, 'url', { value: response.url })
-        return newResponse
-      }
-    } catch (e) {
-      // Ignore parsing error
+const processRequestQueue = (error, token = null) => {
+  failedRequestQueue.forEach((prom) => {
+    if (error) {
+      prom.resolve(prom.originalResponse)
+    } else {
+      prom.resolve(token)
     }
-  }
-  if (response.status === 401) {
-    document.dispatchEvent(new CustomEvent('auth:unauthorized'))
-  }
-  return response
+  })
+  failedRequestQueue = []
 }
 
-document.addEventListener('auth:unauthorized', function () {
-  localStorage.removeItem('auth_token')
-  localStorage.removeItem('user_name')
-  localStorage.removeItem('user_role')
-  localStorage.removeItem('user_fullname')
-  window.location.replace('/campha/manager/login?reason=expired')
+document.addEventListener('auth:login_success', (e) => {
+  isLoginModalOpen = false
+  processRequestQueue(null, e.detail.token)
+})
+
+document.addEventListener('auth:login_cancel', () => {
+  isLoginModalOpen = false
+  processRequestQueue(new Error('Canceled'))
 })
 
 // ─── Error Boundary ─────────────────────────────────────────────────────────
@@ -135,107 +90,118 @@ class ErrorBoundary extends React.Component {
 }
 
 function RequireAuth({ children }) {
-  var token = localStorage.getItem('auth_token')
+  const { token, loading } = useAuth()
+  if (loading) return null
   if (!token) {
-    window.location.replace('/campha/manager/login')
-    return null
+    return <Navigate to="/campha/manager/login" replace />
   }
   return children
 }
 
-// Yêu cầu role Admin — non-admin chỉ được đổi mật khẩu
 function RequireAdmin({ children }) {
-  var token = localStorage.getItem('auth_token')
-  var role = localStorage.getItem('user_role')
+  const { token, user, loading } = useAuth()
+  if (loading) return null
   if (!token) {
-    window.location.replace('/campha/manager/login')
-    return null
+    return <Navigate to="/campha/manager/login" replace />
   }
-  if (role !== 'Admin') {
-    window.location.replace('/campha/manager/change-password')
-    return null
+  if (user?.role !== 'Admin') {
+    return <Navigate to="/campha/manager/change-password" replace />
   }
   return children
 }
 
-// ─── Root Component ─────────────────────────────────────────────────────────
-function Root() {
-  var path = window.location.pathname
-
-  if (path === '/campha/manager/login' || path === '/campha/manager/login/') {
-    if (localStorage.getItem('auth_token')) {
-      window.location.replace('/campha/manager/schedules')
-      return null
-    }
-    return <AdminLogin />
-  }
-
-  if (path === '/campha/manager/accounts' || path === '/campha/manager/accounts/') {
-    return (
-      <RequireAdmin>
-        <AdminAccounts />
-      </RequireAdmin>
-    )
-  }
-
-  if (path === '/campha/manager/schedules' || path === '/campha/manager/schedules/') {
-    return (
-      <RequireAdmin>
-        <AdminSchedules />
-      </RequireAdmin>
-    )
-  }
-
-  if (path === '/campha/manager/change-password' || path === '/campha/manager/change-password/') {
-    return (
+const router = createBrowserRouter([
+  {
+    path: '/campha/',
+    element: <WorkSchedule />,
+  },
+  {
+    path: '/campha/search',
+    element: <SearchSchedule />,
+  },
+  {
+    path: '/campha/manager/login',
+    element: <AdminLogin />,
+  },
+  {
+    path: '/campha/manager',
+    element: (
       <RequireAuth>
-        <AdminChangePassword />
+        <Outlet />
       </RequireAuth>
-    )
-  }
-
-  if (path === '/campha/manager/departments' || path === '/campha/manager/departments/') {
-    return (
-      <RequireAdmin>
-        <AdminDepartments />
-      </RequireAdmin>
-    )
-  }
-
-  if (path === '/campha/manager/employees' || path === '/campha/manager/employees/') {
-    return (
-      <RequireAdmin>
-        <AdminEmployees />
-      </RequireAdmin>
-    )
-  }
-
-  if (path === '/campha/manager/notifications' || path === '/campha/manager/notifications/') {
-    return (
-      <RequireAdmin>
-        <AdminNotifications />
-      </RequireAdmin>
-    )
-  }
-
-  if (path === '/campha/manager/holidays' || path === '/campha/manager/holidays/') {
-    return (
-      <RequireAdmin>
-        <AdminHolidays />
-      </RequireAdmin>
-    )
-  }
-
-  if (path === '/campha/search' || path === '/campha/search/') {
-    return <SearchSchedule />
-  }
-
-  return <WorkSchedule />
-}
+    ),
+    children: [
+      {
+        path: 'change-password',
+        element: <AdminChangePassword />,
+      },
+      {
+        path: 'schedules',
+        element: (
+          <RequireAdmin>
+            <AdminSchedules />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: 'accounts',
+        element: (
+          <RequireAdmin>
+            <AdminAccounts />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: 'departments',
+        element: (
+          <RequireAdmin>
+            <AdminDepartments />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: 'employees',
+        element: (
+          <RequireAdmin>
+            <AdminEmployees />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: 'notifications',
+        element: (
+          <RequireAdmin>
+            <AdminNotifications />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: 'holidays',
+        element: (
+          <RequireAdmin>
+            <AdminHolidays />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: '*',
+        element: <Navigate to="/campha/manager/schedules" replace />,
+      },
+    ],
+  },
+  {
+    path: '*',
+    element: <Navigate to="/campha/" replace />,
+  },
+])
 
 createRoot(document.getElementById('root')).render(
   <ErrorBoundary>
-    <Root />
-    <Toaster position="top-right" richColors />
+    <AuthProvider>
+      <SignalRProvider>
+        <RouterProvider router={router} />
+        <Toaster position="top-right" richColors closeButton />
+      </SignalRProvider>
+    </AuthProvider>
   </ErrorBoundary>
 )

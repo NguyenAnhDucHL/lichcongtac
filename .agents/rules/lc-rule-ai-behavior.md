@@ -57,5 +57,13 @@ Khi gặp báo cáo Bug, thực hiện theo thứ tự:
 4. **Log & Commit:** Ghi chép chi tiết nguyên nhân gốc rễ và cách khắc phục vào `COMMIT_LOG.md`.
 
 ---
+
+## 6. Tư Duy Chủ Động Hướng Tới Best Practice (Best Practice First)
+
+Khi nhận được yêu cầu thêm tính năng mới hoặc tái cấu trúc, AI **PHẢI** luôn chủ động phân tích và áp dụng phương pháp giải quyết tối ưu nhất, chuyên nghiệp nhất (best practice) mà các hệ thống lớn trên thế giới đang sử dụng, ngay cả khi người dùng không yêu cầu trực tiếp. 
+- Không tự bằng lòng với giải pháp "chạy được là được".
+- Phải đề xuất kiến trúc hệ thống chuẩn mực nhất (VD: Dùng Global Context thay vì gọi local hook bừa bãi, dùng Design Pattern chuẩn,...).
+
+---
 **Status:** ACTIVE — HIGH STANDARD  
 **Priority:** LEVEL 1 — Ràng buộc tư duy cốt lõi

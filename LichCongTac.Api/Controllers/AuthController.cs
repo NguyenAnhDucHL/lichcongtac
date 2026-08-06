@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using LichCongTac.Core.Data.Interfaces;
 using LichCongTac.Core.Models;
@@ -123,6 +124,11 @@ namespace LichCongTac.Api.Controllers
             var token       = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
+            // Generate Refresh Token
+            var refreshToken = GenerateRefreshToken();
+            var refreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Refresh token valid for 7 days
+            _userRepository.UpdateRefreshToken(user.Id, refreshToken, refreshTokenExpiryTime);
+
             // Gắn token vào HttpOnly Cookie để trình duyệt tự động gửi khi tải PDF
             Response.Cookies.Append("jwt_cookie", tokenString, new CookieOptions
             {
@@ -132,7 +138,14 @@ namespace LichCongTac.Api.Controllers
                 Expires  = DateTime.UtcNow.AddHours(24)
             });
 
-
+            // Gắn Refresh Token vào HttpOnly Cookie (Chuẩn Enterprise)
+            Response.Cookies.Append("refresh_cookie", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure   = true,
+                SameSite = SameSiteMode.Strict,
+                Expires  = refreshTokenExpiryTime
+            });
 
             return Ok(ApiResponse.Ok(new
             {
@@ -144,12 +157,115 @@ namespace LichCongTac.Api.Controllers
             }));
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            var refreshToken = Request.Cookies["refresh_cookie"];
+            if (string.IsNullOrWhiteSpace(request.Token) || string.IsNullOrWhiteSpace(refreshToken))
+                return BadRequest(ApiResponse.Fail("Token không hợp lệ."));
+
+            var principal = GetPrincipalFromExpiredToken(request.Token);
+            if (principal == null)
+                return BadRequest(ApiResponse.Fail("Token không hợp lệ hoặc đã bị hỏng."));
+
+            var username = principal.Identity?.Name;
+            if (string.IsNullOrEmpty(username))
+                return BadRequest(ApiResponse.Fail("Token không chứa thông tin người dùng."));
+
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+                return Unauthorized(ApiResponse.Fail("Refresh Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại."));
+
+            if (user.RefreshToken != refreshToken)
+                return Unauthorized(ApiResponse.Fail("Tài khoản của bạn vừa được đăng nhập trên thiết bị khác. Vui lòng đăng nhập lại để tiếp tục làm việc ở máy này."));
+
+            // Sinh Token mới
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtSecret = _configuration["JWT_SECRET"] ?? Environment.GetEnvironmentVariable("JWT_SECRET");
+            var key = Encoding.ASCII.GetBytes(jwtSecret!);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(principal.Claims), // Kế thừa toàn bộ claims cũ
+                Expires = DateTime.UtcNow.AddHours(24),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var newToken = tokenHandler.CreateToken(tokenDescriptor);
+            var newTokenString = tokenHandler.WriteToken(newToken);
+            
+            var newRefreshToken = GenerateRefreshToken();
+            var newRefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+            _userRepository.UpdateRefreshToken(user.Id, newRefreshToken, newRefreshTokenExpiryTime);
+
+            Response.Cookies.Append("jwt_cookie", newTokenString, new CookieOptions
+            {
+                HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = DateTime.UtcNow.AddHours(24)
+            });
+
+            Response.Cookies.Append("refresh_cookie", newRefreshToken, new CookieOptions
+            {
+                HttpOnly = true, Secure = true, SameSite = SameSiteMode.Strict, Expires = newRefreshTokenExpiryTime
+            });
+
+            return Ok(ApiResponse.Ok(new
+            {
+                token = newTokenString
+            }));
+        }
+
+        private static string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+        {
+            var jwtSecret = _configuration["JWT_SECRET"] ?? Environment.GetEnvironmentVariable("JWT_SECRET");
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret!)),
+                ValidateLifetime = false // Quan trọng: Bỏ qua kiểm tra thời hạn để có thể đọc được token đã hết hạn
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+                if (securityToken is not JwtSecurityToken jwtSecurityToken || 
+                    !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                    throw new SecurityTokenException("Invalid token");
+
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
         // ─── LOGOUT ──────────────────────────────────────────────────────────────
 
         [HttpPost("logout")]
+        [Authorize]
         public IActionResult Logout()
         {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdStr, out int userId))
+            {
+                _userRepository.UpdateRefreshToken(userId, null, null);
+            }
+
             Response.Cookies.Delete("jwt_cookie");
+            Response.Cookies.Delete("refresh_cookie");
             return Ok(ApiResponse.Ok("Đăng xuất thành công"));
         }
 
@@ -200,6 +316,9 @@ namespace LichCongTac.Api.Controllers
                 var cache = HttpContext.RequestServices.GetService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
                 cache?.Remove($"UserSession_{userId}");
 
+                // Thu hồi Refresh Token
+                _userRepository.UpdateRefreshToken(userId, null, null);
+
                 return Ok(ApiResponse.Ok("Đổi mật khẩu thành công. Vui lòng đăng nhập lại."));
             }
 
@@ -218,6 +337,11 @@ namespace LichCongTac.Api.Controllers
     {
         public string CurrentPassword { get; set; } = "";
         public string NewPassword { get; set; } = "";
+    }
+
+    public class RefreshTokenRequest
+    {
+        public string Token { get; set; } = "";
     }
 }
 

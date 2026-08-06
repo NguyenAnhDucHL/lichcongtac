@@ -4,6 +4,8 @@ using LichCongTac.Core.Data.Interfaces;
 using LichCongTac.Core.Models;
 using LichCongTac.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
+using LichCongTac.Api.Hubs;
 
 namespace LichCongTac.Api.Controllers
 {
@@ -12,10 +14,12 @@ namespace LichCongTac.Api.Controllers
     public class SchedulesController : ControllerBase
     {
         private readonly IScheduleRepository _scheduleRepository;
+        private readonly IHubContext<AppHub> _hubContext;
 
-        public SchedulesController(IScheduleRepository scheduleRepository)
+        public SchedulesController(IScheduleRepository scheduleRepository, IHubContext<AppHub> hubContext)
         {
             _scheduleRepository = scheduleRepository;
+            _hubContext = hubContext;
         }
 
         [HttpGet("public-schedule")]
@@ -93,6 +97,8 @@ namespace LichCongTac.Api.Controllers
             var id = await _scheduleRepository.CreateAsync(schedule);
             schedule.Id = id;
             
+            await _hubContext.Clients.All.SendAsync("ReceiveScheduleUpdate");
+            
             return Ok(ApiResponse<Schedule>.Ok(schedule, "Tạo lịch công tác thành công"));
         }
 
@@ -123,11 +129,22 @@ namespace LichCongTac.Api.Controllers
             existing.Participants = dto.Participants;
             existing.IsPublic = dto.IsPublic;
 
-            var success = await _scheduleRepository.UpdateAsync(existing);
-            if (!success)
+            var updateResult = await _scheduleRepository.UpdateAsync(existing, dto.UpdatedAt);
+            
+            if (updateResult == LichCongTac.Core.Models.UpdateResult.NotFound)
+            {
+                return NotFound(ApiResponse.Fail($"Không tìm thấy lịch công tác #{id}"));
+            }
+            else if (updateResult == LichCongTac.Core.Models.UpdateResult.ConcurrencyConflict)
+            {
+                return StatusCode(409, ApiResponse.Fail("Dữ liệu đã bị thay đổi bởi người khác. Vui lòng tải lại trang."));
+            }
+            else if (updateResult != LichCongTac.Core.Models.UpdateResult.Success)
             {
                 return BadRequest(ApiResponse.Fail("Cập nhật thất bại"));
             }
+
+            await _hubContext.Clients.All.SendAsync("ReceiveScheduleUpdate");
 
             return Ok(ApiResponse.Ok("Cập nhật lịch công tác thành công"));
         }
@@ -147,6 +164,8 @@ namespace LichCongTac.Api.Controllers
             {
                 return BadRequest(ApiResponse.Fail("Xóa thất bại"));
             }
+
+            await _hubContext.Clients.All.SendAsync("ReceiveScheduleUpdate");
 
             return Ok(ApiResponse.Ok("Xóa lịch công tác thành công"));
         }
