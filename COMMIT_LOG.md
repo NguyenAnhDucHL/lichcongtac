@@ -4,6 +4,15 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 01:38] chore(infra): cập nhật cấu hình nginx port và thêm rule AI
+- **Mô tả**: Thay đổi ánh xạ port của Nginx sang 8081 và 8444 trong docker-compose.yml. Bổ sung rule lc-rule-no-temporary-files.md vào AGENTS.md yêu cầu AI dọn dẹp các tệp tạm, đồng thời xóa các file tài liệu không còn sử dụng.
+- **Tệp thay đổi**:
+  - `docker-compose.yml` (Sửa đổi)
+  - `.agents/AGENTS.md` (Sửa đổi)
+  - `.agents/rules/lc-rule-no-temporary-files.md` (Mới)
+  - `CODE_QUALITY.md`, `README.md`, `SYSTEM_FEATURES.md` (Xóa)
+- **Lệnh git commit**: `git commit -m "chore(infra): cập nhật cấu hình nginx port và thêm rule AI"`
+
 ### [2026-08-06 23:10] Fix lỗi dropdown Font Family không hiển thị đúng font hiện tại
 - **Mô tả**: Sửa lỗi ô chọn Phông chữ (Font Family) trong trình soạn thảo TipTap luôn hiển thị "Mặc định" thay vì font chữ thực tế khi click vào đoạn văn bản đã được định dạng. Nguyên nhân do giá trị trả về từ DOM chứa dấu ngoặc kép không khớp với chuỗi trong thẻ option. Đã sử dụng hàm so sánh chuỗi (bỏ ngoặc kép và đối chiếu từ khoá đầu) để sửa lỗi.
 - **Tệp thay đổi**:

@@ -13,6 +13,7 @@ Bạn là **AI Agent** đang làm việc trong dự án **LichCongTac** — Hệ
 5. **Zero-Secret:** Tuyệt đối không commit API key, password, connection string, JWT secret vào Git. Dùng `.env` hoặc `appsettings.json` (không track bởi Git).
 6. **Conventional-Commits:** Mọi commit message phải đúng chuẩn `<type>(<scope>): <mô tả>`. Xem Chốt Commit ở `CODE_QUALITY.md`.
 7. **AI Behavior Standard:** AI phải tuân thủ nghiêm ngặt tiêu chuẩn code tinh gọn, bằng chứng toàn diện và giao tiếp cộc lốc theo chuẩn OpenClaw. Xem chi tiết tại `lc-rule-ai-behavior.md`.
+8. **No-Temporary-Files:** Mọi tệp tạm sinh ra (script test, dump DB, log lỗi...) phải được tự động xóa ngay sau khi hoàn thành công việc. Xem chi tiết tại `lc-rule-no-temporary-files.md`.
 
 ---
 
@@ -120,4 +121,4 @@ LichCongTac/
 **Status:** ACTIVE — TOOL-CALENDAR PROJECT RULES  
 **Version:** 2.1 (Nâng cấp chuẩn OpenClaw)  
 **Last Updated:** 2026-07-25  
-**See also:** [SYSTEM_FEATURES.md](../SYSTEM_FEATURES.md) | [COMMIT_LOG.md](../COMMIT_LOG.md) | [CODE_QUALITY.md](../CODE_QUALITY.md) | [lc-rule-ai-behavior.md](rules/lc-rule-ai-behavior.md)
+**See also:** [SYSTEM_FEATURES.md](../SYSTEM_FEATURES.md) | [COMMIT_LOG.md](../COMMIT_LOG.md) | [CODE_QUALITY.md](../CODE_QUALITY.md) | [lc-rule-ai-behavior.md](rules/lc-rule-ai-behavior.md) | [lc-rule-no-temporary-files.md](rules/lc-rule-no-temporary-files.md)
