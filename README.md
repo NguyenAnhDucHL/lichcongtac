@@ -36,9 +36,7 @@ JWT_SECRET=LinkStrategy_Secure_Key_2026_ReplaceMe
 # Thông tin Push Notification (HTTPS là bắt buộc)
 VAPID_SUBJECT=mailto:admin@yourdomain.com
 
-# Ngrok (Nếu truy cập từ xa)
-NGROK_AUTHTOKEN=your_ngrok_token
-NGROK_DOMAIN=your_custom_domain.ngrok-free.app
+
 ```
 
 > [!IMPORTANT]

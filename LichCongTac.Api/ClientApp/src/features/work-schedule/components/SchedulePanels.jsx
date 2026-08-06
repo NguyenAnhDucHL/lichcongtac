@@ -9,14 +9,6 @@ const formatLocation = (loc) => {
   return s
 }
 
-export const extractTextFromHtml = (html) => {
-  if (!html) return ''
-  const doc = new DOMParser().parseFromString(html, 'text/html')
-  return (doc.body.textContent || '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
 
 /**
  * Renders a single schedule item row (time + content + location).
@@ -40,7 +32,12 @@ export function ScheduleItem({ item }) {
             </span>
           )}
         </span>
-        {item.content && <span className="text-gray-900">{extractTextFromHtml(item.content)}</span>}
+        {item.content && (
+          <div
+            className="text-gray-900 prose dark:prose-invert prose-sm max-w-none [&>p:first-child]:inline"
+            dangerouslySetInnerHTML={{ __html: item.content }}
+          />
+        )}
       </div>
     </div>
   )
@@ -83,7 +80,7 @@ export function TodayPanel({ displayToday, notifications }) {
                   key={notif.id || idx}
                   className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0"
                 >
-                  <div dangerouslySetInnerHTML={{ __html: notif.content }} />
+                  <div className="prose dark:prose-invert max-w-none prose-sm" dangerouslySetInnerHTML={{ __html: notif.content }} />
                 </div>
               ))}
             </div>

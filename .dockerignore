@@ -3,7 +3,7 @@
 **/bin
 **/obj
 **/Uploads
-**/data
+/data_dump
 **/*.db
 **/*.zip
 **/node_modules

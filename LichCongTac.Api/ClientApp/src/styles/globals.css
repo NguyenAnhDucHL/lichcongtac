@@ -256,12 +256,10 @@
 
 @layer utilities {
   .bg-sidebar-gradient {
-    background: linear-gradient(
-      to bottom,
-      var(--color-sidebar-start),
-      var(--color-sidebar-mid),
-      var(--color-sidebar-end)
-    );
+    background: linear-gradient(to bottom,
+        var(--color-sidebar-start),
+        var(--color-sidebar-mid),
+        var(--color-sidebar-end));
   }
 
   .glass-card {
@@ -277,12 +275,10 @@
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.4) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%);
     animation: shimmer-premium 2s infinite ease-out;
   }
 
@@ -312,6 +308,7 @@
 
 /* Prevent horizontal overflow on mobile */
 @media (max-width: 767px) {
+
   html,
   body {
     overflow-x: hidden;
@@ -362,12 +359,10 @@
 
   /* The header gradient stays for the brand area */
   [data-sidebar='sidebar'][data-mobile='true'] .bg-sidebar-gradient {
-    background: linear-gradient(
-      to bottom,
-      var(--color-sidebar-start),
-      var(--color-sidebar-mid),
-      var(--color-sidebar-end)
-    ) !important;
+    background: linear-gradient(to bottom,
+        var(--color-sidebar-start),
+        var(--color-sidebar-mid),
+        var(--color-sidebar-end)) !important;
   }
 }
 
@@ -401,11 +396,11 @@
   border-radius: var(--radius-xl);
 }
 
-.density-compact .glass-card > div:first-child {
+.density-compact .glass-card>div:first-child {
   padding: 1rem 1.25rem;
 }
 
-.density-compact .glass-card > div:nth-child(2) {
+.density-compact .glass-card>div:nth-child(2) {
   padding: 0.75rem 1.25rem;
 }
 
@@ -427,57 +422,13 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* =============================================
-   JODIT WYSIWYG TAILWIND FIXES
-   ============================================= */
-.jodit-wysiwyg b,
-.jodit-wysiwyg strong {
-  font-weight: bold !important;
-}
 
-.jodit-wysiwyg i,
-.jodit-wysiwyg em {
-  font-style: italic !important;
-}
-
-.jodit-wysiwyg u {
-  text-decoration: underline !important;
-}
-
-.jodit-wysiwyg s,
-.jodit-wysiwyg strike {
-  text-decoration: line-through !important;
-}
-
-.jodit-wysiwyg ul {
-  list-style-type: disc !important;
-  padding-left: 1.5rem !important;
-}
-
-.jodit-wysiwyg ol {
-  list-style-type: decimal !important;
-  padding-left: 1.5rem !important;
-}
-
-.jodit-wysiwyg h1 {
-  font-size: 2em !important;
-  font-weight: bold !important;
-}
-
-.jodit-wysiwyg h2 {
-  font-size: 1.5em !important;
-  font-weight: bold !important;
-}
-
-.jodit-wysiwyg h3 {
-  font-size: 1.17em !important;
-  font-weight: bold !important;
-}
 /* Marquee Animation for Holidays */
 @keyframes marquee {
   0% {
     transform: translateX(100%);
   }
+
   100% {
     transform: translateX(-100%);
   }
@@ -494,6 +445,7 @@ input[type='date'].empty-date::-webkit-datetime-edit,
 input[type='time'].empty-date::-webkit-datetime-edit {
   color: transparent;
 }
+
 input[type='date'].empty-date:focus::-webkit-datetime-edit,
 input[type='time'].empty-date:focus::-webkit-datetime-edit {
   color: inherit;

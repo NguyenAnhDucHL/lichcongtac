@@ -1,55 +1,6 @@
-import { useRef } from 'react'
-import JoditEditor from 'jodit-react'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 
-const JODIT_CONFIG = {
-  readonly: false,
-  height: 300,
-  language: 'vi',
-  askBeforePasteHTML: false,
-  askBeforePasteFromWord: false,
-  defaultActionOnPaste: 'insert_as_html',
-  toolbarButtonSize: 'small',
-  buttons: [
-    'source',
-    '|',
-    'bold',
-    'strikethrough',
-    'underline',
-    'italic',
-    '|',
-    'superscript',
-    'subscript',
-    '|',
-    'ul',
-    'ol',
-    '|',
-    'outdent',
-    'indent',
-    '|',
-    'font',
-    'fontsize',
-    'brush',
-    'paragraph',
-    '|',
-    'image',
-    'table',
-    'link',
-    '|',
-    'align',
-    'undo',
-    'redo',
-    '|',
-    'hr',
-    'eraser',
-    'copyformat',
-    '|',
-    'symbol',
-    'fullsize',
-    'print',
-    'about',
-  ],
-  removeButtons: ['file', 'video'],
-}
+
 
 export function NotificationForm({
   formData,
@@ -60,7 +11,7 @@ export function NotificationForm({
   onSubmit,
   onReset,
 }) {
-  const editor = useRef(null)
+
 
   const handleChange = (e) => {
     const { name, type, checked } = e.target
@@ -76,12 +27,9 @@ export function NotificationForm({
       )}
 
       <div className="w-[100%] max-w-[800px] border border-[#8cbabf] rounded overflow-hidden mb-4">
-        <JoditEditor
-          ref={editor}
+        <RichTextEditor
           value={formData.content}
-          config={JODIT_CONFIG}
-          onBlur={(newContent) => setFormData((prev) => ({ ...prev, content: newContent }))}
-          onChange={() => {}}
+          onChange={(newContent) => setFormData((prev) => ({ ...prev, content: newContent }))}
         />
       </div>
 

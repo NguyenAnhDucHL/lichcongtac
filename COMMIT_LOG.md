@@ -4,6 +4,34 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-06 22:55] Tích hợp bộ soạn thảo TipTap thay thế Jodit
+- **Mô tả**: Xoá bỏ Jodit Editor, tích hợp TipTap editor với đầy đủ tính năng chuẩn Word (Font Family, Font Size, Màu sắc, Highlight, Heading, Danh sách...). Đã việt hoá 100% Tooltip khi hover và tối ưu hoá cho mobile. Xoá các file rác như seed_db.sql, config cũ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/ui/rich-text-editor.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/components/ui/toggle.jsx` (Mới)
+  - `LichCongTac.Api/ClientApp/src/features/notifications/components/NotificationForm.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/ScheduleForm.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `seed_db.sql` (Xóa)
+- **Lệnh git commit**: `git commit -m "feat(ui): tích hợp tiptap editor thay thế jodit và xoá file rác"`
+
+### [2026-08-06 17:23] Dọn dẹp các file test/nháp
+- **Mô tả**: Xóa các file script dùng để test nháp (`test.cs`, `test_hash.csx`, `test_regex.cs`, `test_settings.js`) để giữ thư mục gốc gọn gàng.
+- **Tệp thay đổi**:
+  - `test.cs` (Xóa)
+  - `test_hash.csx` (Xóa)
+  - `test_regex.cs` (Xóa)
+  - `test_settings.js` (Xóa)
+- **Lệnh git commit**: `git commit -m "chore(infra): xóa các file script test nháp"`
+
+### [2026-08-06 17:21] Dọn dẹp các file Python nháp
+- **Mô tả**: Xóa các file script Python dùng để test/nháp (`fix_db.py`, `scratch_clean_db.py`, `scratch_rename.py`) để dọn dẹp thư mục gốc. Các file `*.md` không bị xóa do là tài liệu cấu trúc lõi của dự án.
+- **Tệp thay đổi**:
+  - `fix_db.py` (Xóa)
+  - `scratch_clean_db.py` (Xóa)
+  - `scratch_rename.py` (Xóa)
+- **Lệnh git commit**: `git commit -m "chore(infra): dọn dẹp các file python nháp không sử dụng"`
+
 ### [2026-08-06 03:08] Đồng bộ DatePicker Tiếng Việt cho toàn bộ form
 - **Mô tả**: Trên mobile (đặc biệt iOS Safari), thẻ `<input type="date">` mặc định sẽ hiển thị lịch theo ngôn ngữ của hệ điều hành (thường là Tiếng Anh) và không có icon rõ ràng. Đã thay thế toàn bộ `<input type="date">` còn sót lại ở trang Tìm kiếm Lịch (`SearchSchedule.jsx`) và Quản lý Ngày lễ (`HolidayComponents.jsx`) bằng thư viện `react-datepicker` để ép buộc hiển thị Tiếng Việt, có icon lịch, và hỗ trợ popup overlay ở giữa màn hình cho mobile.
 - **Tệp thay đổi**:
@@ -959,12 +987,14 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "refactor(api): chuyển toàn bộ frontend sang dùng apiClient và services pattern"`
 # # #   [ 2 0 2 6 - 0 8 - 0 6   1 1 : 1 6 ]   F i x   u n s t a b l e   s c h e d u l e   l i s t   a n d   s t o p   b r o w s e r   c a c h i n g 
- -   * * M �   t �* * :   T �t   b �  �m   c �a   t r � n h   d u y �t   c h o   A P I   p u b l i c - s c h e d u l e   t r o n g   a p i C l i e n t . j s   �  t r � n h   v i �c   t �i   l �i   c � c   l �c h   �   b �  x � a   h o �c   s �a   ( g � y   r a   h i �n   t ��n g   t h �n h   t h o �n g   h i �n   c � c   l �c h   s a i   n h �  1 1 7 5 ) .   C �p   n h �t   h � m   s o r t   t r o n g   W o r k S c h e d u l e . j s x   �  c �   c �  c h �  f a l l b a c k   s a n g   s �p   x �p   t h e o   I d   n �u   t h �i   g i a n   b �n g   n h a u ,   g i � p   d a n h   s � c h   k h � n g   b �  ' n h �y   l u n g   t u n g ' . 
- -   * * T �p   t h a y   �i * * : 
-     -   L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / l i b / a p i C l i e n t . j s   ( S �a   �i ) 
-     -   L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x   ( S �a   �i ) 
- -   * * L �n h   g i t   c o m m i t * * :   " g i t   c o m m i t   - m   ' f i x ( a p i ) :   d i s a b l e   b r o w s e r   c a c h i n g   f o r   s c h e d u l e   a p i   a n d   i m p l e m e n t   s t a b l e   s o r t   i n   W o r k S c h e d u l e . j s x '  
- "  
+ -   * * M    t * * :   T t   b   m   c a   t r  n h   d u y t   c h o   A P I   p u b l i c - s c h e d u l e   t r o n g   a p i C l i e n t . j s     t r  n h   v i c   t i   l i   c  c   l c h      b   x  a   h o c   s a   ( g  y   r a   h i n   t n g   t h n h   t h o n g   h i n   c  c   l c h   s a i   n h   1 1 7 5 ) .   C p   n h t   h  m   s o r t   t r o n g   W o r k S c h e d u l e . j s x     c    c   c h   f a l l b a c k   s a n g   s p   x p   t h e o   I d   n u   t h i   g i a n   b n g   n h a u ,   g i  p   d a n h   s  c h   k h  n g   b   ' n h y   l u n g   t u n g ' . 
+ -   * * T p   t h a y   i * * : 
+     -   L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / l i b / a p i C l i e n t . j s   ( S a   i ) 
+     -   L i c h C o n g T a c . A p i / C l i e n t A p p / s r c / p a g e s / W o r k S c h e d u l e . j s x   ( S a   i ) 
+ -   * * L n h   g i t   c o m m i t * * :   " g i t   c o m m i t   - m   ' f i x ( a p i ) :   d i s a b l e   b r o w s e r   c a c h i n g   f o r   s c h e d u l e   a p i   a n d   i m p l e m e n t   s t a b l e   s o r t   i n   W o r k S c h e d u l e . j s x ' 
+ 
+ " 
+ 
  
 ### [2026-08-06 12:10] Fix Database Schema cho tinh nang Login
 - **Mo ta**: Fix loi SQL exception 'no such column: u.RefreshToken' do bang Users thieu cot RefreshToken va RefreshTokenExpiryTime. Da them truc tiep vao DB.
@@ -972,3 +1002,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - data_dump/documents.db (Sua doi schema)
   - COMMIT_LOG.md (Cap nhat log)
 - **Lenh git commit**: git commit -m "fix(db): them cot RefreshToken vao bang Users"
+
+### [2026-08-06 22:00] Dọn dẹp file thừa
+- **Mô tả**: Xóa file `seed_db.sql` và `Program.cs` gốc không thuộc thư mục code dự án (file nháp) theo yêu cầu của user. Đã xóa cả trên máy Mac và server.
+- **Tệp thay đổi**:
+  - `seed_db.sql` (Xóa)
+  - `Program.cs` (Xóa)
+- **Lệnh git commit**: `git commit -m "chore: dọn dẹp các file thừa theo yêu cầu"`

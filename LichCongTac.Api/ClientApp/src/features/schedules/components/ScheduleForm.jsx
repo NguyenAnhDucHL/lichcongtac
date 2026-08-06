@@ -1,7 +1,7 @@
 /* global DOMParser */
 import { useState, useEffect } from 'react'
 import { Calendar } from 'lucide-react'
-import JoditEditor from 'jodit-react'
+import { RichTextEditor } from '@/components/ui/rich-text-editor'
 import DatePicker, { registerLocale } from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { vi } from 'date-fns/locale'
@@ -15,54 +15,6 @@ const LOCATIONS = [
   'Phòng tiếp công dân - Trụ sở HĐND và UBND phường',
 ]
 
-const JODIT_CONFIG = {
-  readonly: false,
-  placeholder: '• Nội dung: ...\n• Thành phần dự: ...',
-  height: 300,
-  language: 'vi',
-  askBeforePasteHTML: false,
-  askBeforePasteFromWord: false,
-  defaultActionOnPaste: 'insert_as_html',
-  toolbarButtonSize: 'small',
-  buttons: [
-    'source',
-    '|',
-    'bold',
-    'strikethrough',
-    'underline',
-    'italic',
-    '|',
-    'superscript',
-    'subscript',
-    '|',
-    'ul',
-    'ol',
-    '|',
-    'outdent',
-    'indent',
-    '|',
-    'font',
-    'fontsize',
-    'brush',
-    'paragraph',
-    '|',
-    'image',
-    'table',
-    'link',
-    '|',
-    'align',
-    'undo',
-    'redo',
-    '|',
-    'hr',
-    'eraser',
-    'copyformat',
-    '|',
-    'symbol',
-    'fullsize',
-    'print',
-  ],
-}
 
 export function ScheduleForm({
   formData,
@@ -257,10 +209,9 @@ export function ScheduleForm({
         </div>
         <div className="flex-1 w-full">
           <div className="w-[100%] max-w-[800px] border border-[#8cbabf] rounded overflow-hidden">
-            <JoditEditor
+            <RichTextEditor
               value={formData.content}
-              config={JODIT_CONFIG}
-              onBlur={(newContent) => setFormData((prev) => ({ ...prev, content: newContent }))}
+              onChange={(newContent) => setFormData((prev) => ({ ...prev, content: newContent }))}
             />
           </div>
         </div>

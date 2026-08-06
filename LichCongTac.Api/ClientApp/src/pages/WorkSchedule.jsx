@@ -17,14 +17,7 @@ const formatLocation = (loc) => {
   return s
 }
 
-const extractText = (html) => {
-  if (!html) return ''
-  const doc = new DOMParser().parseFromString(html, 'text/html')
-  return (doc.body.textContent || '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
+
 
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
 
@@ -81,7 +74,12 @@ function ScheduleItem({ item }) {
             (Tại {formatLocation(item.location)}){' '}
           </span>
         )}
-        {item.content && <span className="text-gray-900">{extractText(item.content)}</span>}
+        {item.content && (
+          <div
+            className="text-gray-900 prose dark:prose-invert prose-sm max-w-none [&>p:first-child]:inline"
+            dangerouslySetInnerHTML={{ __html: item.content }}
+          />
+        )}
       </div>
     </div>
   )
@@ -126,7 +124,7 @@ export default function WorkSchedule() {
     scheduleService
       .getTodayHoliday()
       .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
-      .catch(() => {})
+      .catch(() => { })
   }, [lastHolidayUpdate])
 
   const todayData = scheduleData.find((d) => d.isToday) || {
@@ -175,7 +173,7 @@ export default function WorkSchedule() {
                           key={notif.id || idx}
                           className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0"
                         >
-                          <div dangerouslySetInnerHTML={{ __html: notif.content }} />
+                          <div className="prose dark:prose-invert max-w-none prose-sm" dangerouslySetInnerHTML={{ __html: notif.content }} />
                         </div>
                       ))}
                     </div>

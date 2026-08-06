@@ -1,3 +1,4 @@
+version: "3.3"
 services:
   lichcongtac-backend:
     build:
@@ -18,28 +19,19 @@ services:
       - PUBLIC_ID_SECRET=${PUBLIC_ID_SECRET}
     volumes:
       - ./data_dump:/app/data
-      - ./LichCongTac.Api/Uploads:/app/Uploads
+
     restart: always
 
   nginx:
     image: nginx:alpine
-    platform: linux/amd64
     container_name: lichcongtac-nginx
     ports:
-      - "8088:80"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - lichcongtac-backend
     restart: always
 
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: lichcongtac-ngrok
-    restart: always
-    environment:
-      # Lấy Authtoken từ file .env để bảo mật
-      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
-    command: "http --url=freewill-problem-reluctant.ngrok-free.dev --pooling-enabled nginx:80"
-    depends_on:
-      - nginx
