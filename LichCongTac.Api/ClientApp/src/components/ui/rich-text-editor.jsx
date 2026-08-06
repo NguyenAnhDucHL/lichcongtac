@@ -61,15 +61,32 @@ const FontSize = Extension.create({
   },
 })
 
+const FONT_FAMILIES = [
+  { label: 'Mặc định', value: '' },
+  { label: 'Arial', value: 'Arial' },
+  { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
+  { label: 'Helvetica', value: 'Helvetica' },
+  { label: 'Tahoma', value: 'Tahoma' },
+  { label: 'Verdana', value: 'Verdana' },
+  { label: 'Courier New', value: "'Courier New', Courier, monospace" },
+]
+
 const MenuBar = ({ editor }) => {
   if (!editor) {
     return null
   }
 
+  const currentFontFamily = (editor.getAttributes('textStyle').fontFamily || '').replace(/['"]+/g, '')
+  const activeFontFamily = FONT_FAMILIES.find(f => {
+    if (!f.value) return false
+    const primaryFont = f.value.replace(/['"]+/g, '').split(',')[0].trim()
+    return currentFontFamily.includes(primaryFont)
+  })?.value || ''
+
   return (
     <div className="flex flex-wrap items-center gap-1 border-b p-1 bg-muted/50 rounded-t-md">
       {/* Font Family */}
-      <select 
+      <select
         onChange={(e) => {
           if (e.target.value) {
             editor.chain().focus().setFontFamily(e.target.value).run()
@@ -77,20 +94,16 @@ const MenuBar = ({ editor }) => {
             editor.chain().focus().unsetFontFamily().run()
           }
         }}
-        value={editor.getAttributes('textStyle').fontFamily || ''}
+        value={activeFontFamily}
         className="h-8 rounded-sm border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
       >
-        <option value="">Mặc định</option>
-        <option value="Arial">Arial</option>
-        <option value="'Times New Roman', Times, serif">Times New Roman</option>
-        <option value="Helvetica">Helvetica</option>
-        <option value="Tahoma">Tahoma</option>
-        <option value="Verdana">Verdana</option>
-        <option value="'Courier New', Courier, monospace">Courier New</option>
+        {FONT_FAMILIES.map(f => (
+          <option key={f.label} value={f.value}>{f.label}</option>
+        ))}
       </select>
 
       {/* Font Size */}
-      <select 
+      <select
         onChange={(e) => {
           if (e.target.value) {
             editor.chain().focus().setFontSize(e.target.value).run()

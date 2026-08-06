@@ -4,6 +4,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-06 23:10] Fix lỗi dropdown Font Family không hiển thị đúng font hiện tại
+- **Mô tả**: Sửa lỗi ô chọn Phông chữ (Font Family) trong trình soạn thảo TipTap luôn hiển thị "Mặc định" thay vì font chữ thực tế khi click vào đoạn văn bản đã được định dạng. Nguyên nhân do giá trị trả về từ DOM chứa dấu ngoặc kép không khớp với chuỗi trong thẻ option. Đã sử dụng hàm so sánh chuỗi (bỏ ngoặc kép và đối chiếu từ khoá đầu) để sửa lỗi.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/ui/rich-text-editor.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi ô chọn font family không hiển thị đúng font hiện tại"`
+
 ### [2026-08-06 23:01] Fix lỗi không xoá trắng khung soạn thảo TipTap
 - **Mô tả**: Sửa lỗi khung soạn thảo TipTap không tự reset (xoá trắng) khi React thay đổi giá trị `value` thành chuỗi rỗng (`''`), do điều kiện kiểm tra bên trong `useEffect` bị thiếu. Lỗi này làm các ô nhập liệu cũ vẫn còn khi thêm lịch công tác mới.
 - **Tệp thay đổi**:
