@@ -1,7 +1,7 @@
 /* global CustomEvent */
 export async function apiClient(url, options = {}) {
   // Tự động thêm Content-Type: application/json khi body là JSON string
-  const headers = { ...(options.headers || {}) }
+  const headers = { 'ngrok-skip-browser-warning': 'true', ...(options.headers || {}) }
   if (options.body && typeof options.body === 'string' && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json'
   }
@@ -33,7 +33,7 @@ export async function apiClient(url, options = {}) {
     try {
       const refreshResponse = await fetch('/api/auth/refresh', {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', headers: { 'ngrok-skip-browser-warning': 'true' },
       })
 
       if (refreshResponse.ok) {
