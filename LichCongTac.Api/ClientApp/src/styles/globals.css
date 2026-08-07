@@ -455,9 +455,20 @@ input[type='time'].empty-date:focus::-webkit-datetime-edit {
    RICH TEXT EDITOR & CONTENT DEFAULT FONT
    ============================================= */
 .prose p, .prose div, .prose span, .prose li {
-  font-family: Arial, Helvetica, sans-serif !important;
+  font-family: "Times New Roman", Times, serif !important;
   font-size: 18px !important;
   line-height: 1.6 !important;
+}
+
+.prose p {
+  margin-top: 0.25em !important;
+  margin-bottom: 0.25em !important;
+}
+.prose p:first-child {
+  margin-top: 0 !important;
+}
+.prose p:last-child {
+  margin-bottom: 0 !important;
 }
 
 /* =============================================

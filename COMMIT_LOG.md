@@ -10,6 +10,14 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 18:13] Chuyển đổi font chữ toàn bộ sang Times New Roman
+- **Mô tả**: Sửa lại cấu hình font chữ hiển thị trên màn hình lịch công tác từ Arial sang Times New Roman cỡ 18 theo đúng yêu cầu, áp dụng đồng bộ cho cả Tiêu đề, Thời gian, Địa điểm, Số giấy mời và Nội dung chi tiết.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/features/work-schedule/components/SchedulePanels.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sử dụng font Times New Roman cho toàn bộ nội dung lịch hiển thị"`
+
 ### [2026-08-07 18:07] Xóa bỏ inline cho đoạn p đầu tiên để sửa lỗi khoảng cách lớn
 - **Mô tả**: Sửa lỗi khoảng cách lớn giữa địa điểm và nội dung do class inline làm vỡ flow của DOM. Bỏ class inline, thay vào đó đã cấu hình margin-top/bottom nhỏ trong globals.css giúp các khối p cách nhau rất khít và đẹp mắt.
 - **Tệp thay đổi**:

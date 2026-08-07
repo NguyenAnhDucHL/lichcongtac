@@ -17,17 +17,17 @@ export function ScheduleItem({ item }) {
   return (
     <div className="flex gap-2">
       {item.startTime && item.startTime.trim() !== '' && (
-        <span className="text-[#c8102e] shrink-0 font-bold text-[17px] md:text-[18px]">
+        <span className="text-[#c8102e] shrink-0 font-bold font-['Times_New_Roman',_Times,_serif] text-[18px]">
           {item.startTime.trim()}:
         </span>
       )}
-      <div className="font-medium text-[16px] md:text-[17px] leading-relaxed w-full text-justify">
+      <div className="font-medium font-['Times_New_Roman',_Times,_serif] text-[18px] leading-relaxed w-full text-justify">
         <span>
           {item.invitationNumber && (
             <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>
           )}
           {item.location && (
-            <span className="text-[#005f6b] font-bold mr-1 inline font-['Times_New_Roman',_Times,_serif] text-[18px]">
+            <span className="text-[#005f6b] font-bold mr-1 inline">
               (Tại <span className="inline-html-content ml-1" dangerouslySetInnerHTML={{ __html: formatLocation(item.location) }} />)
             </span>
           )}
