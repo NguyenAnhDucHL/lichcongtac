@@ -450,3 +450,11 @@ input[type='date'].empty-date:focus::-webkit-datetime-edit,
 input[type='time'].empty-date:focus::-webkit-datetime-edit {
   color: inherit;
 }
+
+/* =============================================
+   RICH TEXT EDITOR & CONTENT DEFAULT FONT
+   ============================================= */
+.prose p, .prose div, .prose span, .prose li {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+}

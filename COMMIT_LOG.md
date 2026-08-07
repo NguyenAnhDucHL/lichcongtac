@@ -4,6 +4,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 15:51] Cập nhật font chữ mặc định cho trình soạn thảo văn bản
+- **Mô tả**: Thiết lập font chữ mặc định của trình soạn thảo Rich Text Editor (Tiptap) thành Arial, cỡ chữ 18px để đồng bộ giao diện hiển thị và tạo sự thuận tiện cho người dùng khi nhập liệu/copy-paste mà chưa chọn font. Thay đổi này sử dụng CSS global để thiết lập mức mặc định mà không ghi đè cài đặt của người dùng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): đặt font mặc định arial 18px cho trình soạn thảo văn bản"`
+
 ### [2026-08-07 01:38] chore(infra): cập nhật cấu hình nginx port và thêm rule AI
 - **Mô tả**: Thay đổi ánh xạ port của Nginx sang 8081 và 8444 trong docker-compose.yml. Bổ sung rule lc-rule-no-temporary-files.md vào AGENTS.md yêu cầu AI dọn dẹp các tệp tạm, đồng thời xóa các file tài liệu không còn sử dụng.
 - **Tệp thay đổi**:
