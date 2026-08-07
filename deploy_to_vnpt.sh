@@ -12,7 +12,8 @@ echo "Đang triển khai lên VNPT Server ($VNPT_HOST)..."
 
 # Nén code (bỏ qua các thư mục không cần thiết)
 echo "Đang đóng gói mã nguồn..."
-tar --exclude='.git' --exclude='node_modules' --exclude='bin' --exclude='obj' --exclude='.env' --exclude='data_dump' -czf deploy.tar.gz .
+export COPYFILE_DISABLE=1
+tar --exclude='.git' --exclude='node_modules' --exclude='bin' --exclude='obj' --exclude='.env' --exclude='data_dump' --exclude='._*' -czf deploy.tar.gz .
 
 echo "Đang tải mã nguồn lên VNPT Server ($VNPT_HOST)..."
 expect << EOF

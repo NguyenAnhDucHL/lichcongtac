@@ -4,6 +4,19 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 16:53] Thêm footer bản quyền vào trang Quản trị (AdminLogin)
+- **Mô tả**: Bổ sung thanh footer với nền xanh và nội dung "Bản quyền thuộc về UBND phường Cẩm Phả" vào trang đăng nhập hệ thống Quản trị, giúp đồng bộ thông tin bản quyền với toàn bộ nền tảng thay vì sử dụng footer cũ của hệ thống Link Strategy.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminLogin.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(auth): bổ sung thông tin bản quyền UBND phường Cẩm Phả vào trang Đăng nhập quản trị"`
+
+
+### [2026-08-07 16:43] Khắc phục lỗi build .NET do file hệ thống macOS (`._*`)
+- **Mô tả**: Khi dùng lệnh `tar` để đóng gói code trên macOS, hệ điều hành tự sinh ra các file AppleDouble (`._*`). Các file này bị .NET compiler trên Linux nhận diện nhầm là file mã nguồn C# nhưng định dạng nhị phân, gây ra lỗi build "is a binary file instead of a text file". Đã bổ sung `COPYFILE_DISABLE=1` và loại trừ `._*` trong script `deploy_to_vnpt.sh`.
+- **Tệp thay đổi**:
+  - `deploy_to_vnpt.sh` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "chore(infra): disable macos COPYFILE generation when tar archiving"`
+
 ### [2026-08-07 16:42] Sửa script deploy để bỏ qua git trên server do Private Repo
 - **Mô tả**: Sửa file `deploy_to_vnpt.sh`. Thay vì chạy `git fetch` trên server VNPT (dẫn đến lỗi do repo mới là Private nên không fetch được), script giờ đây sẽ nén code đang có trên máy bạn, tải trực tiếp qua SCP lên server và giải nén, sau đó build lại Docker. Đảm bảo những gì bạn thấy trên máy sẽ được đẩy thẳng lên server mà không vướng mắc về bản quyền hay khóa xác thực Git.
 - **Tệp thay đổi**:

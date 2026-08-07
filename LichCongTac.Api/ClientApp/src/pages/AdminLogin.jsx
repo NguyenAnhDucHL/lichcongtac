@@ -140,6 +140,13 @@ export default function AdminLogin() {
           </div>
         </form>
       </div>
+
+      {/* Footer */}
+      <div className="absolute bottom-0 w-full z-20">
+        <footer className="bg-[#1d8fe8] text-white text-center py-2 text-xs">
+          Bản quyền thuộc về UBND phường Cẩm Phả
+        </footer>
+      </div>
     </div>
   )
 }
