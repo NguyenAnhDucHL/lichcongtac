@@ -4,6 +4,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 16:11] Thêm script deploy lên VNPT Server và bỏ qua file secret
+- **Mô tả**: Viết lại script `deploy_to_vnpt.sh` để lấy thông tin kết nối SSH từ file `.deploy.env` thay vì hardcode trực tiếp vào script, nhằm tránh lộ thông tin bảo mật (credentials) khi đẩy code lên Github. Thêm `.deploy.env` vào `.gitignore` để Git không theo dõi file này.
+- **Tệp thay đổi**:
+  - `deploy_to_vnpt.sh` (Mới)
+  - `.gitignore` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "chore(infra): thêm script deploy vnpt và ignore file .deploy.env"`
+
 ### [2026-08-07 15:55] Khắc phục giao diện chọn Font và Paste Text trong Tiptap Editor
 - **Mô tả**: Sửa lỗi thanh công cụ (toolbar) của trình soạn thảo không hiển thị đúng "Arial" và "18px" khi người dùng nhập liệu bình thường. Thêm tính năng `transformPastedHTML` để tự động loại bỏ các định dạng `font-family` và `font-size` bị lẫn vào khi người dùng copy/paste từ nguồn khác (Word, Web...), giúp đoạn text được dán vào luôn thừa hưởng font mặc định là Arial 18px.
 - **Tệp thay đổi**:

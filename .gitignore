@@ -13,6 +13,7 @@ packages/
 
 # Environment & Secrets
 .env
+.deploy.env
 .htpasswd
 nginx/certs/*
 !nginx/certs/.gitkeep
