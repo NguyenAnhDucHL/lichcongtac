@@ -26,8 +26,8 @@ services:
     image: nginx:alpine
     container_name: lichcongtac-nginx
     ports:
-      - "8081:80"
-      - "8444:443"
+      - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro

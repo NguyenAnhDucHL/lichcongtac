@@ -4,6 +4,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 16:58] Cấu hình Nginx port 80/443 để public web
+- **Mô tả**: Sửa cấu hình `docker-compose.yml` trả Nginx về port chuẩn `80:80` và `443:443` (thay vì 8081/8444) để người dùng truy cập trực tiếp tên miền `lichcongtac.vpdtcampha.vn` không bị lỗi kết nối bị từ chối (Connection Refused).
+- **Tệp thay đổi**:
+  - `docker-compose.yml` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(infra): đổi port nginx về 80 và 443 để kết nối trực tiếp tên miền"`
+
+
 ### [2026-08-07 16:53] Thêm footer bản quyền vào trang Quản trị (AdminLogin)
 - **Mô tả**: Bổ sung thanh footer với nền xanh và nội dung "Bản quyền thuộc về UBND phường Cẩm Phả" vào trang đăng nhập hệ thống Quản trị, giúp đồng bộ thông tin bản quyền với toàn bộ nền tảng thay vì sử dụng footer cũ của hệ thống Link Strategy.
 - **Tệp thay đổi**:
