@@ -10,10 +10,14 @@ source .deploy.env
 
 echo "Đang triển khai lên VNPT Server ($VNPT_HOST)..."
 
-# Dùng expect để ssh và chạy lệnh tự động
+# Nén code (bỏ qua các thư mục không cần thiết)
+echo "Đang đóng gói mã nguồn..."
+tar --exclude='.git' --exclude='node_modules' --exclude='bin' --exclude='obj' --exclude='.env' --exclude='data_dump' -czf deploy.tar.gz .
+
+echo "Đang tải mã nguồn lên VNPT Server ($VNPT_HOST)..."
 expect << EOF
 set timeout -1
-spawn ssh -o StrictHostKeyChecking=no $VNPT_USER@$VNPT_HOST "cd /root/Tool-Calendar-New || cd /root/Tool-Calendar || cd /root/lichcongtac || exit 1; git fetch origin; git reset --hard origin/main; docker compose down; docker compose build; docker compose up -d"
+spawn scp -o StrictHostKeyChecking=no deploy.tar.gz $VNPT_USER@$VNPT_HOST:/root/
 expect {
     "password:" {
         send "$VNPT_PASS\r"
@@ -22,5 +26,21 @@ expect {
     eof
 }
 EOF
+
+echo "Đang giải nén và khởi động lại Docker trên Server..."
+expect << EOF
+set timeout -1
+spawn ssh -o StrictHostKeyChecking=no $VNPT_USER@$VNPT_HOST "cd /root/Tool-Calendar-New || cd /root/Tool-Calendar || cd /root/lichcongtac || exit 1; tar -xzf /root/deploy.tar.gz; docker-compose down; docker compose down; docker compose build; docker compose up -d; rm /root/deploy.tar.gz"
+expect {
+    "password:" {
+        send "$VNPT_PASS\r"
+        exp_continue
+    }
+    eof
+}
+EOF
+
+# Xóa file nén cục bộ
+rm deploy.tar.gz
 
 echo "Triển khai hoàn tất!"

@@ -4,6 +4,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 16:42] Sửa script deploy để bỏ qua git trên server do Private Repo
+- **Mô tả**: Sửa file `deploy_to_vnpt.sh`. Thay vì chạy `git fetch` trên server VNPT (dẫn đến lỗi do repo mới là Private nên không fetch được), script giờ đây sẽ nén code đang có trên máy bạn, tải trực tiếp qua SCP lên server và giải nén, sau đó build lại Docker. Đảm bảo những gì bạn thấy trên máy sẽ được đẩy thẳng lên server mà không vướng mắc về bản quyền hay khóa xác thực Git.
+- **Tệp thay đổi**:
+  - `deploy_to_vnpt.sh` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "chore(infra): sửa script deploy để upload trực tiếp, bỏ qua git fetch trên server do private repo"`
+
 ### [2026-08-07 16:11] Thêm script deploy lên VNPT Server và bỏ qua file secret
 - **Mô tả**: Viết lại script `deploy_to_vnpt.sh` để lấy thông tin kết nối SSH từ file `.deploy.env` thay vì hardcode trực tiếp vào script, nhằm tránh lộ thông tin bảo mật (credentials) khi đẩy code lên Github. Thêm `.deploy.env` vào `.gitignore` để Git không theo dõi file này.
 - **Tệp thay đổi**:
