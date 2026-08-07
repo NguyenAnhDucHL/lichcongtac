@@ -10,6 +10,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 18:04] Cập nhật CSS để đồng nhất định dạng chữ trong editor
+- **Mô tả**: Sửa lỗi giao diện do RichText Editor dính inline style khiến font-size, font-family của Nội dung chi tiết hiển thị không đồng nhất. Bắt buộc !important cho toàn bộ text để về chuẩn font Arial, 18px.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): buộc font-size và font-family đồng nhất cho nội dung editor"`
+
 ### [2026-08-07 17:58] Thêm rule cấm chạy lệnh docker-compose sai
 - **Mô tả**: Bổ sung luật `LC-RULE-DOCKER-DEPLOYMENT` để AI Agent luôn nhớ dùng cờ `-p lichcongtac` khi thao tác với Docker Compose, tránh làm hỏng các hệ thống proxy chung trên server như sự cố ngày hôm nay.
 - **Tệp thay đổi**:

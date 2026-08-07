@@ -455,6 +455,16 @@ input[type='time'].empty-date:focus::-webkit-datetime-edit {
    RICH TEXT EDITOR & CONTENT DEFAULT FONT
    ============================================= */
 .prose p, .prose div, .prose span, .prose li {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 18px;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+}
+
+/* =============================================
+   INLINE HTML FIX FOR LOCATION AND DEPARTMENT
+   ============================================= */
+.inline-html-content * {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
