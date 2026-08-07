@@ -121,4 +121,4 @@ LichCongTac/
 **Status:** ACTIVE — TOOL-CALENDAR PROJECT RULES  
 **Version:** 2.1 (Nâng cấp chuẩn OpenClaw)  
 **Last Updated:** 2026-07-25  
-**See also:** [SYSTEM_FEATURES.md](../SYSTEM_FEATURES.md) | [COMMIT_LOG.md](../COMMIT_LOG.md) | [CODE_QUALITY.md](../CODE_QUALITY.md) | [lc-rule-ai-behavior.md](rules/lc-rule-ai-behavior.md) | [lc-rule-no-temporary-files.md](rules/lc-rule-no-temporary-files.md)
+**See also:** [SYSTEM_FEATURES.md](../SYSTEM_FEATURES.md) | [COMMIT_LOG.md](../COMMIT_LOG.md) | [CODE_QUALITY.md](../CODE_QUALITY.md) | [lc-rule-ai-behavior.md](rules/lc-rule-ai-behavior.md) | [lc-rule-no-temporary-files.md](rules/lc-rule-no-temporary-files.md) | [lc-rule-docker-deployment.md](rules/lc-rule-docker-deployment.md)

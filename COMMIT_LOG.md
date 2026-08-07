@@ -10,6 +10,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 17:58] Thêm rule cấm chạy lệnh docker-compose sai
+- **Mô tả**: Bổ sung luật `LC-RULE-DOCKER-DEPLOYMENT` để AI Agent luôn nhớ dùng cờ `-p lichcongtac` khi thao tác với Docker Compose, tránh làm hỏng các hệ thống proxy chung trên server như sự cố ngày hôm nay.
+- **Tệp thay đổi**:
+  - `.agents/rules/lc-rule-docker-deployment.md` (Mới)
+  - `.agents/AGENTS.md` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "docs: thêm rule bắt buộc sử dụng cờ -p lichcongtac khi dùng docker compose"`
+
 ### [2026-08-07 17:54] Sửa lỗi Nginx proxy sập và cấu hình deploy an toàn
 - **Mô tả**: 
   1. Fix lỗi `nginx-proxy` (thuộc hệ thống Tool-Calendar) bị crash loop vì không resolve được `host.docker.internal`. Đã sửa trực tiếp trên server VNPT bằng cách hardcode IP `172.17.0.1`.
