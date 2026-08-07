@@ -10,6 +10,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 18:07] Xóa bỏ inline cho đoạn p đầu tiên để sửa lỗi khoảng cách lớn
+- **Mô tả**: Sửa lỗi khoảng cách lớn giữa địa điểm và nội dung do class inline làm vỡ flow của DOM. Bỏ class inline, thay vào đó đã cấu hình margin-top/bottom nhỏ trong globals.css giúp các khối p cách nhau rất khít và đẹp mắt.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/features/work-schedule/components/SchedulePanels.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi khoảng trống lớn giữa tiêu đề và nội dung lịch"`
+
 ### [2026-08-07 18:04] Cập nhật CSS để đồng nhất định dạng chữ trong editor
 - **Mô tả**: Sửa lỗi giao diện do RichText Editor dính inline style khiến font-size, font-family của Nội dung chi tiết hiển thị không đồng nhất. Bắt buộc !important cho toàn bộ text để về chuẩn font Arial, 18px.
 - **Tệp thay đổi**:
