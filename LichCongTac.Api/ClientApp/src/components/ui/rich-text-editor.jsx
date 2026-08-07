@@ -76,12 +76,12 @@ const MenuBar = ({ editor }) => {
     return null
   }
 
-  const currentFontFamily = (editor.getAttributes('textStyle').fontFamily || 'Arial').replace(/['"]+/g, '')
+  const currentFontFamily = (editor.getAttributes('textStyle').fontFamily || "'Times New Roman', Times, serif").replace(/['"]+/g, '')
   const activeFontFamily = FONT_FAMILIES.find(f => {
     if (!f.value) return false
     const primaryFont = f.value.replace(/['"]+/g, '').split(',')[0].trim()
     return currentFontFamily.includes(primaryFont)
-  })?.value || 'Arial'
+  })?.value || "'Times New Roman', Times, serif"
 
   return (
     <div className="flex flex-wrap items-center gap-1 border-b p-1 bg-muted/50 rounded-t-md">
@@ -241,6 +241,7 @@ export function RichTextEditor({ value, onChange }) {
       attributes: {
         class:
           'prose dark:prose-invert prose-sm sm:prose-base focus:outline-none min-h-[200px] w-full p-4 max-w-none',
+        style: 'font-family: "Times New Roman", Times, serif; font-size: 18px;',
       },
       transformPastedHTML(html) {
         return html

@@ -1,0 +1,1 @@
+UPDATE Schedules SET Content = '<span style="font-family: ''Times New Roman'', Times, serif; font-size: 18px;">' || Content || '</span>' WHERE Content IS NOT NULL AND Content NOT LIKE '%Times New Roman%';

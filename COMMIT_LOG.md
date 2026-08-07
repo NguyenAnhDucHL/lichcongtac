@@ -4,6 +4,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 17:38] Đổi font mặc định của Editor sang Times New Roman cỡ 18
+- **Mô tả**: Thay đổi font chữ và cỡ chữ mặc định của khung soạn thảo Rich Text Editor (Nội dung chi tiết) sang Times New Roman và 18px theo yêu cầu. Đồng thời đã chạy lệnh SQL update trực tiếp trên database server để tự động bọc thẻ `<span style="font-family: 'Times New Roman', Times, serif; font-size: 18px;">` cho tất cả các nội dung cũ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/ui/rich-text-editor.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): đổi font chữ mặc định của khung soạn thảo sang Times New Roman cỡ 18"`
+
+
 ### [2026-08-07 17:08] Sửa đường dẫn deploy dứt điểm trên VNPT Server
 - **Mô tả**: Gỡ bỏ cấu trúc thư mục lộn xộn cũ trong file deploy (bỏ lệnh cd Tool-Calendar-New/Tool-Calendar/lichcongtac chắp vá). Cố định vị trí triển khai duy nhất trên máy chủ VNPT tại `/root/lichcongtac`. Việc này giúp quá trình đẩy code luôn trỏ đúng về một thư mục chứa dữ liệu gốc, không bao giờ bị lỗi "mất dữ liệu" do nhảy nhầm sang thư mục khác chưa có DB nữa.
 - **Tệp thay đổi**:
