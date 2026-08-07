@@ -27,8 +27,8 @@ export function ScheduleItem({ item }) {
             <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>
           )}
           {item.location && (
-            <span className="text-[#005f6b] font-bold mr-1">
-              (Tại {formatLocation(item.location)}){' '}
+            <span className="text-[#005f6b] font-bold mr-1 inline-flex items-baseline flex-wrap font-['Times_New_Roman',_Times,_serif] text-[18px]">
+              (Tại <span className="[&>p]:inline ml-1" dangerouslySetInnerHTML={{ __html: formatLocation(item.location) }} />)
             </span>
           )}
         </span>

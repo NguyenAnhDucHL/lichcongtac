@@ -10,6 +10,17 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 17:48] Thay thế Textarea bằng RichTextEditor (mini) cho ô Địa điểm và Phòng ban
+- **Mô tả**: Thay thế Textarea nhập tự do cho Địa điểm và Phòng ban bằng RichTextEditor thu nhỏ (có thanh công cụ rút gọn). Cấu hình font chữ mặc định là Times New Roman 18px để đồng bộ với khung soạn thảo chính, theo yêu cầu người dùng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/ui/rich-text-editor.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/ScheduleForm.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/ScheduleTable.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/features/work-schedule/components/SchedulePanels.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(ui): thay thế textarea bằng rich text editor mini cho ô địa điểm và phòng ban"`
+
 ### [2026-08-07 17:38] Đổi font mặc định của Editor sang Times New Roman cỡ 18
 - **Mô tả**: Thay đổi font chữ và cỡ chữ mặc định của khung soạn thảo Rich Text Editor (Nội dung chi tiết) sang Times New Roman và 18px theo yêu cầu. Đồng thời đã chạy lệnh SQL update trực tiếp trên database server để tự động bọc thẻ `<span style="font-family: 'Times New Roman', Times, serif; font-size: 18px;">` cho tất cả các nội dung cũ.
 - **Tệp thay đổi**:

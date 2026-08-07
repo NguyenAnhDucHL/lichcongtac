@@ -66,7 +66,7 @@ export function ScheduleTable({ schedules, currentPage, pageSize, onEdit, onDele
                         )}
                         {item.location && (
                           <span className="text-[#005f6b] font-bold mr-1">
-                            (Tại {item.location})
+                            (Tại {extractTextFromHtml(item.location)})
                           </span>
                         )}
                         <span className="text-gray-800">
@@ -75,7 +75,7 @@ export function ScheduleTable({ schedules, currentPage, pageSize, onEdit, onDele
                       </span>
                     </td>
                     <td className="border border-gray-200 py-2.5 px-4">
-                      {item.preparingUnit || 'CƠ QUAN'}
+                      {extractTextFromHtml(item.preparingUnit) || 'CƠ QUAN'}
                     </td>
                     <td className="border border-gray-200 py-2.5 px-4">
                       {item.isPublic ? 'Có' : 'Không'}

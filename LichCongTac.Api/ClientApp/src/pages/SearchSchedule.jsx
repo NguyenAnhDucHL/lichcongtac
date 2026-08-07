@@ -58,7 +58,7 @@ export default function SearchSchedule() {
     scheduleService
       .getTodayHoliday()
       .then((data) => setTodayHoliday(data?.content ? data : data?.data || null))
-      .catch(() => {})
+      .catch(() => { })
   }, [lastHolidayUpdate])
 
   const handleSearch = async (e) => {
@@ -265,7 +265,7 @@ export default function SearchSchedule() {
                             )}
                             {item.location && (
                               <span className="text-[#005f6b] font-bold mr-1">
-                                (Tại {item.location})
+                                (Tại {extractText(item.location)})
                               </span>
                             )}
                             {item.content && (
@@ -273,7 +273,7 @@ export default function SearchSchedule() {
                             )}
                           </td>
                           <td className="border border-gray-300 py-2.5 px-3 text-center">
-                            {item.preparingUnit || 'Văn phòng'}
+                            {extractText(item.preparingUnit) || 'Văn phòng'}
                           </td>
                         </tr>
                       )

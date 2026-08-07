@@ -134,14 +134,13 @@ export function ScheduleForm({
           {!departments.some((d) => d.name === formData.department) && !!formData.department && (
             <div className="mt-2 flex flex-col gap-1 w-full">
               <span className="text-xs text-gray-500 italic">hoặc nhập tên đơn vị khác:</span>
-              <textarea
-                placeholder="VD: Công an phường, Quân sự, ..."
-                value={formData.department === 'Khác' ? '' : formData.department}
-                onChange={(e) => setFormData((prev) => ({ ...prev, department: e.target.value }))}
-                rows={2}
-                className="w-full md:w-[500px] border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c] resize-y"
-                autoFocus
-              />
+              <div className="w-[100%] md:w-[500px] border border-[#8cbabf] rounded overflow-hidden">
+                <RichTextEditor
+                  minimal={true}
+                  value={formData.department === 'Khác' ? '' : formData.department}
+                  onChange={(newContent) => setFormData((prev) => ({ ...prev, department: newContent }))}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -189,14 +188,13 @@ export function ScheduleForm({
           {!LOCATIONS.includes(formData.location) && !!formData.location && (
             <div className="mt-2 flex flex-col gap-1 w-full">
               <span className="text-xs text-gray-500 italic">hoặc nhập địa điểm khác:</span>
-              <textarea
-                placeholder="VD: Phòng họp số 1"
-                value={formData.location === 'Khác' ? '' : formData.location}
-                onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
-                rows={2}
-                className="w-full md:w-[500px] border border-gray-300 rounded px-3 py-1.5 text-sm outline-none focus:border-[#5cb85c] focus:ring-1 focus:ring-[#5cb85c] resize-y"
-                autoFocus
-              />
+              <div className="w-[100%] md:w-[500px] border border-[#8cbabf] rounded overflow-hidden">
+                <RichTextEditor
+                  minimal={true}
+                  value={formData.location === 'Khác' ? '' : formData.location}
+                  onChange={(newContent) => setFormData((prev) => ({ ...prev, location: newContent }))}
+                />
+              </div>
             </div>
           )}
         </div>
