@@ -4,6 +4,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 15:55] Khắc phục giao diện chọn Font và Paste Text trong Tiptap Editor
+- **Mô tả**: Sửa lỗi thanh công cụ (toolbar) của trình soạn thảo không hiển thị đúng "Arial" và "18px" khi người dùng nhập liệu bình thường. Thêm tính năng `transformPastedHTML` để tự động loại bỏ các định dạng `font-family` và `font-size` bị lẫn vào khi người dùng copy/paste từ nguồn khác (Word, Web...), giúp đoạn text được dán vào luôn thừa hưởng font mặc định là Arial 18px.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/ui/rich-text-editor.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): hiển thị mặc định arial 18px trên toolbar và xoá định dạng khi paste"`
+
 ### [2026-08-07 15:51] Cập nhật font chữ mặc định cho trình soạn thảo văn bản
 - **Mô tả**: Thiết lập font chữ mặc định của trình soạn thảo Rich Text Editor (Tiptap) thành Arial, cỡ chữ 18px để đồng bộ giao diện hiển thị và tạo sự thuận tiện cho người dùng khi nhập liệu/copy-paste mà chưa chọn font. Thay đổi này sử dụng CSS global để thiết lập mức mặc định mà không ghi đè cài đặt của người dùng.
 - **Tệp thay đổi**:

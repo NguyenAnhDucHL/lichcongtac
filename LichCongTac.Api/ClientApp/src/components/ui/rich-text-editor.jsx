@@ -76,12 +76,12 @@ const MenuBar = ({ editor }) => {
     return null
   }
 
-  const currentFontFamily = (editor.getAttributes('textStyle').fontFamily || '').replace(/['"]+/g, '')
+  const currentFontFamily = (editor.getAttributes('textStyle').fontFamily || 'Arial').replace(/['"]+/g, '')
   const activeFontFamily = FONT_FAMILIES.find(f => {
     if (!f.value) return false
     const primaryFont = f.value.replace(/['"]+/g, '').split(',')[0].trim()
     return currentFontFamily.includes(primaryFont)
-  })?.value || ''
+  })?.value || 'Arial'
 
   return (
     <div className="flex flex-wrap items-center gap-1 border-b p-1 bg-muted/50 rounded-t-md">
@@ -111,7 +111,7 @@ const MenuBar = ({ editor }) => {
             editor.chain().focus().unsetFontSize().run()
           }
         }}
-        value={editor.getAttributes('textStyle').fontSize || ''}
+        value={editor.getAttributes('textStyle').fontSize || '18px'}
         className="h-8 rounded-sm border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring w-16"
       >
         <option value="">Cỡ</option>
@@ -241,6 +241,11 @@ export function RichTextEditor({ value, onChange }) {
       attributes: {
         class:
           'prose dark:prose-invert prose-sm sm:prose-base focus:outline-none min-h-[200px] w-full p-4 max-w-none',
+      },
+      transformPastedHTML(html) {
+        return html
+          .replace(/font-family\s*:[^;"]+;?/gi, '')
+          .replace(/font-size\s*:[^;"]+;?/gi, '')
       },
     },
     onUpdate: ({ editor }) => {
