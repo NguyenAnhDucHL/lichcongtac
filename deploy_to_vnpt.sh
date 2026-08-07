@@ -31,7 +31,7 @@ EOF
 echo "Đang giải nén và khởi động lại Docker trên Server..."
 expect << EOF
 set timeout -1
-spawn ssh -o StrictHostKeyChecking=no $VNPT_USER@$VNPT_HOST "mkdir -p /root/lichcongtac; cd /root/lichcongtac; tar -xzf /root/deploy.tar.gz; docker-compose down; docker compose down; docker compose build; docker compose up -d; rm /root/deploy.tar.gz"
+spawn ssh -o StrictHostKeyChecking=no $VNPT_USER@$VNPT_HOST "mkdir -p /root/lichcongtac; cd /root/lichcongtac; tar -xzf /root/deploy.tar.gz; docker compose -p lichcongtac down; docker compose -p lichcongtac build; docker compose -p lichcongtac up -d; rm /root/deploy.tar.gz"
 expect {
     "password:" {
         send "$VNPT_PASS\r"

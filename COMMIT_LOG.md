@@ -10,6 +10,14 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 17:54] Sửa lỗi Nginx proxy sập và cấu hình deploy an toàn
+- **Mô tả**: 
+  1. Fix lỗi `nginx-proxy` (thuộc hệ thống Tool-Calendar) bị crash loop vì không resolve được `host.docker.internal`. Đã sửa trực tiếp trên server VNPT bằng cách hardcode IP `172.17.0.1`.
+  2. Cập nhật script `deploy_to_vnpt.sh` thêm cờ `-p lichcongtac` vào các lệnh `docker compose` để tránh xung đột project name với hệ thống Tool-Calendar trên server, ngăn chặn việc restart nhầm container khi deploy.
+- **Tệp thay đổi**:
+  - `deploy_to_vnpt.sh` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(infra): chỉ định project name khi deploy để tránh conflict docker-compose"`
+
 ### [2026-08-07 17:48] Thay thế Textarea bằng RichTextEditor (mini) cho ô Địa điểm và Phòng ban
 - **Mô tả**: Thay thế Textarea nhập tự do cho Địa điểm và Phòng ban bằng RichTextEditor thu nhỏ (có thanh công cụ rút gọn). Cấu hình font chữ mặc định là Times New Roman 18px để đồng bộ với khung soạn thảo chính, theo yêu cầu người dùng.
 - **Tệp thay đổi**:
