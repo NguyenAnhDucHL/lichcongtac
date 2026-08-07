@@ -10,6 +10,12 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 18:16] Tắt hiệu ứng nền highlight do paste từ Word
+- **Mô tả**: Sửa lỗi văn bản copy từ Word vào editor giữ lại `background-color: white` khiến văn bản hiển thị ra ngoài trông giống bị bôi đen (highlight) trên nền xanh. Bổ sung `background-color: transparent !important` vào cấu hình font chung trong globals.css.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/styles/globals.css` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): xóa hiệu ứng background highlight lỗi khi copy từ word"`
+
 ### [2026-08-07 18:13] Chuyển đổi font chữ toàn bộ sang Times New Roman
 - **Mô tả**: Sửa lại cấu hình font chữ hiển thị trên màn hình lịch công tác từ Arial sang Times New Roman cỡ 18 theo đúng yêu cầu, áp dụng đồng bộ cho cả Tiêu đề, Thời gian, Địa điểm, Số giấy mời và Nội dung chi tiết.
 - **Tệp thay đổi**:

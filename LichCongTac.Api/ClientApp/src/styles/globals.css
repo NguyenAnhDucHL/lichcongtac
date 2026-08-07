@@ -458,6 +458,7 @@ input[type='time'].empty-date:focus::-webkit-datetime-edit {
   font-family: "Times New Roman", Times, serif !important;
   font-size: 18px !important;
   line-height: 1.6 !important;
+  background-color: transparent !important;
 }
 
 .prose p {
