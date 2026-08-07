@@ -10,6 +10,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 18:32] Giảm khoảng cách giữa các lịch công tác
+- **Mô tả**: Thu hẹp khoảng trống quá rộng giữa các lịch công tác (từ space-y-6, space-y-5 xuống space-y-3) để nhìn gọn gàng và liền mạch hơn, đồng thời đảm bảo phông chữ chuẩn Nghị định 30.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/features/work-schedule/components/SchedulePanels.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): giảm khoảng cách dọc giữa các lịch công tác để giao diện gọn hơn"`
+
 ### [2026-08-07 18:16] Tắt hiệu ứng nền highlight do paste từ Word
 - **Mô tả**: Sửa lỗi văn bản copy từ Word vào editor giữ lại `background-color: white` khiến văn bản hiển thị ra ngoài trông giống bị bôi đen (highlight) trên nền xanh. Bổ sung `background-color: transparent !important` vào cấu hình font chung trong globals.css.
 - **Tệp thay đổi**:

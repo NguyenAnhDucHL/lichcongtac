@@ -153,7 +153,7 @@ export default function WorkSchedule() {
                 {todayData.dayLabel}: ngày {todayData.date}
               </h3>
               {todayData.items.length > 0 ? (
-                <div className="space-y-6 px-4">
+                <div className="space-y-3 px-4">
                   {todayData.items.map((item, idx) => (
                     <ScheduleItem key={idx} item={item} />
                   ))}
@@ -189,7 +189,7 @@ export default function WorkSchedule() {
                     <h3 className="text-[18px] md:text-[19px] font-bold text-[#1d5792] mb-4 text-center">
                       {day.dayLabel}, ngày {day.date}:
                     </h3>
-                    <div className="space-y-5">
+                    <div className="space-y-3">
                       {day.items.map((item, i) => (
                         <ScheduleItem key={i} item={item} />
                       ))}

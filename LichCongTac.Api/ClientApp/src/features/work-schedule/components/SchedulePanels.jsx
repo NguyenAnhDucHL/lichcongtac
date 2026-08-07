@@ -57,7 +57,7 @@ export function TodayPanel({ displayToday, notifications }) {
         </h3>
 
         {displayToday.items.length > 0 ? (
-          <div className="space-y-6 px-4">
+          <div className="space-y-3 px-4">
             {displayToday.items.map((item, idx) => (
               <ScheduleItem key={idx} item={item} />
             ))}
@@ -103,7 +103,7 @@ export function UpcomingPanel({ upcomingSchedules }) {
             <h3 className="text-[18px] md:text-[19px] font-bold text-[#1d5792] mb-4 text-center">
               {day.dayLabel}, ngày {day.date}:
             </h3>
-            <div className="space-y-5">
+            <div className="space-y-3">
               {day.items.map((item, idx) => (
                 <ScheduleItem key={idx} item={item} />
               ))}
