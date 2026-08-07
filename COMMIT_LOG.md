@@ -4,6 +4,13 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 
 ## Lịch sử
 
+### [2026-08-07 17:08] Sửa đường dẫn deploy dứt điểm trên VNPT Server
+- **Mô tả**: Gỡ bỏ cấu trúc thư mục lộn xộn cũ trong file deploy (bỏ lệnh cd Tool-Calendar-New/Tool-Calendar/lichcongtac chắp vá). Cố định vị trí triển khai duy nhất trên máy chủ VNPT tại `/root/lichcongtac`. Việc này giúp quá trình đẩy code luôn trỏ đúng về một thư mục chứa dữ liệu gốc, không bao giờ bị lỗi "mất dữ liệu" do nhảy nhầm sang thư mục khác chưa có DB nữa.
+- **Tệp thay đổi**:
+  - `deploy_to_vnpt.sh` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(infra): cố định vị trí thư mục deploy duy nhất trên server để tránh thất thoát dữ liệu"`
+
+
 ### [2026-08-07 16:58] Cấu hình Nginx port 80/443 để public web
 - **Mô tả**: Sửa cấu hình `docker-compose.yml` trả Nginx về port chuẩn `80:80` và `443:443` (thay vì 8081/8444) để người dùng truy cập trực tiếp tên miền `lichcongtac.vpdtcampha.vn` không bị lỗi kết nối bị từ chối (Connection Refused).
 - **Tệp thay đổi**:
