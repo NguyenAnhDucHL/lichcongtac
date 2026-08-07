@@ -21,17 +21,3 @@ services:
       - ./data_dump:/app/data
 
     restart: always
-
-  nginx:
-    image: nginx:alpine
-    container_name: lichcongtac-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-    depends_on:
-      - lichcongtac-backend
-    restart: always
-

@@ -1,3 +1,9 @@
+### [2026-08-07 17:45] Sửa lỗi xung đột Nginx proxy (Không tải được dữ liệu trên Zalo/Mobile)
+- **Mô tả**: Bỏ container `nginx` trong `docker-compose.yml` của dự án `lichcongtac` để tránh xung đột port 80 và 443 với container `nginx-proxy` chung của máy chủ (nằm trong dự án `Tool-Calendar`). Việc xung đột khiến chứng chỉ SSL của `congvan.vpdtcampha.vn` bị trả về sai (thành `lichcongtac.vpdtcampha.vn`), dẫn đến lỗi "Không tải được dữ liệu" khi truy cập từ Zalo In-App Browser hoặc Mobile Safari.
+- **Tệp thay đổi**:
+  - `docker-compose.yml` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(infra): loại bỏ nginx nội bộ để tránh xung đột port 80/443 với nginx-proxy chung"`
+
 # Nhật ký Thay đổi Mã Nguồn (Commit Log)
 
 Tệp này lưu trữ lịch sử các thay đổi và tính năng mới được thêm vào hệ thống để AI có thể nhanh chóng nắm bắt ngữ cảnh mà không cần quét lại toàn bộ mã nguồn. Kể từ ngày 26/07/2026, toàn bộ hệ thống đã được tái cấu trúc (pivot) để chuyên biệt phục vụ chức năng **Lịch Công Tác**.
