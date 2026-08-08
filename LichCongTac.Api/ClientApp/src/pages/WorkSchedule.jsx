@@ -91,14 +91,17 @@ export default function WorkSchedule() {
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
   const [todayHoliday, setTodayHoliday] = useState(null)
+  const [error, setError] = useState(null)
   const { lastScheduleUpdate, lastHolidayUpdate } = useAppSignalR()
 
   const fetchData = useCallback(async () => {
     try {
+      setError(null)
       const raw = await scheduleService.getPublicSchedule()
       setScheduleData(groupAndTransform(Array.isArray(raw) ? raw : raw?.data || []))
     } catch (err) {
       console.error('Lỗi tải lịch:', err)
+      setError('Đang mất kết nối máy chủ, vui lòng thử lại sau...')
     } finally {
       setLoading(false)
     }
@@ -144,6 +147,13 @@ export default function WorkSchedule() {
         {loading ? (
           <div className="flex justify-center py-20 text-[#1d5792]">
             <Loader2 className="animate-spin w-8 h-8" />
+          </div>
+        ) : error ? (
+          <div className="flex justify-center py-20 px-4">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-md text-center max-w-lg shadow-sm">
+              <p className="font-medium text-lg">{error}</p>
+              <p className="text-sm mt-2 text-red-500">Hệ thống có thể đang bảo trì hoặc mạng không ổn định.</p>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-4">

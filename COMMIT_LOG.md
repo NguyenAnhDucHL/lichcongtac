@@ -1,3 +1,9 @@
+### [2026-08-08 08:39] Thêm hiển thị thông báo lỗi kết nối máy chủ ở trang chủ
+- **Mô tả**: Sửa lỗi giao diện tự động hiển thị "Không có lịch công tác" và che giấu lỗi khi kết nối mạng/API thất bại (vd: khi server đang bảo trì hoặc mạng chập chờn). Thay vào đó, giờ sẽ hiển thị màn hình báo lỗi cụ thể để người dùng biết máy chủ đang tạm mất kết nối, tránh hiểu lầm là bị mất dữ liệu.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): hiển thị thông báo lỗi mạng thay vì ẩn đi và báo không có lịch khi api lỗi"`
+
 ### [2026-08-08 08:31] Cấu hình Log Rotation chống tràn bộ nhớ / ổ cứng (Production Mode)
 - **Mô tả**: Bổ sung giới hạn lưu trữ log cho container `lichcongtac-backend` (tối đa 10MB/file, giữ lại 3 file) trong `docker-compose.yml`. Điều này giúp ngăn chặn file log của Docker phình to bất thường theo thời gian gây lỗi server, làm trắng website hay cạn kiệt bộ nhớ.
 - **Tệp thay đổi**:
