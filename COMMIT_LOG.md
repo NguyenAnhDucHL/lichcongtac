@@ -1,3 +1,16 @@
+### [2026-08-08 08:31] Cấu hình Log Rotation chống tràn bộ nhớ / ổ cứng (Production Mode)
+- **Mô tả**: Bổ sung giới hạn lưu trữ log cho container `lichcongtac-backend` (tối đa 10MB/file, giữ lại 3 file) trong `docker-compose.yml`. Điều này giúp ngăn chặn file log của Docker phình to bất thường theo thời gian gây lỗi server, làm trắng website hay cạn kiệt bộ nhớ.
+- **Tệp thay đổi**:
+  - `docker-compose.yml` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "perf(infra): add log rotation limits to prevent disk and memory overflow"`
+
+### [2026-08-08 08:25] Dọn dẹp các cấu hình ngrok thừa
+- **Mô tả**: Xoá bỏ các thiết lập CORS (`.ngrok-free.dev`) và cập nhật `README.md` do hệ thống đã chạy ổn định trên server VNPT, không cần dùng ngrok tunnel.
+- **Tệp thay đổi**:
+  - `README.md` (Sửa đổi)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "chore(infra): dọn dẹp các cấu hình ngrok không còn dùng"`
+
 ### [2026-08-07 17:45] Sửa lỗi xung đột Nginx proxy (Không tải được dữ liệu trên Zalo/Mobile)
 - **Mô tả**: Bỏ container `nginx` trong `docker-compose.yml` của dự án `lichcongtac` để tránh xung đột port 80 và 443 với container `nginx-proxy` chung của máy chủ (nằm trong dự án `Tool-Calendar`). Việc xung đột khiến chứng chỉ SSL của `congvan.vpdtcampha.vn` bị trả về sai (thành `lichcongtac.vpdtcampha.vn`), dẫn đến lỗi "Không tải được dữ liệu" khi truy cập từ Zalo In-App Browser hoặc Mobile Safari.
 - **Tệp thay đổi**:

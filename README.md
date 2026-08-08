@@ -109,7 +109,7 @@ Hệ thống được nạp sẵn dữ liệu mẫu (Seed Data) trong file `seed
 > **Bắt buộc thay đổi mật khẩu ngay sau lần đăng nhập đầu tiên.**
 
 - **Địa chỉ truy cập nội bộ**: [https://localhost](https://localhost) hoặc IP của máy chủ.
-- **Địa chỉ truy cập từ xa**: Sử dụng link do Ngrok cung cấp (kiểm tra trong Docker logs của container ngrok).
+- **Địa chỉ truy cập từ xa**: Sử dụng domain/IP thực tế của server (ví dụ: server VNPT).
 
 ---
 

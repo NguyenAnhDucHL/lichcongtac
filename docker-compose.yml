@@ -19,5 +19,9 @@ services:
       - PUBLIC_ID_SECRET=${PUBLIC_ID_SECRET}
     volumes:
       - ./data_dump:/app/data
-
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: always
