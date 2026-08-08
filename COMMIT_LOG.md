@@ -1189,3 +1189,11 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Core/Data/Repositories/NotificationRepository.cs` (Sửa đổi)
   - `deploy_to_vnpt.sh` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(notifications): remove missing UpdatedAt column from SQL queries"`
+
+### [2026-08-08 09:45] Add UpdatedAt to Notifications table
+- **Mô tả**: Thiết kế DB chuẩn chỉnh theo yêu cầu, thêm cột UpdatedAt vào bảng Notifications của Lịch Công Tác để lưu vết thời gian sửa đổi (về sau có thể hiển thị trên giao diện).
+- **Tệp thay đổi**:
+  - `data_dump/documents.db` (Sửa đổi schema SQLite)
+  - `LichCongTac.Core/Models/Notification.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/NotificationRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(notifications): add UpdatedAt column to track modification time"`

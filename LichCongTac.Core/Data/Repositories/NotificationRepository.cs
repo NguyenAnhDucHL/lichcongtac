@@ -33,7 +33,7 @@ namespace LichCongTac.Core.Data.Repositories
 
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy 
+                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy, UpdatedAt 
                 FROM Notifications 
                 ORDER BY Id DESC LIMIT 200";
 
@@ -46,7 +46,8 @@ namespace LichCongTac.Core.Data.Repositories
                     Content = reader.GetString(1),
                     IsVisible = reader.GetInt32(2),
                     CreatedAt = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                    CreatedBy = reader.IsDBNull(4) ? null : reader.GetInt32(4)
+                    CreatedBy = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+                    UpdatedAt = reader.IsDBNull(5) ? null : reader.GetString(5)
                 });
             }
 
@@ -61,7 +62,7 @@ namespace LichCongTac.Core.Data.Repositories
 
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy 
+                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy, UpdatedAt 
                 FROM Notifications 
                 WHERE IsVisible = 1
                 ORDER BY Id DESC LIMIT 100";
@@ -75,7 +76,8 @@ namespace LichCongTac.Core.Data.Repositories
                     Content = reader.GetString(1),
                     IsVisible = reader.GetInt32(2),
                     CreatedAt = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                    CreatedBy = reader.IsDBNull(4) ? null : reader.GetInt32(4)
+                    CreatedBy = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+                    UpdatedAt = reader.IsDBNull(5) ? null : reader.GetString(5)
                 });
             }
 
@@ -89,7 +91,7 @@ namespace LichCongTac.Core.Data.Repositories
 
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy
+                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy, UpdatedAt 
                 FROM Notifications
                 WHERE Id = @Id";
             cmd.Parameters.AddWithValue("@Id", id);
@@ -103,7 +105,8 @@ namespace LichCongTac.Core.Data.Repositories
                 Content = reader.GetString(1),
                 IsVisible = reader.GetInt32(2),
                 CreatedAt = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                CreatedBy = reader.IsDBNull(4) ? null : reader.GetInt32(4)
+                CreatedBy = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+                UpdatedAt = reader.IsDBNull(5) ? null : reader.GetString(5)
             };
         }
 
@@ -134,7 +137,7 @@ namespace LichCongTac.Core.Data.Repositories
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
                 UPDATE Notifications 
-                SET Content = @Content, IsVisible = @IsVisible
+                SET Content = @Content, IsVisible = @IsVisible, UpdatedAt = datetime('now', 'localtime')
                 WHERE Id = @Id";
             
             cmd.Parameters.AddWithValue("@Id", notification.Id);
