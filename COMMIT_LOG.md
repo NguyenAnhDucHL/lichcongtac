@@ -1182,3 +1182,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `seed_db.sql` (Xóa)
   - `Program.cs` (Xóa)
 - **Lệnh git commit**: `git commit -m "chore: dọn dẹp các file thừa theo yêu cầu"`
+
+### [2026-08-08 09:36] Fix NotificationRepository crash and update deploy script
+- **Mô tả**: Sửa lỗi crash (SQLite Error 1: 'no such column: UpdatedAt') trong hệ thống Lịch Công Tác. Xóa cột UpdatedAt khỏi câu truy vấn SELECT trong NotificationRepository do bảng Notifications không có cột này. Đồng thời update file deploy_to_vnpt.sh không dùng 'docker compose down' để đảm bảo an toàn cho nginx.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/NotificationRepository.cs` (Sửa đổi)
+  - `deploy_to_vnpt.sh` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(notifications): remove missing UpdatedAt column from SQL queries"`

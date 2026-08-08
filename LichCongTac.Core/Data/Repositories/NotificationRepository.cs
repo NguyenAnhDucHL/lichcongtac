@@ -33,7 +33,7 @@ namespace LichCongTac.Core.Data.Repositories
 
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy, UpdatedAt 
+                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy 
                 FROM Notifications 
                 ORDER BY Id DESC LIMIT 200";
 
@@ -61,7 +61,7 @@ namespace LichCongTac.Core.Data.Repositories
 
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy, UpdatedAt 
+                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy 
                 FROM Notifications 
                 WHERE IsVisible = 1
                 ORDER BY Id DESC LIMIT 100";
