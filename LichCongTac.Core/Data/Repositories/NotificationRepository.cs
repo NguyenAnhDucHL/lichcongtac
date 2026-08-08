@@ -33,9 +33,9 @@ namespace LichCongTac.Core.Data.Repositories
 
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy
-                FROM Notifications
-                ORDER BY Id DESC";
+                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy, UpdatedAt 
+                FROM Notifications 
+                ORDER BY Id DESC LIMIT 200";
 
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -61,10 +61,10 @@ namespace LichCongTac.Core.Data.Repositories
 
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy
-                FROM Notifications
+                SELECT Id, Content, IsVisible, CreatedAt, CreatedBy, UpdatedAt 
+                FROM Notifications 
                 WHERE IsVisible = 1
-                ORDER BY Id DESC";
+                ORDER BY Id DESC LIMIT 100";
 
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())

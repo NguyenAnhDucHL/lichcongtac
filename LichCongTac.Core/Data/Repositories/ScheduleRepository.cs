@@ -72,7 +72,7 @@ namespace LichCongTac.Core.Data.Repositories
             {
                 cmd.CommandText += " WHERE IsPublic = 1";
             }
-            cmd.CommandText += " ORDER BY Date DESC, StartTime DESC";
+            cmd.CommandText += " ORDER BY Date DESC, StartTime DESC LIMIT 1000";
 
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -98,7 +98,7 @@ namespace LichCongTac.Core.Data.Repositories
             {
                 cmd.CommandText += " AND IsPublic = 1";
             }
-            cmd.CommandText += " ORDER BY Date ASC, StartTime ASC";
+            cmd.CommandText += " ORDER BY Date ASC, StartTime ASC LIMIT 1000";
 
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())

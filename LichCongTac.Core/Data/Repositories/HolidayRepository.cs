@@ -29,7 +29,7 @@ namespace LichCongTac.Core.Data.Repositories
             await conn.OpenAsync();
 
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT Id, Date, Content, CreatedAt, CreatedBy, UpdatedAt FROM Holidays ORDER BY Date DESC";
+            cmd.CommandText = "SELECT Id, Date, Content, CreatedAt, CreatedBy, UpdatedAt FROM Holidays ORDER BY Date DESC LIMIT 365";
 
             using var reader = await cmd.ExecuteReaderAsync();
             while (await reader.ReadAsync())

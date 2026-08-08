@@ -1,3 +1,11 @@
+### [2026-08-08 08:45] Tối ưu hóa Database: Chống tấn công OOM (Tràn bộ nhớ)
+- **Mô tả**: Bổ sung `LIMIT` vào tất cả các truy vấn danh sách (Schedules, Notifications, Holidays) trong Repositories bằng ADO.NET. Việc này ngăn chặn tình trạng bảng dữ liệu phình to theo thời gian gây tràn bộ nhớ server khi tải về frontend mà không giới hạn.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/ScheduleRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/NotificationRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/HolidayRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "perf(db): thêm LIMIT cho các truy vấn danh sách để chống tràn bộ nhớ (OOM)"`
+
 ### [2026-08-08 08:39] Thêm hiển thị thông báo lỗi kết nối máy chủ ở trang chủ
 - **Mô tả**: Sửa lỗi giao diện tự động hiển thị "Không có lịch công tác" và che giấu lỗi khi kết nối mạng/API thất bại (vd: khi server đang bảo trì hoặc mạng chập chờn). Thay vào đó, giờ sẽ hiển thị màn hình báo lỗi cụ thể để người dùng biết máy chủ đang tạm mất kết nối, tránh hiểu lầm là bị mất dữ liệu.
 - **Tệp thay đổi**:
