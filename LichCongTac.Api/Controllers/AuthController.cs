@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -20,15 +21,18 @@ namespace LichCongTac.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
         private readonly UserManager<User> _userManager;
+        private readonly IHubContext<LichCongTac.Api.Hubs.AppHub> _hubContext;
 
         public AuthController(
             IConfiguration configuration,
             IUserRepository userRepository,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            IHubContext<LichCongTac.Api.Hubs.AppHub> hubContext)
         {
             _configuration  = configuration;
             _userRepository = userRepository;
             _userManager    = userManager;
+            _hubContext     = hubContext;
         }
 
         // ─── LOGIN ───────────────────────────────────────────────────────────────
@@ -146,6 +150,9 @@ namespace LichCongTac.Api.Controllers
                 SameSite = SameSiteMode.Strict,
                 Expires  = refreshTokenExpiryTime
             });
+
+            // Bắn tín hiệu ForceLogout tới các kết nối hiện tại của user (trên thiết bị cũ)
+            await _hubContext.Clients.Group($"User_{user.Id}").SendAsync("ForceLogout", "Tài khoản của bạn vừa được đăng nhập trên thiết bị khác.");
 
             return Ok(ApiResponse.Ok(new
             {

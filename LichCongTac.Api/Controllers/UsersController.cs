@@ -149,7 +149,15 @@ namespace LichCongTac.Api.Controllers
             user.ZaloId       = request.ZaloId;
             user.NotificationPreference = request.NotificationPreference;
 
+            // Invalidate token cũ khi Admin cập nhật thông tin user (để các thay đổi quyền có hiệu lực ngay)
+            user.SecurityStamp = Guid.NewGuid().ToString();
+
             _userRepository.UpdateUser(user);
+            
+            // Xóa cache session để SecurityStamp mới có hiệu lực ngay lập tức
+            var memCache = HttpContext.RequestServices.GetService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+            memCache?.Remove($"UserSession_{user.Id}");
+
             return Ok(ApiResponse.Ok("Cập nhật người dùng thành công."));
         }
 

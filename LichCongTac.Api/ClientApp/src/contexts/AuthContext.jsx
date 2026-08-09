@@ -78,8 +78,10 @@ export const AuthProvider = ({ children }) => {
       }
     }
     document.addEventListener('auth:unauthorized', handleUnauthorized)
+    document.addEventListener('auth:forcelogout', handleUnauthorized)
     return () => {
       document.removeEventListener('auth:unauthorized', handleUnauthorized)
+      document.removeEventListener('auth:forcelogout', handleUnauthorized)
       if (unauthorizedTimerRef.current) clearTimeout(unauthorizedTimerRef.current)
     }
   }, [])

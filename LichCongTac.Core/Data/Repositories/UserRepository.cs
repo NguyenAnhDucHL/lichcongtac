@@ -348,8 +348,8 @@ namespace LichCongTac.Core.Data.Repositories
             cmd.Parameters.AddWithValue("@pn",    (object?)user.PhoneNumber ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@r",     (object?)user.Role ?? "Guest");
             cmd.Parameters.AddWithValue("@d",     (object?)user.DepartmentId ?? DBNull.Value);
-            // Tạo SecurityStamp mới mỗi khi thông tin user thay đổi (invalidate token cũ)
-            cmd.Parameters.AddWithValue("@stamp", Guid.NewGuid().ToString());
+            // Sử dụng SecurityStamp từ object để đồng bộ với Identity (tránh lỗi desync)
+            cmd.Parameters.AddWithValue("@stamp", string.IsNullOrEmpty(user.SecurityStamp) ? Guid.NewGuid().ToString() : user.SecurityStamp);
             cmd.Parameters.AddWithValue("@ph",    user.PasswordHash ?? "");
             cmd.Parameters.AddWithValue("@zalo",  (object?)user.ZaloId ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@notif", (object?)user.NotificationPreference ?? DBNull.Value);

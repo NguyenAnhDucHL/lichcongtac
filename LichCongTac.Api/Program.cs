@@ -146,7 +146,13 @@ builder.Services.AddAuthentication(x =>
         // Giúp mở file PDF an toàn bằng iframe/window.open không cần token trên URL
         OnMessageReceived = context =>
         {
-            if (context.Request.Cookies.TryGetValue("jwt_cookie", out var cookieToken))
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/appHub"))
+            {
+                context.Token = accessToken;
+            }
+            else if (context.Request.Cookies.TryGetValue("jwt_cookie", out var cookieToken))
             {
                 context.Token = cookieToken;
             }
@@ -198,16 +204,15 @@ builder.Services.AddAuthentication(x =>
                         cache.Set(cacheKey, cachedSecStamp, TimeSpan.FromMinutes(2));
                     }
 
-                    // VÔ HIỆU HÓA: Tạm thời tắt luồng kiểm tra SecurityStamp (chống đăng nhập nhiều nơi)
-                    // để tránh lỗi người dùng vừa đăng nhập đã bị văng ra (theo yêu cầu).
-                    // var tokenStamp = context.Principal?.FindFirst("sec_stamp")?.Value
-                    //               ?? context.Principal?.FindFirst("sid")?.Value; // fallback token cũ
+                    // KÍCH HOẠT: Kiểm tra SecurityStamp để ngăn chặn đăng nhập nhiều nơi (Enterprise feature)
+                    var tokenStamp = context.Principal?.FindFirst("sec_stamp")?.Value
+                                  ?? context.Principal?.FindFirst("sid")?.Value; // fallback token cũ
 
-                    // if (!string.IsNullOrEmpty(tokenStamp) && cachedSecStamp != tokenStamp)
-                    // {
-                    //     Console.WriteLine($"[AuthError] SecurityStamp không khớp → phiên đăng nhập bị vô hiệu hóa.");
-                    //     context.Fail("Phiên đăng nhập đã hết hạn hoặc tài khoản đã đăng nhập ở nơi khác.");
-                    // }
+                    if (!string.IsNullOrEmpty(tokenStamp) && cachedSecStamp != tokenStamp)
+                    {
+                        Console.WriteLine($"[AuthError] SecurityStamp không khớp → phiên đăng nhập bị vô hiệu hóa.");
+                        context.Fail("Phiên đăng nhập đã hết hạn hoặc tài khoản đã đăng nhập ở nơi khác.");
+                    }
                 }
             }
             catch (Exception ex)

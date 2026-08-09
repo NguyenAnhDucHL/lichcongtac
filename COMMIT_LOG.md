@@ -1,3 +1,13 @@
+### [2026-08-09 22:31] Fix password reset logic missing empty password check and sync SecurityStamp
+- **Mô tả**: Sửa lỗi chức năng cập nhật mật khẩu thất bại nhưng không báo lỗi. Nguyên nhân do `UserManager.AddPasswordAsync` từ chối cập nhật mật khẩu nếu `GetPasswordHashAsync` trả về không null. Giải pháp: Sử dụng trực tiếp `PasswordHasher.HashPassword` để hash thay vì qua `RemovePasswordAsync` và `AddPasswordAsync`. Đồng thời cập nhật `UserRepository` để lưu `SecurityStamp` từ object. Xử lý đồng bộ logout qua SignalR bằng cách ép các thiết bị khác đăng xuất.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/UsersController.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
+  - `LichCongTac.Api/Hubs/AppHub.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi đổi mật khẩu và đồng bộ trạng thái đăng xuất SignalR"`
 ### [2026-08-09 17:30] Sửa lỗi SignalR không kết nối lại sau khi đăng nhập khiến không nhận được sự kiện realtime
 - **Mô tả**: Khi người dùng (như Máy B) đăng nhập thành công, vì trang web sử dụng react-router không tải lại trang, nên component `SignalRContext` (vốn chỉ chạy 1 lần lúc đầu) tiếp tục sử dụng connection cũ với token bị lỗi/rỗng thay vì kết nối lại với token mới. Hậu quả là máy B không tham gia vào `Group` SignalR của user, dẫn đến việc không nhận được sự kiện ForceLogout khi có máy khác đăng nhập đè. Đã sửa bằng cách thêm biến `token` từ `AuthContext` vào dependency array của `useEffect` trong `SignalRContext`, để nó tự động disconnect và connect lại khi token thay đổi (ví dụ: sau khi đăng nhập thành công).
 - **Tệp thay đổi**:
