@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Menu } from 'lucide-react'
 
 const PUBLIC_NAV = [
-  { label: 'HOME', href: '/campha/' },
+  { label: 'TRANG CHỦ', href: '/campha/' },
   {
     label: 'QUẢN LÝ VĂN BẢN ĐIỀU HÀNH',
     href: 'https://congchuc.quangninh.gov.vn/sso/Login.aspx',

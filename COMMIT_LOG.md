@@ -1,3 +1,40 @@
+### [2026-08-09 17:30] Sửa lỗi SignalR không kết nối lại sau khi đăng nhập khiến không nhận được sự kiện realtime
+- **Mô tả**: Khi người dùng (như Máy B) đăng nhập thành công, vì trang web sử dụng react-router không tải lại trang, nên component `SignalRContext` (vốn chỉ chạy 1 lần lúc đầu) tiếp tục sử dụng connection cũ với token bị lỗi/rỗng thay vì kết nối lại với token mới. Hậu quả là máy B không tham gia vào `Group` SignalR của user, dẫn đến việc không nhận được sự kiện ForceLogout khi có máy khác đăng nhập đè. Đã sửa bằng cách thêm biến `token` từ `AuthContext` vào dependency array của `useEffect` trong `SignalRContext`, để nó tự động disconnect và connect lại khi token thay đổi (ví dụ: sau khi đăng nhập thành công).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): signalr reconnect khi token thay đổi để nhận force logout"`
+
+
+- **Mô tả**: Khi client khởi tạo kết nối SignalR, nó không tự gửi JWT token lên server. Đã cập nhật `SignalRContext.jsx` để gửi kèm token qua `accessTokenFactory`, đồng thời cấu hình `Program.cs` đọc token từ query string `access_token` để `AppHub` có thể định danh User và đưa vào đúng group `User_{userId}`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+  - `LichCongTac.Api/Hubs/AppHub.cs` (Thêm `[Authorize]`)
+- **Lệnh git commit**: `git commit -m "fix(auth): truyền token cho SignalR qua accessTokenFactory để hỗ trợ realtime force logout"`
+
+
+- **Mô tả**: Đổi `window.dispatchEvent` thành `document.dispatchEvent` trong `SignalRContext.jsx` để `AuthContext` có thể bắt được sự kiện và hiển thị đúng thông báo "Tài khoản của bạn vừa được đăng nhập trên thiết bị khác" thay vì thông báo mặc định.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi frontend không bắt được sự kiện ForceLogout từ SignalR do sai DOM target"`
+
+### [2026-08-09 16:58] Thêm tính năng đẩy (kick) thiết bị cũ realtime qua SignalR
+- **Mô tả**: Bổ sung tính năng Real-time Force Logout. Khi thiết bị B đăng nhập thành công, hệ thống lập tức gửi tín hiệu `ForceLogout` qua SignalR (`AppHub`) tới `User_{userId}`. Thiết bị A (đang sử dụng) sẽ nhận được sự kiện này ngay lập tức, kích hoạt luồng `handleUnauthorized` để văng tài khoản hoặc hiển thị modal báo "Tài khoản của bạn vừa được đăng nhập trên thiết bị khác" mà không cần đợi đến lúc thực hiện một thao tác API mới.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Hubs/AppHub.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/contexts/AuthContext.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(auth): thêm tính năng đẩy thiết bị cũ ra ngay lập tức realtime qua SignalR"`
+
+### [2026-08-09 16:45] Sửa lỗi SecurityStamp bị lệch và kích hoạt tính năng chống đăng nhập nhiều nơi (Enterprise)
+- **Mô tả**: Sửa lỗi ngầm trong `UserRepository.UpdateUser` liên tục tạo `SecurityStamp` mới mỗi khi gọi `UpdateUser` (làm đè luồng của Identity khiến `tokenStamp` bị lệch và đẩy người dùng ra ngay sau khi login). Đồng thời kích hoạt lại cấu hình kiểm tra `SecurityStamp` trong `Program.cs` để thiết lập tính năng bảo mật cấp độ Enterprise: Chỉ cho phép một phiên làm việc duy nhất trên cùng một tài khoản (khi thiết bị mới đăng nhập, thiết bị cũ sẽ bị vô hiệu hóa). Cập nhật `UsersController` tạo `SecurityStamp` mới khi Admin đổi quyền người dùng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/UsersController.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(auth): sửa lỗi lệch SecurityStamp và kích hoạt tính năng đăng nhập một phiên duy nhất"`
+
 ### [2026-08-08 08:45] Tối ưu hóa Database: Chống tấn công OOM (Tràn bộ nhớ)
 - **Mô tả**: Bổ sung `LIMIT` vào tất cả các truy vấn danh sách (Schedules, Notifications, Holidays) trong Repositories bằng ADO.NET. Việc này ngăn chặn tình trạng bảng dữ liệu phình to theo thời gian gây tràn bộ nhớ server khi tải về frontend mà không giới hạn.
 - **Tệp thay đổi**:
@@ -1197,3 +1234,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Core/Models/Notification.cs` (Sửa đổi)
   - `LichCongTac.Core/Data/Repositories/NotificationRepository.cs` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(notifications): add UpdatedAt column to track modification time"`
+
+### [2026-08-09 21:35] Fix SignalR context and Update UI Text
+- **Mô tả**: Xử lý triệt để lỗi race condition trong SignalR và bắt lỗi 401 Unauthorized khi reconnect để hiển thị modal đăng nhập lại; Đồng thời đổi nhãn menu "HOME" thành "TRANG CHỦ".
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/shared/components/PublicLayout.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): change HOME to TRANG CHỦ and fix signalr 401 reconnect"`

@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import * as signalR from '@microsoft/signalr'
 import PropTypes from 'prop-types'
+import { useAuth } from './AuthContext'
 
 const SignalRContext = createContext(null)
 
 export const SignalRProvider = ({ children }) => {
+  const { token } = useAuth()
   const [connection, setConnection] = useState(null)
   const [lastScheduleUpdate, setLastScheduleUpdate] = useState(Date.now())
   const [lastHolidayUpdate, setLastHolidayUpdate] = useState(Date.now())
@@ -16,6 +18,7 @@ export const SignalRProvider = ({ children }) => {
         .withUrl('/appHub', {
           skipNegotiation: true,
           transport: signalR.HttpTransportType.WebSockets,
+          accessTokenFactory: () => localStorage.getItem('auth_token')
         })
         .withAutomaticReconnect()
         .build()
@@ -32,6 +35,10 @@ export const SignalRProvider = ({ children }) => {
             console.log('SignalR Global: Holiday updated.')
             setLastHolidayUpdate(Date.now())
           })
+          newConnection.on('ForceLogout', (message) => {
+            console.log('SignalR Global: Received ForceLogout')
+            document.dispatchEvent(new CustomEvent('auth:forcelogout', { detail: { message } }))
+          })
         })
         .catch((e) => console.error('SignalR Global Connection Error: ', e))
 
@@ -45,7 +52,7 @@ export const SignalRProvider = ({ children }) => {
         newConnection.stop()
       }
     }
-  }, [])
+  }, [token])
 
   return (
     <SignalRContext.Provider value={{ connection, lastScheduleUpdate, lastHolidayUpdate }}>
