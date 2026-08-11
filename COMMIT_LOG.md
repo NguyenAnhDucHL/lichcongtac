@@ -1263,3 +1263,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): force zero margin on schedule content to fix spacing"`
+
+### [2026-08-11 10:48] Remove prose class from WorkSchedule
+- **Mô tả**: Bỏ hoàn toàn class `.prose` khỏi giao diện hiển thị Lịch Công Tác do `@tailwindcss/typography` tự động override line-height và margin. Sử dụng CSS thô (`[&_p]:m-0`) và thêm style cơ bản cho list để đoạn văn nội dung dính sát hoàn toàn lên dòng phía trên, giữ nguyên `leading-tight`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): remove prose to fix excessive spacing in schedule content"`

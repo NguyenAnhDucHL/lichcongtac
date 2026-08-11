@@ -79,7 +79,7 @@ function ScheduleItem({ item }) {
         )}
         {item.content && (
           <div
-            className="text-gray-900 prose dark:prose-invert prose-sm max-w-none [&_p]:!my-0 [&_ul]:!my-0 [&_ol]:!my-0 [&_li]:!my-0"
+            className="text-gray-900 mt-0.5 [&_p]:m-0 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-5 [&_ol]:ml-5 [&_li]:m-0"
             dangerouslySetInnerHTML={{ __html: item.content }}
           />
         )}
