@@ -63,7 +63,7 @@ function ScheduleItem({ item }) {
           {item.startTime.trim()}:
         </span>
       )}
-      <div className="font-medium font-['Times_New_Roman',_Times,_serif] text-[18px] leading-snug w-full text-justify">
+      <div className="font-medium font-['Times_New_Roman',_Times,_serif] text-[18px] leading-tight w-full text-justify">
         {item.invitationNumber && (
           <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>
         )}
@@ -79,7 +79,7 @@ function ScheduleItem({ item }) {
         )}
         {item.content && (
           <div
-            className="text-gray-900 prose dark:prose-invert prose-sm max-w-none prose-p:mt-1 prose-p:mb-1 prose-li:my-0"
+            className="text-gray-900 prose dark:prose-invert prose-sm max-w-none [&_p]:!my-0 [&_ul]:!my-0 [&_ol]:!my-0 [&_li]:!my-0"
             dangerouslySetInnerHTML={{ __html: item.content }}
           />
         )}

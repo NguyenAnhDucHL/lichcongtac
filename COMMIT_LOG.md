@@ -1257,3 +1257,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): reduce line height and spacing in work schedule"`
+
+### [2026-08-11 10:39] Aggressively reduce WorkSchedule margins
+- **Mô tả**: Fix lỗi dãn dòng quá rộng bằng cách force 0 margin cho tất cả các thẻ `<p>`, `<ul>`, `<ol>`, `<li>` bên trong `.prose` của nội dung lịch công tác bằng arbitrary variants của Tailwind. Giảm tiếp `leading-snug` thành `leading-tight`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): force zero margin on schedule content to fix spacing"`
