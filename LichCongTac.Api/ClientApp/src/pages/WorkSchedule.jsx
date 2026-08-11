@@ -17,8 +17,6 @@ const formatLocation = (loc) => {
   return s
 }
 
-
-
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
 
 const groupAndTransform = (arrayData) => {
@@ -65,18 +63,23 @@ function ScheduleItem({ item }) {
           {item.startTime.trim()}:
         </span>
       )}
-      <div className="font-medium font-['Times_New_Roman',_Times,_serif] text-[18px] leading-relaxed w-full text-justify">
+      <div className="font-medium font-['Times_New_Roman',_Times,_serif] text-[18px] leading-snug w-full text-justify">
         {item.invitationNumber && (
           <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>
         )}
         {item.location && (
           <span className="text-[#005f6b] font-bold mr-1 inline">
-            (Tại <span className="inline-html-content ml-1" dangerouslySetInnerHTML={{ __html: formatLocation(item.location) }} />)
+            (Tại{' '}
+            <span
+              className="inline-html-content ml-1"
+              dangerouslySetInnerHTML={{ __html: formatLocation(item.location) }}
+            />
+            )
           </span>
         )}
         {item.content && (
           <div
-            className="text-gray-900 prose dark:prose-invert prose-sm max-w-none"
+            className="text-gray-900 prose dark:prose-invert prose-sm max-w-none prose-p:mt-1 prose-p:mb-1 prose-li:my-0"
             dangerouslySetInnerHTML={{ __html: item.content }}
           />
         )}
@@ -127,7 +130,7 @@ export default function WorkSchedule() {
     scheduleService
       .getTodayHoliday()
       .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
-      .catch(() => { })
+      .catch(() => {})
   }, [lastHolidayUpdate])
 
   const todayData = scheduleData.find((d) => d.isToday) || {
@@ -152,7 +155,9 @@ export default function WorkSchedule() {
           <div className="flex justify-center py-20 px-4">
             <div className="bg-red-50 border border-red-200 text-red-600 px-6 py-4 rounded-md text-center max-w-lg shadow-sm">
               <p className="font-medium text-lg">{error}</p>
-              <p className="text-sm mt-2 text-red-500">Hệ thống có thể đang bảo trì hoặc mạng không ổn định.</p>
+              <p className="text-sm mt-2 text-red-500">
+                Hệ thống có thể đang bảo trì hoặc mạng không ổn định.
+              </p>
             </div>
           </div>
         ) : (
@@ -163,7 +168,7 @@ export default function WorkSchedule() {
                 {todayData.dayLabel}: ngày {todayData.date}
               </h3>
               {todayData.items.length > 0 ? (
-                <div className="space-y-3 px-4">
+                <div className="space-y-2 px-4">
                   {todayData.items.map((item, idx) => (
                     <ScheduleItem key={idx} item={item} />
                   ))}
@@ -183,7 +188,10 @@ export default function WorkSchedule() {
                           key={notif.id || idx}
                           className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0"
                         >
-                          <div className="prose dark:prose-invert max-w-none prose-sm" dangerouslySetInnerHTML={{ __html: notif.content }} />
+                          <div
+                            className="prose dark:prose-invert max-w-none prose-sm"
+                            dangerouslySetInnerHTML={{ __html: notif.content }}
+                          />
                         </div>
                       ))}
                     </div>
@@ -199,7 +207,7 @@ export default function WorkSchedule() {
                     <h3 className="text-[18px] md:text-[19px] font-bold text-[#1d5792] mb-4 text-center">
                       {day.dayLabel}, ngày {day.date}:
                     </h3>
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {day.items.map((item, i) => (
                         <ScheduleItem key={i} item={item} />
                       ))}

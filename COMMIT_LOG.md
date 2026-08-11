@@ -1251,3 +1251,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
   - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi)
   - `LichCongTac.Api/ClientApp/src/shared/components/PublicLayout.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): change HOME to TRANG CHỦ and fix signalr 401 reconnect"`
+
+### [2026-08-11 10:30] Reduce spacing in WorkSchedule UI
+- **Mô tả**: Giảm khoảng cách (dãn dòng) giữa các dòng trong lịch công tác. Đổi `leading-relaxed` thành `leading-snug`, giảm margin của các thẻ `<p>` bên trong `.prose` và giảm khoảng cách giữa các khối `space-y-3` thành `space-y-2` để giao diện trông gọn gàng hơn.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): reduce line height and spacing in work schedule"`
