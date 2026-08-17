@@ -1,3 +1,9 @@
+### [2026-08-17 23:20] Tự động dọn dẹp rác (images, file thừa) sau khi deploy
+- **Mô tả**: Bổ sung lệnh `docker image prune -f` vào script `deploy_to_vnpt.sh` để đảm bảo hệ thống tự động xóa các docker images cũ và các rác thải sinh ra trong quá trình build, tuân thủ quy tắc sạch sẽ môi trường deploy.
+- **Tệp thay đổi**:
+  - `deploy_to_vnpt.sh` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "chore(infra): add docker image prune to deploy script to clean up junk files"`
+
 ### [2026-08-17 23:12] Chuyển đổi phân trang Server-side cho tìm kiếm
 - **Mô tả**: Thay đổi chức năng tìm kiếm lịch công tác từ phân trang client-side sang server-side pagination do dữ liệu lớn. Thêm endpoint `/api/schedules/public-search` có hỗ trợ `page` và `pageSize`. Cập nhật `SearchSchedule.jsx` để fetch dữ liệu từng trang, khắc phục tình trạng bị gọi toàn bộ lịch sử khi tìm kiếm.
 - **Tệp thay đổi**:
