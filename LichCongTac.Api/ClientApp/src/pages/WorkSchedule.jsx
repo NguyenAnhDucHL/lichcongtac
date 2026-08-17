@@ -130,7 +130,7 @@ export default function WorkSchedule() {
     scheduleService
       .getTodayHoliday()
       .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
-      .catch(() => {})
+      .catch(() => { })
   }, [lastHolidayUpdate])
 
   const todayData = scheduleData.find((d) => d.isToday) || {

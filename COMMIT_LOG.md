@@ -1,3 +1,19 @@
+### [2026-08-17 23:12] Chuyển đổi phân trang Server-side cho tìm kiếm
+- **Mô tả**: Thay đổi chức năng tìm kiếm lịch công tác từ phân trang client-side sang server-side pagination do dữ liệu lớn. Thêm endpoint `/api/schedules/public-search` có hỗ trợ `page` và `pageSize`. Cập nhật `SearchSchedule.jsx` để fetch dữ liệu từng trang, khắc phục tình trạng bị gọi toàn bộ lịch sử khi tìm kiếm.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Interfaces/IScheduleRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/ScheduleRepository.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/services/schedule.service.js` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "perf(docs): chuyển tìm kiếm lịch công tác sang server-side pagination"`
+
+### [2026-08-12 19:50] Sửa lỗi realtime SignalR ở trang public bị chặn bởi Authorize
+- **Mô tả**: Trang Public (`/campha/`) không nhận được thông báo cập nhật lịch công tác qua SignalR (`ReceiveScheduleUpdate`) do client không truyền token (vì chưa đăng nhập), trong khi `AppHub` ở Backend lại cấu hình `[Authorize]`. Điều này dẫn đến kết nối WebSocket từ trang Public bị từ chối với lỗi 401 Unauthorized. Giải pháp: Gỡ bỏ thẻ `[Authorize]` trên class `AppHub` vì Hub này chỉ dùng để nhận broadcast event chung hoặc event theo `ConnectionId`, việc không đăng nhập vẫn an toàn (những người chưa đăng nhập không được add vào group `User_{userId}`).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Hubs/AppHub.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(notify): gỡ bỏ Authorize ở AppHub cho phép trang public kết nối SignalR"`
+
 ### [2026-08-09 22:31] Fix password reset logic missing empty password check and sync SecurityStamp
 - **Mô tả**: Sửa lỗi chức năng cập nhật mật khẩu thất bại nhưng không báo lỗi. Nguyên nhân do `UserManager.AddPasswordAsync` từ chối cập nhật mật khẩu nếu `GetPasswordHashAsync` trả về không null. Giải pháp: Sử dụng trực tiếp `PasswordHasher.HashPassword` để hash thay vì qua `RemovePasswordAsync` và `AddPasswordAsync`. Đồng thời cập nhật `UserRepository` để lưu `SecurityStamp` từ object. Xử lý đồng bộ logout qua SignalR bằng cách ép các thiết bị khác đăng xuất.
 - **Tệp thay đổi**:

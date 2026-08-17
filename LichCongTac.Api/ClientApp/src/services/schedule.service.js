@@ -11,5 +11,9 @@ export const scheduleService = {
     const query = params ? `?${new URLSearchParams(params).toString()}` : ''
     return apiClient(`/api/schedules/public-schedule${query}`)
   },
+  searchPublicSchedules: (params) => {
+    const query = params ? `?${new URLSearchParams(params).toString()}` : ''
+    return apiClient(`/api/schedules/public-search${query}`)
+  },
   getTodayHoliday: () => apiClient('/api/holidays/today'),
 }

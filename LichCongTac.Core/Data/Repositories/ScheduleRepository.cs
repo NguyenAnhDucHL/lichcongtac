@@ -109,6 +109,56 @@ namespace LichCongTac.Core.Data.Repositories
             return schedules;
         }
 
+        public async Task<(IEnumerable<Schedule> Items, int TotalCount)> SearchPaginatedAsync(string? startDate, string? endDate, string? keyword, int page, int pageSize, bool includeInternal = false)
+        {
+            var schedules = new List<Schedule>();
+            using var conn = new SqliteConnection(_connectionString);
+            await conn.OpenAsync();
+
+            string whereClause = "1=1";
+            if (!includeInternal)
+            {
+                whereClause += " AND IsPublic = 1";
+            }
+
+            using var cmd = conn.CreateCommand();
+            if (!string.IsNullOrEmpty(startDate))
+            {
+                whereClause += " AND Date >= @StartDate";
+                cmd.Parameters.AddWithValue("@StartDate", startDate);
+            }
+            if (!string.IsNullOrEmpty(endDate))
+            {
+                whereClause += " AND Date <= @EndDate";
+                cmd.Parameters.AddWithValue("@EndDate", endDate);
+            }
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                whereClause += " AND (LOWER(Content) LIKE @Keyword OR LOWER(Title) LIKE @Keyword OR LOWER(InvitationNumber) LIKE @Keyword)";
+                cmd.Parameters.AddWithValue("@Keyword", $"%{keyword.ToLower()}%");
+            }
+
+            using var countCmd = conn.CreateCommand();
+            countCmd.CommandText = $"SELECT COUNT(1) FROM Schedules WHERE {whereClause}";
+            foreach (SqliteParameter param in cmd.Parameters)
+            {
+                countCmd.Parameters.AddWithValue(param.ParameterName, param.Value);
+            }
+            int totalCount = Convert.ToInt32(await countCmd.ExecuteScalarAsync());
+
+            cmd.CommandText = $"SELECT Id, Title, Date, StartTime, Location, Content, InvitationNumber, Presider, PreparingUnit, Participants, IsPublic, CreatedAt, CreatedBy, UpdatedAt FROM Schedules WHERE {whereClause} ORDER BY Date DESC, StartTime DESC LIMIT @PageSize OFFSET @Offset";
+            cmd.Parameters.AddWithValue("@PageSize", pageSize);
+            cmd.Parameters.AddWithValue("@Offset", (page - 1) * pageSize);
+
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                schedules.Add(MapReaderToSchedule(reader));
+            }
+
+            return (schedules, totalCount);
+        }
+
         public async Task<Schedule?> GetByIdAsync(int id)
         {
             using var conn = new SqliteConnection(_connectionString);

@@ -48,6 +48,7 @@ export default function SearchSchedule() {
     return () => window.removeEventListener('resize', handler)
   }, [])
   const [results, setResults] = useState([])
+  const [totalCount, setTotalCount] = useState(0)
   const [searched, setSearched] = useState(false)
   const [loading, setLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -61,42 +62,46 @@ export default function SearchSchedule() {
       .catch(() => { })
   }, [lastHolidayUpdate])
 
-  const handleSearch = async (e) => {
-    e.preventDefault()
+  const fetchResults = async (page) => {
     setLoading(true)
-    setCurrentPage(1)
     try {
-      const params = {}
+      const params = { page, pageSize: PAGE_SIZE }
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
-      const raw = await scheduleService.getPublicSchedule(params)
-      let data = Array.isArray(raw) ? raw : raw?.data || []
-      if (keyword.trim()) {
-        const kw = keyword.trim().toLowerCase()
-        data = data.filter(
-          (item) =>
-            (item.content && item.content.toLowerCase().includes(kw)) ||
-            (item.title && item.title.toLowerCase().includes(kw)) ||
-            (item.invitationNumber && item.invitationNumber.toLowerCase().includes(kw))
-        )
-      }
-      data.sort((a, b) => {
-        const da = (a.date || '').split('T')[0]
-        const db = (b.date || '').split('T')[0]
-        return db > da ? 1 : db < da ? -1 : (b.startTime || '').localeCompare(a.startTime || '')
-      })
-      setResults(data)
+      if (keyword.trim()) params.keyword = keyword.trim()
+
+      const raw = await scheduleService.searchPublicSchedules(params)
+      const data = raw?.data || { items: [], totalCount: 0 }
+      setResults(data.items || [])
+      setTotalCount(data.totalCount || 0)
       setSearched(true)
     } catch {
       setResults([])
+      setTotalCount(0)
       setSearched(true)
     } finally {
       setLoading(false)
     }
   }
 
-  const totalPages = Math.max(1, Math.ceil(results.length / PAGE_SIZE))
-  const paginated = results.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (currentPage === 1) {
+      fetchResults(1)
+    } else {
+      setCurrentPage(1)
+    }
+  }
+
+  useEffect(() => {
+    if (searched) {
+      fetchResults(currentPage)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage])
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
+  const paginated = results
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1)
     .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
     .reduce((acc, p, idx, arr) => {
@@ -219,7 +224,7 @@ export default function SearchSchedule() {
         {searched && (
           <>
             <div className="text-gray-500 text-[14px] mb-2">
-              Danh sách lịch làm việc {results.length > 0 ? `(${results.length} kết quả)` : ''}
+              Danh sách lịch làm việc {totalCount > 0 ? `(${totalCount} kết quả)` : ''}
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[600px] border-collapse border border-gray-300 text-[15px]">
@@ -292,7 +297,7 @@ export default function SearchSchedule() {
               </table>
             </div>
             {/* Pagination */}
-            {results.length > PAGE_SIZE && (
+            {totalCount > PAGE_SIZE && (
               <div className="flex items-center justify-center gap-0.5 mt-4 text-xs flex-wrap">
                 {currentPage > 1 && (
                   <button

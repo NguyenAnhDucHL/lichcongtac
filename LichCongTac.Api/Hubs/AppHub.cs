@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace LichCongTac.Api.Hubs
 {
-    [Authorize]
     public class AppHub : Hub
     {
         // Hub methods can be added here if clients need to send messages to the server.

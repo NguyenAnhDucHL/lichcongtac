@@ -38,6 +38,14 @@ namespace LichCongTac.Api.Controllers
             return Ok(ApiResponse<IEnumerable<Schedule>>.Ok(schedules));
         }
 
+        [HttpGet("public-search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchPublicSchedules([FromQuery] string? startDate, [FromQuery] string? endDate, [FromQuery] string? keyword, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _scheduleRepository.SearchPaginatedAsync(startDate, endDate, keyword, page, pageSize, includeInternal: false);
+            return Ok(ApiResponse<object>.Ok(new { items = result.Items, totalCount = result.TotalCount }));
+        }
+
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllSchedules([FromQuery] string? startDate, [FromQuery] string? endDate)
