@@ -71,9 +71,11 @@ export default function SearchSchedule() {
       if (keyword.trim()) params.keyword = keyword.trim()
 
       const raw = await scheduleService.searchPublicSchedules(params)
-      const data = raw?.data || { items: [], totalCount: 0 }
-      setResults(data.items || [])
-      setTotalCount(data.totalCount || 0)
+      const items = raw?.items || []
+      const count = raw?.totalCount || 0
+      
+      setResults(items)
+      setTotalCount(count)
       setSearched(true)
     } catch {
       setResults([])

@@ -1291,3 +1291,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): remove prose to fix excessive spacing in schedule content"`
+### [2026-08-17 23:33] Fix UI rendering logic for SearchSchedule
+- **Mô tả**: Sửa lỗi trang Tìm kiếm không render dữ liệu (do parse sai response từ api).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi hiển thị kết quả tìm kiếm lịch công tác"`
