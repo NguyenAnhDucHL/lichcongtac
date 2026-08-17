@@ -1296,3 +1296,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi hiển thị kết quả tìm kiếm lịch công tác"`
+### [2026-08-17 23:39] Fix DatePicker overflow issue in SearchSchedule
+- **Mô tả**: Bỏ thuộc tính `overflow-hidden` ở thẻ form để popup DatePicker không bị cắt mất phần dưới.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): sửa lỗi popup lịch chọn ngày bị cắt lẹm ở trang tìm kiếm"`

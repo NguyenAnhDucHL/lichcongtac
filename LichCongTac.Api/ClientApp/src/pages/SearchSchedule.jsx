@@ -73,7 +73,7 @@ export default function SearchSchedule() {
       const raw = await scheduleService.searchPublicSchedules(params)
       const items = raw?.items || []
       const count = raw?.totalCount || 0
-      
+
       setResults(items)
       setTotalCount(count)
       setSearched(true)
@@ -120,7 +120,7 @@ export default function SearchSchedule() {
           <h2 className="text-[#1d5792] font-bold text-base mb-4">Tìm kiếm</h2>
           <form
             onSubmit={handleSearch}
-            className="flex flex-col gap-4 w-full max-w-[550px] overflow-hidden"
+            className="flex flex-col gap-4 w-full max-w-[550px]"
           >
             <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
               <label className="text-gray-700 font-medium md:w-[160px] shrink-0">
