@@ -1,3 +1,9 @@
+### [2026-08-19 10:41] Chỉnh sửa khoảng cách và ẩn thẻ p thừa trong UI Lịch
+- **Mô tả**: Khoảng cách giữa các ngày bị thưa do kết hợp margin (`mb-8`) và các dòng trắng sinh ra từ rich text editor (các thẻ `<p><br></p>` hoặc `<p></p>` rỗng ở cuối dòng do user bấm Enter). Đã giảm khoảng cách các ngày xuống `mb-5` và thêm rule Tailwind `[&_p:empty]:hidden [&_p:has(br:only-child)]:hidden` để tự động dọn dẹp khoảng trống thừa do user nhập lỗi.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): giảm khoảng cách giữa các ngày và ẩn dòng trắng thừa"`
+
 ### [2026-08-19 10:27] Fix lỗi trống dữ liệu ở trang 2 của AdminSchedules
 - **Mô tả**: Component `ScheduleTable` vẫn giữ logic cũ là tự động cắt mảng (slice) theo trang. Do dữ liệu trả về từ server đã là trang hiện tại rồi nên lúc sang trang 2, component lấy mảng 10 phần tử cắt từ index 10 đến 20 dẫn đến trống không. Đã thêm prop `serverSide={true}` truyền từ `AdminSchedules` xuống để tắt tính năng tự cắt mảng của `ScheduleTable`.
 - **Tệp thay đổi**:

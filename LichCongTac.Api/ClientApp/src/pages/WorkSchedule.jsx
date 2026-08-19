@@ -103,7 +103,7 @@ function ScheduleItem({ item }) {
         )}
         {item.content && (
           <div
-            className="text-gray-900 mt-0.5 [&_p]:m-0 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-5 [&_ol]:ml-5 [&_li]:m-0"
+            className="text-gray-900 mt-0.5 [&_p]:m-0 [&_p:empty]:hidden [&_p:has(br:only-child)]:hidden [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-5 [&_ol]:ml-5 [&_li]:m-0"
             dangerouslySetInnerHTML={{ __html: item.content }}
           />
         )}
@@ -360,8 +360,8 @@ export default function WorkSchedule() {
             <div className="bg-[#e6fbda] p-4 rounded-sm md:col-span-2">
               {upcoming.length > 0 ? (
                 upcoming.map((day, idx) => (
-                  <div key={idx} className="mb-8">
-                    <h3 className="text-[18px] md:text-[19px] font-bold text-[#1d5792] mb-4 text-center">
+                  <div key={idx} className="mb-5">
+                    <h3 className="text-[18px] md:text-[19px] font-bold text-[#1d5792] mb-3 text-center">
                       {day.dayLabel}, ngày {day.date}:
                     </h3>
                     <div className="space-y-2">
