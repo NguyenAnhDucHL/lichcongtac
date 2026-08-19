@@ -1,3 +1,9 @@
+### [2026-08-19 09:59] Bổ sung các trường hợp stale data còn thiếu
+- **Mô tả**: Sau lần fix đầu tiên, phát hiện thêm 3 trường hợp chưa được xử lý: (1) BFCache — iOS Safari và Mobile Chrome khôi phục trang từ cache khi nhấn Back, `visibilitychange` không fire nhưng `pageshow` với `persisted=true` sẽ bắt được; (2) Chuyển mạng WiFi→4G không qua trạng thái offline — thêm auto-retry 1 lần sau 3 giây khi fetch thất bại, chỉ hiện lỗi sau 2 lần thất bại; (3) UTC date parsing — thêm `parseDateStr()` xử lý đúng cả date string dạng `YYYY-MM-DD` lẫn ISO UTC `YYYY-MM-DDTHH:mm:ssZ`, tránh lệch ngày khi server trả timestamp có timezone.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(docs): bổ sung xử lý BFCache, retry mạng và UTC date parsing"`
+
 ### [2026-08-19 09:54] Fix dữ liệu bị đóng băng khi để app qua đêm
 - **Mô tả**: Khi người dùng để app mở qua đêm (điện thoại tắt màn hình), dữ liệu lịch công tác bị hiển thị sai ngày vì `groupAndTransform` dùng `new Date()` cứng tại thời điểm mount, không tự refresh khi ngày mới bắt đầu. Thêm 6 cơ chế bảo vệ: (1) SignalR push từ admin, (2) SignalR reconnect sau sleep/mất mạng, (3) `visibilitychange` khi quay lại tab/app, (4) `online` event khi mạng trở lại, (5) Midnight clock-tick lúc 0h01, (6) Fallback polling 30 phút. Tách `getTodayStr()` thành helper riêng để ngày luôn được tính tại thời điểm gọi.
 - **Tệp thay đổi**:

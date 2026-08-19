@@ -19,10 +19,27 @@ const formatLocation = (loc) => {
 
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
 
-// Helper luôn trả về ngày hôm nay thực tế (không bị đóng băng trong closure)
+// Helper luôn trả về ngày hôm nay theo giờ Việt Nam (GMT+7)
+// Dùng local time để match với server lưu date theo múi giờ địa phương
 const getTodayStr = () => {
   const today = new Date()
   return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+}
+
+// Parse date string từ server về local date string — xử lý cả 2 dạng:
+//   'YYYY-MM-DD'          → trả nguyên về
+//   'YYYY-MM-DDTHH:mm:ssZ' → chuyển sang local date theo múi giờ máy client
+const parseDateStr = (raw) => {
+  if (!raw) return null
+  const plain = raw.split('T')[0]   // lấy phần YYYY-MM-DD
+  // Nếu server trả dạng có timezone (Z hoặc +07:00), parse đúng về local
+  if (raw.includes('T')) {
+    const d = new Date(raw)
+    if (!isNaN(d.getTime())) {
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    }
+  }
+  return plain
 }
 
 const groupAndTransform = (arrayData) => {
@@ -30,7 +47,9 @@ const groupAndTransform = (arrayData) => {
   const grouped = {}
   arrayData.forEach((item) => {
     if (!item.date) return
-    const dateStr = item.date.split('T')[0]
+    // Dùng parseDateStr để xử lý đúng cả UTC ISO string lẫn plain YYYY-MM-DD
+    const dateStr = parseDateStr(item.date)
+    if (!dateStr) return
     if (!grouped[dateStr]) grouped[dateStr] = []
     grouped[dateStr].push(item)
   })
@@ -104,7 +123,7 @@ export default function WorkSchedule() {
   // Lưu ngày cuối cùng fetch để phát hiện khi ngày thay đổi qua đêm
   const lastFetchDateRef = useRef(null)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (isRetry = false) => {
     // Ghi nhận ngày đang fetch để phát hiện khi ngày đổi
     lastFetchDateRef.current = getTodayStr()
     try {
@@ -113,7 +132,15 @@ export default function WorkSchedule() {
       setScheduleData(groupAndTransform(Array.isArray(raw) ? raw : raw?.data || []))
     } catch (err) {
       console.error('Lỗi tải lịch:', err)
-      setError('Đang mất kết nối máy chủ, vui lòng thử lại sau...')
+      // Nếu lỗi mạng (chuyển WiFi→4G, mất sóng thoáng qua) → retry 1 lần sau 3s
+      // Không retry nếu đây đã là lần retry để tránh vòng lặp vô tận
+      if (!isRetry) {
+        console.log('[WorkSchedule] Fetch failed — retrying in 3s...')
+        setTimeout(() => fetchData(true), 3000)
+      } else {
+        // Sau 2 lần thất bại mới hiện thông báo lỗi
+        setError('Đang mất kết nối máy chủ, vui lòng thử lại sau...')
+      }
     } finally {
       setLoading(false)
     }
@@ -166,6 +193,20 @@ export default function WorkSchedule() {
     }
     window.addEventListener('online', handleOnline)
     return () => window.removeEventListener('online', handleOnline)
+  }, [fetchData])
+
+  // Cơ chế 4b: pageshow — BFCache (Back/Forward Cache trên iOS Safari & Mobile Chrome)
+  // visibilitychange KHÔNG fire khi trang được khôi phục từ BFCache → cần event riêng
+  useEffect(() => {
+    const handlePageShow = (e) => {
+      if (e.persisted) {
+        // e.persisted = true nghĩa là trang được restore từ BFCache, không phải load mới
+        console.log('[WorkSchedule] Restored from BFCache — refetching...')
+        fetchData()
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
   }, [fetchData])
 
   // Cơ chế 5: Midnight clock-tick — tự động đổi ngày lúc 0h00
