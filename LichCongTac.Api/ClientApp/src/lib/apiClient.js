@@ -13,14 +13,31 @@ export async function apiClient(url, options = {}) {
   }
 
   // Ensure credentials are sent (for HttpOnly cookies)
+  // AbortController timeout 15s — ngăn request treo vô hạn trên mạng 2G/Captive Portal
+  const timeoutMs = options.timeoutMs ?? 15000
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+
   const fetchOptions = {
     ...options,
     headers,
     credentials: options.credentials || 'include',
     cache: options.cache || 'no-store',
+    // Nếu caller đã truyền signal riêng thì dùng của caller, không override
+    signal: options.signal ?? controller.signal,
   }
 
-  let response = await fetch(url, fetchOptions)
+  let response
+  try {
+    response = await fetch(url, fetchOptions)
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('Yêu cầu quá thời gian chờ (timeout). Vui lòng kiểm tra kết nối mạng.')
+    }
+    throw err
+  } finally {
+    clearTimeout(timeoutId)
+  }
 
   // Xử lý 401: Thử refresh token (chỉ cho các API thông thường, không phải auth endpoints)
   if (response.status === 401) {

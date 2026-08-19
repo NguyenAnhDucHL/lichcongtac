@@ -128,39 +128,71 @@ export default function WorkSchedule() {
     isMountedRef.current = true
     return () => { isMountedRef.current = false }
   }, [])
+  // Race condition guard: mọi fetch được đánh số ID — response cũ hơn sẽ bị bỏ qua
+  const fetchIdRef = useRef(0)
+  // Deduplication: không start fetch mới khi đang có fetch chạy
+  const isFetchingRef = useRef(false)
 
-  const fetchData = useCallback(async (isRetry = false) => {
-    // Ghi nhận ngày đang fetch để phát hiện khi ngày đổi
+  const fetchData = useCallback(async (retryCount = 0) => {
+    // ━━ Deduplication: bỏ qua nếu đang có fetch chạy (tránh 3 trigger cùng lúc gây 3 request song song)
+    if (isFetchingRef.current && retryCount === 0) {
+      console.log('[WorkSchedule] Fetch already in progress, skipping duplicate trigger')
+      return
+    }
+
+    // ━━ Race condition guard: đánh dấu fetch này với ID duy nhất
+    const currentId = ++fetchIdRef.current
+    isFetchingRef.current = true
     lastFetchDateRef.current = getTodayStr()
+
+    let scheduleOk = false
     try {
       if (isMountedRef.current) setError(null)
       const raw = await scheduleService.getPublicSchedule()
+
+      // Chỉ cập nhật state nếu đây là fetch MỚI NHẤT (bỏ qua response lỗi thời)
+      if (fetchIdRef.current !== currentId) {
+        console.log('[WorkSchedule] Stale response discarded (newer fetch already resolved)')
+        return
+      }
       if (isMountedRef.current) {
         setScheduleData(groupAndTransform(Array.isArray(raw) ? raw : raw?.data || []))
+        scheduleOk = true
       }
     } catch (err) {
+      if (fetchIdRef.current !== currentId || !isMountedRef.current) return
+
       console.error('Lỗi tải lịch:', err)
-      if (!isMountedRef.current) return  // Component đã unmount, bỏ qua
-      // Nếu lỗi mạng (chuyển WiFi→4G, mất sóng thoáng qua) → retry 1 lần sau 3s
-      if (!isRetry) {
-        console.log('[WorkSchedule] Fetch failed — retrying in 3s...')
-        setTimeout(() => { if (isMountedRef.current) fetchData(true) }, 3000)
+      // ━━ Exponential backoff: 3s → 6s → 12s (ghìp đôi mỗi lần retry, tối đa 3 lần)
+      const MAX_RETRIES = 3
+      if (retryCount < MAX_RETRIES) {
+        const delay = 3000 * Math.pow(2, retryCount)  // 3s, 6s, 12s
+        console.log(`[WorkSchedule] Retry ${retryCount + 1}/${MAX_RETRIES} in ${delay}ms...`)
+        setTimeout(() => { if (isMountedRef.current) fetchData(retryCount + 1) }, delay)
       } else {
-        // Sau 2 lần thất bại mới hiện thông báo lỗi
         if (isMountedRef.current) setError('Đang mất kết nối máy chủ, vui lòng thử lại sau...')
       }
     } finally {
       if (isMountedRef.current) setLoading(false)
+      // Giải phóng lock chỉ khi đây là fetch hiện tại (không giải phóng nếu đã có fetch mới hơn)
+      if (fetchIdRef.current === currentId) isFetchingRef.current = false
     }
+
+    // Chỉ fetch notification/holiday khi lịch chính thành công — tránh gọi API thừa khi lỗi
+    if (!scheduleOk) return
     try {
       const notifRaw = await notificationService.getVisibleNotifications()
-      setNotifications(Array.isArray(notifRaw) ? notifRaw : notifRaw?.data || [])
+      if (isMountedRef.current) {
+        setNotifications(Array.isArray(notifRaw) ? notifRaw : notifRaw?.data || [])
+      }
     } catch {
       /* silent */
     }
     try {
       const hol = await scheduleService.getTodayHoliday()
-      setTodayHoliday(hol?.content ? hol : hol?.data || null)
+      if (isMountedRef.current) {
+        setTodayHoliday(hol?.content ? hol : hol?.data || null)
+      }
     } catch {
       /* silent */
     }

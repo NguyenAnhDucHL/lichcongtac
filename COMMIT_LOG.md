@@ -1,3 +1,10 @@
+### [2026-08-19 10:10] Fix lỗi enterprise-grade: race condition, timeout, deduplication, exponential backoff
+- **Mô tả**: Phân tích theo tiêu chuẩn hệ thống lớn (Facebook/YouTube), phát hiện 4 lỗ hổng: (1) Race condition — 3 trigger (visibilitychange + online + SignalR) cùng lúc tạo 3 fetch song song, response chậm nhất có thể ghi đè data mới hơn → thêm `fetchIdRef` để discard stale response; (2) Request deduplication — `isFetchingRef` ngăn fetch mới khi đã có fetch đang chạy; (3) Request timeout 15s — `AbortController` trong `apiClient.js` ngăn request treo vô hạn trên 2G/Captive Portal; (4) Exponential backoff — thay flat 3s thành 3s→6s→12s (tối đa 3 lần) tránh thundering herd khi server quá tải. Bonus: chỉ fetch notification/holiday khi lịch chính thành công.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi — thêm AbortController timeout 15s)
+- **Lệnh git commit**: `git commit -m "fix(docs): race condition, request timeout, dedup và exponential backoff"`
+
 ### [2026-08-19 10:03] Fix memory leak retry timeout và tối ưu polling cho người dùng nhiều tab
 - **Mô tả**: Hai fix quan trọng cho kịch bản người dùng PWA + nhiều tab: (1) Thêm `isMountedRef` guard để ngăn `setState` sau khi component unmount — tránh memory leak khi retry timeout 3s vẫn chạy sau khi user chuyển màn hình; (2) Polling 30 phút chỉ chạy khi `document.visibilityState === 'visible'` — tránh trường hợp 5-10 tab đều ẩn cùng poll song song lãng phí CPU và pin điện thoại.
 - **Tệp thay đổi**:
