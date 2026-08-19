@@ -111,9 +111,9 @@ export default function AdminSchedules() {
     setSelectedParticipants(
       item.participants
         ? item.participants
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean)
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
         : []
     )
     window.scrollTo({ top: 0, behavior: 'smooth' })

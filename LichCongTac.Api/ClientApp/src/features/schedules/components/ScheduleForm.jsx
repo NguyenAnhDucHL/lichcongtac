@@ -15,7 +15,6 @@ const LOCATIONS = [
   'Phòng tiếp công dân - Trụ sở HĐND và UBND phường',
 ]
 
-
 export function ScheduleForm({
   formData,
   setFormData,
@@ -138,7 +137,9 @@ export function ScheduleForm({
                 <RichTextEditor
                   minimal={true}
                   value={formData.department === 'Khác' ? '' : formData.department}
-                  onChange={(newContent) => setFormData((prev) => ({ ...prev, department: newContent }))}
+                  onChange={(newContent) =>
+                    setFormData((prev) => ({ ...prev, department: newContent }))
+                  }
                 />
               </div>
             </div>
@@ -192,7 +193,9 @@ export function ScheduleForm({
                 <RichTextEditor
                   minimal={true}
                   value={formData.location === 'Khác' ? '' : formData.location}
-                  onChange={(newContent) => setFormData((prev) => ({ ...prev, location: newContent }))}
+                  onChange={(newContent) =>
+                    setFormData((prev) => ({ ...prev, location: newContent }))
+                  }
                 />
               </div>
             </div>

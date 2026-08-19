@@ -2,7 +2,7 @@
 /* global Response */
 import React, { useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Toaster } from 'sonner'
+import { Toaster, toast } from 'sonner'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 import WorkSchedule from './pages/WorkSchedule.jsx'
@@ -43,6 +43,19 @@ document.addEventListener('auth:login_success', (e) => {
 document.addEventListener('auth:login_cancel', () => {
   isLoginModalOpen = false
   processRequestQueue(new Error('Canceled'))
+})
+
+// ─── Lắng nghe sự kiện mất mạng / có mạng ────────────────────────────────────
+window.addEventListener('offline', () => {
+  toast.error('Cảnh báo: Bạn đang mất kết nối mạng. Tuyệt đối không bấm Lưu dữ liệu lúc này!', {
+    duration: Infinity,
+    id: 'offline-toast',
+  })
+})
+
+window.addEventListener('online', () => {
+  toast.dismiss('offline-toast')
+  toast.success('Kết nối mạng đã khôi phục!')
 })
 
 // ─── Error Boundary ─────────────────────────────────────────────────────────

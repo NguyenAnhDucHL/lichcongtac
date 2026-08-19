@@ -27,7 +27,7 @@ import {
   Highlighter,
   Palette,
   Heading1,
-  Heading2
+  Heading2,
 } from 'lucide-react'
 
 // Custom FontSize extension
@@ -43,8 +43,8 @@ const FontSize = Extension.create({
         attributes: {
           fontSize: {
             default: null,
-            parseHTML: element => element.style.fontSize.replace(/['"]+/g, ''),
-            renderHTML: attributes => {
+            parseHTML: (element) => element.style.fontSize.replace(/['"]+/g, ''),
+            renderHTML: (attributes) => {
               if (!attributes.fontSize) return {}
               return { style: `font-size: ${attributes.fontSize}` }
             },
@@ -55,8 +55,14 @@ const FontSize = Extension.create({
   },
   addCommands() {
     return {
-      setFontSize: fontSize => ({ chain }) => chain().setMark('textStyle', { fontSize }).run(),
-      unsetFontSize: () => ({ chain }) => chain().setMark('textStyle', { fontSize: null }).run(),
+      setFontSize:
+        (fontSize) =>
+        ({ chain }) =>
+          chain().setMark('textStyle', { fontSize }).run(),
+      unsetFontSize:
+        () =>
+        ({ chain }) =>
+          chain().setMark('textStyle', { fontSize: null }).run(),
     }
   },
 })
@@ -76,12 +82,15 @@ const MenuBar = ({ editor, minimal }) => {
     return null
   }
 
-  const currentFontFamily = (editor.getAttributes('textStyle').fontFamily || "'Times New Roman', Times, serif").replace(/['"]+/g, '')
-  const activeFontFamily = FONT_FAMILIES.find(f => {
-    if (!f.value) return false
-    const primaryFont = f.value.replace(/['"]+/g, '').split(',')[0].trim()
-    return currentFontFamily.includes(primaryFont)
-  })?.value || "'Times New Roman', Times, serif"
+  const currentFontFamily = (
+    editor.getAttributes('textStyle').fontFamily || "'Times New Roman', Times, serif"
+  ).replace(/['"]+/g, '')
+  const activeFontFamily =
+    FONT_FAMILIES.find((f) => {
+      if (!f.value) return false
+      const primaryFont = f.value.replace(/['"]+/g, '').split(',')[0].trim()
+      return currentFontFamily.includes(primaryFont)
+    })?.value || "'Times New Roman', Times, serif"
 
   return (
     <div className="flex flex-wrap items-center gap-1 border-b p-1 bg-muted/50 rounded-t-md">
@@ -97,8 +106,10 @@ const MenuBar = ({ editor, minimal }) => {
         value={activeFontFamily}
         className="h-8 rounded-sm border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
       >
-        {FONT_FAMILIES.map(f => (
-          <option key={f.label} value={f.value}>{f.label}</option>
+        {FONT_FAMILIES.map((f) => (
+          <option key={f.label} value={f.value}>
+            {f.label}
+          </option>
         ))}
       </select>
 
@@ -135,10 +146,22 @@ const MenuBar = ({ editor, minimal }) => {
       {/* Headings - hide on minimal */}
       {!minimal && (
         <>
-          <Toggle size="sm" pressed={editor.isActive('heading', { level: 1 })} onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} aria-label="Tiêu đề 1" title="Tiêu đề lớn (H1)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive('heading', { level: 1 })}
+            onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+            aria-label="Tiêu đề 1"
+            title="Tiêu đề lớn (H1)"
+          >
             <Heading1 className="h-4 w-4" />
           </Toggle>
-          <Toggle size="sm" pressed={editor.isActive('heading', { level: 2 })} onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} aria-label="Tiêu đề 2" title="Tiêu đề vừa (H2)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive('heading', { level: 2 })}
+            onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            aria-label="Tiêu đề 2"
+            title="Tiêu đề vừa (H2)"
+          >
             <Heading2 className="h-4 w-4" />
           </Toggle>
           <div className="w-[1px] h-6 bg-border mx-1" />
@@ -146,25 +169,61 @@ const MenuBar = ({ editor, minimal }) => {
       )}
 
       {/* Formatting */}
-      <Toggle size="sm" pressed={editor.isActive('bold')} onPressedChange={() => editor.chain().focus().toggleBold().run()} aria-label="In đậm" title="In đậm (Ctrl+B)">
+      <Toggle
+        size="sm"
+        pressed={editor.isActive('bold')}
+        onPressedChange={() => editor.chain().focus().toggleBold().run()}
+        aria-label="In đậm"
+        title="In đậm (Ctrl+B)"
+      >
         <Bold className="h-4 w-4" />
       </Toggle>
-      <Toggle size="sm" pressed={editor.isActive('italic')} onPressedChange={() => editor.chain().focus().toggleItalic().run()} aria-label="In nghiêng" title="In nghiêng (Ctrl+I)">
+      <Toggle
+        size="sm"
+        pressed={editor.isActive('italic')}
+        onPressedChange={() => editor.chain().focus().toggleItalic().run()}
+        aria-label="In nghiêng"
+        title="In nghiêng (Ctrl+I)"
+      >
         <Italic className="h-4 w-4" />
       </Toggle>
-      <Toggle size="sm" pressed={editor.isActive('underline')} onPressedChange={() => editor.chain().focus().toggleUnderline().run()} aria-label="Gạch dưới" title="Gạch dưới (Ctrl+U)">
+      <Toggle
+        size="sm"
+        pressed={editor.isActive('underline')}
+        onPressedChange={() => editor.chain().focus().toggleUnderline().run()}
+        aria-label="Gạch dưới"
+        title="Gạch dưới (Ctrl+U)"
+      >
         <UnderlineIcon className="h-4 w-4" />
       </Toggle>
 
       {!minimal && (
         <>
-          <Toggle size="sm" pressed={editor.isActive('strike')} onPressedChange={() => editor.chain().focus().toggleStrike().run()} aria-label="Gạch ngang" title="Gạch ngang (Ctrl+Shift+S)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive('strike')}
+            onPressedChange={() => editor.chain().focus().toggleStrike().run()}
+            aria-label="Gạch ngang"
+            title="Gạch ngang (Ctrl+Shift+S)"
+          >
             <Strikethrough className="h-4 w-4" />
           </Toggle>
-          <Toggle size="sm" pressed={editor.isActive('subscript')} onPressedChange={() => editor.chain().focus().toggleSubscript().run()} aria-label="Chỉ số dưới" title="Chỉ số dưới">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive('subscript')}
+            onPressedChange={() => editor.chain().focus().toggleSubscript().run()}
+            aria-label="Chỉ số dưới"
+            title="Chỉ số dưới"
+          >
             <SubscriptIcon className="h-4 w-4" />
           </Toggle>
-          <Toggle size="sm" pressed={editor.isActive('superscript')} onPressedChange={() => editor.chain().focus().toggleSuperscript().run()} aria-label="Chỉ số trên" title="Chỉ số trên">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive('superscript')}
+            onPressedChange={() => editor.chain().focus().toggleSuperscript().run()}
+            aria-label="Chỉ số trên"
+            title="Chỉ số trên"
+          >
             <SuperscriptIcon className="h-4 w-4" />
           </Toggle>
           <div className="w-[1px] h-6 bg-border mx-1" />
@@ -174,16 +233,40 @@ const MenuBar = ({ editor, minimal }) => {
       {/* Alignment - hide on minimal */}
       {!minimal && (
         <>
-          <Toggle size="sm" pressed={editor.isActive({ textAlign: 'left' })} onPressedChange={() => editor.chain().focus().setTextAlign('left').run()} aria-label="Canh trái" title="Canh trái (Ctrl+Shift+L)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive({ textAlign: 'left' })}
+            onPressedChange={() => editor.chain().focus().setTextAlign('left').run()}
+            aria-label="Canh trái"
+            title="Canh trái (Ctrl+Shift+L)"
+          >
             <AlignLeft className="h-4 w-4" />
           </Toggle>
-          <Toggle size="sm" pressed={editor.isActive({ textAlign: 'center' })} onPressedChange={() => editor.chain().focus().setTextAlign('center').run()} aria-label="Canh giữa" title="Canh giữa (Ctrl+Shift+E)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive({ textAlign: 'center' })}
+            onPressedChange={() => editor.chain().focus().setTextAlign('center').run()}
+            aria-label="Canh giữa"
+            title="Canh giữa (Ctrl+Shift+E)"
+          >
             <AlignCenter className="h-4 w-4" />
           </Toggle>
-          <Toggle size="sm" pressed={editor.isActive({ textAlign: 'right' })} onPressedChange={() => editor.chain().focus().setTextAlign('right').run()} aria-label="Canh phải" title="Canh phải (Ctrl+Shift+R)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive({ textAlign: 'right' })}
+            onPressedChange={() => editor.chain().focus().setTextAlign('right').run()}
+            aria-label="Canh phải"
+            title="Canh phải (Ctrl+Shift+R)"
+          >
             <AlignRight className="h-4 w-4" />
           </Toggle>
-          <Toggle size="sm" pressed={editor.isActive({ textAlign: 'justify' })} onPressedChange={() => editor.chain().focus().setTextAlign('justify').run()} aria-label="Canh đều" title="Canh đều (Ctrl+Shift+J)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive({ textAlign: 'justify' })}
+            onPressedChange={() => editor.chain().focus().setTextAlign('justify').run()}
+            aria-label="Canh đều"
+            title="Canh đều (Ctrl+Shift+J)"
+          >
             <AlignJustify className="h-4 w-4" />
           </Toggle>
           <div className="w-[1px] h-6 bg-border mx-1" />
@@ -193,10 +276,22 @@ const MenuBar = ({ editor, minimal }) => {
       {/* Lists */}
       {!minimal && (
         <>
-          <Toggle size="sm" pressed={editor.isActive('bulletList')} onPressedChange={() => editor.chain().focus().toggleBulletList().run()} aria-label="Danh sách chấm" title="Danh sách chấm (Ctrl+Shift+8)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive('bulletList')}
+            onPressedChange={() => editor.chain().focus().toggleBulletList().run()}
+            aria-label="Danh sách chấm"
+            title="Danh sách chấm (Ctrl+Shift+8)"
+          >
             <List className="h-4 w-4" />
           </Toggle>
-          <Toggle size="sm" pressed={editor.isActive('orderedList')} onPressedChange={() => editor.chain().focus().toggleOrderedList().run()} aria-label="Danh sách số" title="Danh sách số (Ctrl+Shift+7)">
+          <Toggle
+            size="sm"
+            pressed={editor.isActive('orderedList')}
+            onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}
+            aria-label="Danh sách số"
+            title="Danh sách số (Ctrl+Shift+7)"
+          >
             <ListOrdered className="h-4 w-4" />
           </Toggle>
           <div className="w-[1px] h-6 bg-border mx-1" />
@@ -206,23 +301,31 @@ const MenuBar = ({ editor, minimal }) => {
       {/* Colors */}
       {!minimal && (
         <div className="flex items-center gap-1 px-1">
-          <label className="flex items-center gap-1 cursor-pointer hover:bg-muted p-1 rounded-sm" title="Màu chữ">
+          <label
+            className="flex items-center gap-1 cursor-pointer hover:bg-muted p-1 rounded-sm"
+            title="Màu chữ"
+          >
             <Palette className="h-4 w-4 text-muted-foreground" />
             <input
               type="color"
               className="w-5 h-5 p-0 border-0 cursor-pointer rounded-sm"
-              onInput={event => editor.chain().focus().setColor(event.target.value).run()}
+              onInput={(event) => editor.chain().focus().setColor(event.target.value).run()}
               value={editor.getAttributes('textStyle').color || '#000000'}
               title="Màu chữ"
             />
           </label>
 
-          <label className="flex items-center gap-1 cursor-pointer hover:bg-muted p-1 rounded-sm" title="Màu nền (Highlight)">
+          <label
+            className="flex items-center gap-1 cursor-pointer hover:bg-muted p-1 rounded-sm"
+            title="Màu nền (Highlight)"
+          >
             <Highlighter className="h-4 w-4 text-muted-foreground" />
             <input
               type="color"
               className="w-5 h-5 p-0 border-0 cursor-pointer rounded-sm"
-              onInput={event => editor.chain().focus().toggleHighlight({ color: event.target.value }).run()}
+              onInput={(event) =>
+                editor.chain().focus().toggleHighlight({ color: event.target.value }).run()
+              }
               title="Màu nền (Highlight)"
             />
           </label>
@@ -254,14 +357,11 @@ export function RichTextEditor({ value, onChange, minimal = false }) {
     content: value,
     editorProps: {
       attributes: {
-        class:
-          `prose dark:prose-invert prose-sm sm:prose-base focus:outline-none w-full max-w-none ${minimal ? 'min-h-[80px] p-2' : 'min-h-[200px] p-4'}`,
+        class: `prose dark:prose-invert prose-sm sm:prose-base focus:outline-none w-full max-w-none ${minimal ? 'min-h-[80px] p-2' : 'min-h-[200px] p-4'}`,
         style: 'font-family: "Times New Roman", Times, serif; font-size: 18px;',
       },
       transformPastedHTML(html) {
-        return html
-          .replace(/font-family\s*:[^;"]+;?/gi, '')
-          .replace(/font-size\s*:[^;"]+;?/gi, '')
+        return html.replace(/font-family\s*:[^;"]+;?/gi, '').replace(/font-size\s*:[^;"]+;?/gi, '')
       },
     },
     onUpdate: ({ editor }) => {

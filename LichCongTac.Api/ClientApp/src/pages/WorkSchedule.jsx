@@ -31,7 +31,7 @@ const getTodayStr = () => {
 //   'YYYY-MM-DDTHH:mm:ssZ' → chuyển sang local date theo múi giờ máy client
 const parseDateStr = (raw) => {
   if (!raw) return null
-  const plain = raw.split('T')[0]   // lấy phần YYYY-MM-DD
+  const plain = raw.split('T')[0] // lấy phần YYYY-MM-DD
   // Nếu server trả dạng có timezone (Z hoặc +07:00), parse đúng về local
   if (raw.includes('T')) {
     const d = new Date(raw)
@@ -81,15 +81,18 @@ const groupAndTransform = (arrayData) => {
 // --- Sub-components (local, small) ---
 function ScheduleItem({ item }) {
   // Cắt bỏ tận gốc các thẻ <p> rỗng (kể cả có chứa style/class), chứa space, <br> hoặc &nbsp; ở cuối nội dung do user gõ Enter thừa
-  let cleanContent = item.content || '';
-  let prev;
+  let cleanContent = item.content || ''
+  let prev
   do {
-    prev = cleanContent;
+    prev = cleanContent
     // Bắt các thẻ p rỗng chứa khoảng trắng, br, hoặc span rỗng
-    cleanContent = cleanContent.replace(/(<p[^>]*>(\s|&nbsp;|<br\s*\/?>|<span[^>]*>\s*<\/span>)*<\/p>\s*)+$/gi, '');
+    cleanContent = cleanContent.replace(
+      /(<p[^>]*>(\s|&nbsp;|<br\s*\/?>|<span[^>]*>\s*<\/span>)*<\/p>\s*)+$/gi,
+      ''
+    )
     // Bắt các thẻ br, nbsp thừa ở cuối cùng (bên ngoài hoặc bên trong thẻ p bị sót)
-    cleanContent = cleanContent.replace(/(<br\s*\/?>|&nbsp;|\s)+$/gi, '');
-  } while (cleanContent !== prev);
+    cleanContent = cleanContent.replace(/(<br\s*\/?>|&nbsp;|\s)+$/gi, '')
+  } while (cleanContent !== prev)
 
   return (
     <div className="flex gap-2">
@@ -137,7 +140,9 @@ export default function WorkSchedule() {
   const isMountedRef = useRef(true)
   useEffect(() => {
     isMountedRef.current = true
-    return () => { isMountedRef.current = false }
+    return () => {
+      isMountedRef.current = false
+    }
   }, [])
   // Race condition guard: mọi fetch được đánh số ID — response cũ hơn sẽ bị bỏ qua
   const fetchIdRef = useRef(0)
@@ -177,9 +182,11 @@ export default function WorkSchedule() {
       // ━━ Exponential backoff: 3s → 6s → 12s (ghìp đôi mỗi lần retry, tối đa 3 lần)
       const MAX_RETRIES = 3
       if (retryCount < MAX_RETRIES) {
-        const delay = 3000 * Math.pow(2, retryCount)  // 3s, 6s, 12s
+        const delay = 3000 * Math.pow(2, retryCount) // 3s, 6s, 12s
         console.log(`[WorkSchedule] Retry ${retryCount + 1}/${MAX_RETRIES} in ${delay}ms...`)
-        setTimeout(() => { if (isMountedRef.current) fetchData(retryCount + 1) }, delay)
+        setTimeout(() => {
+          if (isMountedRef.current) fetchData(retryCount + 1)
+        }, delay)
       } else {
         if (isMountedRef.current) setError('Đang mất kết nối máy chủ, vui lòng thử lại sau...')
       }
@@ -266,7 +273,8 @@ export default function WorkSchedule() {
       const now = new Date()
       // Tính số ms còn lại đến 00:01 ngày hôm sau (buffer 1 phút)
       const msToMidnight =
-        new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 1, 0).getTime() - now.getTime()
+        new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 1, 0).getTime() -
+        now.getTime()
       const timer = setTimeout(() => {
         console.log('[WorkSchedule] Midnight tick — refreshing for new day...')
         fetchData()
@@ -298,7 +306,7 @@ export default function WorkSchedule() {
     scheduleService
       .getTodayHoliday()
       .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
-      .catch(() => { })
+      .catch(() => {})
   }, [lastHolidayUpdate])
 
   const todayData = scheduleData.find((d) => d.isToday) || {

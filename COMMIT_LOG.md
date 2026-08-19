@@ -5,6 +5,17 @@
   - `deploy_to_vnpt.sh` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(infra): nén file ra tmp để không bị lỗi file changed as we read it"`
 
+### [2026-08-19 11:20] Sửa lỗi cấu trúc Enterprise: Thundering Herd, SignalR Retry, Offline Toast
+- **Mô tả**: Vá 3 lỗ hổng lớn về khả năng chịu lỗi của frontend:
+  1. `apiClient.js`: Thêm cơ chế Promise Lock queue khi xử lý Refresh Token (tránh Thundering Herd khi 401 nhiều request cùng lúc).
+  2. `SignalRContext.jsx`: Áp dụng `InfiniteRetryPolicy` (thử lại vô hạn định) thay vì bỏ cuộc sau 4 lần chập chờn mạng.
+  3. `main.jsx`: Lắng nghe sự kiện `offline`/`online` từ window để hiển thị Toast cảnh báo đỏ không cho người dùng bấm Lưu khi mất kết nối mạng.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/lib/apiClient.js` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(infra): vá lỗi kiến trúc enterprise cho apiClient, signalR và xử lý offline"`
+
 ### [2026-08-19 11:06] Sửa lỗi lệnh tar trong GitHub Actions gây crash "file changed as we read it"
 - **Mô tả**: Khi chạy lệnh `tar -czf deploy.tar.gz .` trên máy chủ Ubuntu của GitHub Actions (sử dụng GNU tar), công cụ nén đọc đụng đúng cái file `deploy.tar.gz` mà nó đang tạo ra, dẫn đến cảnh báo file thay đổi và trả về exit code 1 làm hỏng tiến trình deploy. Đã thêm `--exclude='deploy.tar.gz'` vào cả `deploy.yml` và `deploy_to_vnpt.sh` để khắc phục lỗi này.
 - **Tệp thay đổi**:

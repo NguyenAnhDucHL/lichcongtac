@@ -1,4 +1,18 @@
 /* global CustomEvent */
+let isRefreshing = false
+let failedQueue = []
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
 export async function apiClient(url, options = {}) {
   // Tự động thêm Content-Type: application/json khi body là JSON string
   const headers = { ...(options.headers || {}) }
@@ -47,6 +61,17 @@ export async function apiClient(url, options = {}) {
       throw new Error(errData.message || 'Sai tài khoản hoặc mật khẩu')
     }
 
+    if (isRefreshing) {
+      const newToken = await new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject })
+      })
+      if (!fetchOptions.headers) fetchOptions.headers = {}
+      fetchOptions.headers['Authorization'] = `Bearer ${newToken}`
+      return fetch(url, fetchOptions)
+    }
+
+    isRefreshing = true
+
     try {
       const refreshResponse = await fetch('/api/auth/refresh', {
         method: 'POST',
@@ -56,26 +81,33 @@ export async function apiClient(url, options = {}) {
       if (refreshResponse.ok) {
         // Gắn lại token nếu dùng header (dự phòng)
         const refreshData = await refreshResponse.json()
-        if (refreshData.data && refreshData.data.token) {
-          localStorage.setItem('auth_token', refreshData.data.token)
+        const newToken = refreshData.data?.token
+        if (newToken) {
+          localStorage.setItem('auth_token', newToken)
 
           if (!fetchOptions.headers) fetchOptions.headers = {}
-          fetchOptions.headers['Authorization'] = `Bearer ${refreshData.data.token}`
+          fetchOptions.headers['Authorization'] = `Bearer ${newToken}`
         }
+
+        processQueue(null, newToken)
 
         // Gọi lại request ban đầu
         response = await fetch(url, fetchOptions)
       } else {
+        processQueue(new Error('Session expired'))
         document.dispatchEvent(new CustomEvent('auth:unauthorized'))
         throw new Error('Session expired')
       }
     } catch (err) {
+      processQueue(err)
       // Chỉ bắn unauthorized nếu chưa bắn ở trên (tránh duplicate)
       if (err.message !== 'Session expired') {
         console.error('[Auth] Silent refresh failed', err)
         document.dispatchEvent(new CustomEvent('auth:unauthorized'))
       }
       throw err
+    } finally {
+      isRefreshing = false
     }
   }
 

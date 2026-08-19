@@ -14,14 +14,25 @@ export const SignalRProvider = ({ children }) => {
 
   useEffect(() => {
     let newConnection
+
+    const infiniteRetryPolicy = {
+      nextRetryDelayInMilliseconds: (retryContext) => {
+        if (retryContext.previousRetryCount === 0) return 0
+        if (retryContext.previousRetryCount === 1) return 2000
+        if (retryContext.previousRetryCount === 2) return 10000
+        if (retryContext.previousRetryCount === 3) return 30000
+        return 60000 // Thử lại vĩnh viễn mỗi 60s
+      },
+    }
+
     try {
       newConnection = new signalR.HubConnectionBuilder()
         .withUrl('/appHub', {
           skipNegotiation: true,
           transport: signalR.HttpTransportType.WebSockets,
-          accessTokenFactory: () => localStorage.getItem('auth_token')
+          accessTokenFactory: () => localStorage.getItem('auth_token'),
         })
-        .withAutomaticReconnect()
+        .withAutomaticReconnect(infiniteRetryPolicy)
         .build()
 
       // Khi SignalR reconnect thành công sau khi bị đứt (sleep mode, mất mạng)
@@ -62,7 +73,9 @@ export const SignalRProvider = ({ children }) => {
   }, [token])
 
   return (
-    <SignalRContext.Provider value={{ connection, lastScheduleUpdate, lastHolidayUpdate, lastReconnect }}>
+    <SignalRContext.Provider
+      value={{ connection, lastScheduleUpdate, lastHolidayUpdate, lastReconnect }}
+    >
       {children}
     </SignalRContext.Provider>
   )

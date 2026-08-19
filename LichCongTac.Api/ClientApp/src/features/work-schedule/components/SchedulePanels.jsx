@@ -9,7 +9,6 @@ const formatLocation = (loc) => {
   return s
 }
 
-
 /**
  * Renders a single schedule item row (time + content + location).
  */
@@ -28,7 +27,12 @@ export function ScheduleItem({ item }) {
           )}
           {item.location && (
             <span className="text-[#005f6b] font-bold mr-1 inline">
-              (Tại <span className="inline-html-content ml-1" dangerouslySetInnerHTML={{ __html: formatLocation(item.location) }} />)
+              (Tại{' '}
+              <span
+                className="inline-html-content ml-1"
+                dangerouslySetInnerHTML={{ __html: formatLocation(item.location) }}
+              />
+              )
             </span>
           )}
         </span>
@@ -80,7 +84,10 @@ export function TodayPanel({ displayToday, notifications }) {
                   key={notif.id || idx}
                   className="text-gray-800 text-[16px] leading-relaxed text-justify break-words content-render border-b border-gray-200 last:border-0 pb-3 last:pb-0"
                 >
-                  <div className="prose dark:prose-invert max-w-none prose-sm" dangerouslySetInnerHTML={{ __html: notif.content }} />
+                  <div
+                    className="prose dark:prose-invert max-w-none prose-sm"
+                    dangerouslySetInnerHTML={{ __html: notif.content }}
+                  />
                 </div>
               ))}
             </div>

@@ -256,10 +256,12 @@
 
 @layer utilities {
   .bg-sidebar-gradient {
-    background: linear-gradient(to bottom,
-        var(--color-sidebar-start),
-        var(--color-sidebar-mid),
-        var(--color-sidebar-end));
+    background: linear-gradient(
+      to bottom,
+      var(--color-sidebar-start),
+      var(--color-sidebar-mid),
+      var(--color-sidebar-end)
+    );
   }
 
   .glass-card {
@@ -275,10 +277,12 @@
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
     animation: shimmer-premium 2s infinite ease-out;
   }
 
@@ -308,7 +312,6 @@
 
 /* Prevent horizontal overflow on mobile */
 @media (max-width: 767px) {
-
   html,
   body {
     overflow-x: hidden;
@@ -359,10 +362,12 @@
 
   /* The header gradient stays for the brand area */
   [data-sidebar='sidebar'][data-mobile='true'] .bg-sidebar-gradient {
-    background: linear-gradient(to bottom,
-        var(--color-sidebar-start),
-        var(--color-sidebar-mid),
-        var(--color-sidebar-end)) !important;
+    background: linear-gradient(
+      to bottom,
+      var(--color-sidebar-start),
+      var(--color-sidebar-mid),
+      var(--color-sidebar-end)
+    ) !important;
   }
 }
 
@@ -396,11 +401,11 @@
   border-radius: var(--radius-xl);
 }
 
-.density-compact .glass-card>div:first-child {
+.density-compact .glass-card > div:first-child {
   padding: 1rem 1.25rem;
 }
 
-.density-compact .glass-card>div:nth-child(2) {
+.density-compact .glass-card > div:nth-child(2) {
   padding: 0.75rem 1.25rem;
 }
 
@@ -421,7 +426,6 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 }
-
 
 /* Marquee Animation for Holidays */
 @keyframes marquee {
@@ -454,8 +458,11 @@ input[type='time'].empty-date:focus::-webkit-datetime-edit {
 /* =============================================
    RICH TEXT EDITOR & CONTENT DEFAULT FONT
    ============================================= */
-.prose p, .prose div, .prose span, .prose li {
-  font-family: "Times New Roman", Times, serif !important;
+.prose p,
+.prose div,
+.prose span,
+.prose li {
+  font-family: 'Times New Roman', Times, serif !important;
   font-size: 18px !important;
   line-height: 1.6 !important;
   background-color: transparent !important;

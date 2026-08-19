@@ -1,7 +1,5 @@
 import { RichTextEditor } from '@/components/ui/rich-text-editor'
 
-
-
 export function NotificationForm({
   formData,
   setFormData,
@@ -11,8 +9,6 @@ export function NotificationForm({
   onSubmit,
   onReset,
 }) {
-
-
   const handleChange = (e) => {
     const { name, type, checked } = e.target
     setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : e.target.value }))

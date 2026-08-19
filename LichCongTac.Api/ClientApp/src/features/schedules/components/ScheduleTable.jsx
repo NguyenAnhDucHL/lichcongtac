@@ -25,7 +25,14 @@ const formatDateDisplay = (dateString) => {
   }
 }
 
-export function ScheduleTable({ schedules, currentPage, pageSize, onEdit, onDelete, serverSide = false }) {
+export function ScheduleTable({
+  schedules,
+  currentPage,
+  pageSize,
+  onEdit,
+  onDelete,
+  serverSide = false,
+}) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse border border-gray-200 text-center">
@@ -42,70 +49,72 @@ export function ScheduleTable({ schedules, currentPage, pageSize, onEdit, onDele
         </thead>
         <tbody>
           {schedules.length > 0 ? (
-            (serverSide ? schedules : schedules.slice((currentPage - 1) * pageSize, currentPage * pageSize))
-              .map((item, index) => {
-                const globalIndex = (currentPage - 1) * pageSize + index + 1
-                const dateInfo = formatDateDisplay(item.date)
-                return (
-                  <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="border border-gray-200 py-2.5 px-4 font-bold">{globalIndex}</td>
-                    <td className="border border-gray-200 py-2.5 px-4 leading-tight">
-                      <div>{dateInfo.dayName}</div>
-                      <div className="text-blue-700 font-bold">{dateInfo.date}</div>
-                    </td>
-                    <td className="border border-gray-200 py-2.5 px-4 text-left">
-                      <span className="text-red-600 font-bold mr-2">
-                        {item.startTime ? `${item.startTime}:` : ''}
-                      </span>
-                      <span>
-                        {item.invitationNumber && (
-                          <span className="text-[#005f6b] font-bold mr-1">
-                            {item.invitationNumber}
-                          </span>
-                        )}
-                        {item.location && (
-                          <span className="text-[#005f6b] font-bold mr-1">
-                            (Tại {extractTextFromHtml(item.location)})
-                          </span>
-                        )}
-                        <span className="text-gray-800">
-                          {item.content && ` ${extractTextFromHtml(item.content)} `}
+            (serverSide
+              ? schedules
+              : schedules.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+            ).map((item, index) => {
+              const globalIndex = (currentPage - 1) * pageSize + index + 1
+              const dateInfo = formatDateDisplay(item.date)
+              return (
+                <tr key={item.id} className="hover:bg-gray-50">
+                  <td className="border border-gray-200 py-2.5 px-4 font-bold">{globalIndex}</td>
+                  <td className="border border-gray-200 py-2.5 px-4 leading-tight">
+                    <div>{dateInfo.dayName}</div>
+                    <div className="text-blue-700 font-bold">{dateInfo.date}</div>
+                  </td>
+                  <td className="border border-gray-200 py-2.5 px-4 text-left">
+                    <span className="text-red-600 font-bold mr-2">
+                      {item.startTime ? `${item.startTime}:` : ''}
+                    </span>
+                    <span>
+                      {item.invitationNumber && (
+                        <span className="text-[#005f6b] font-bold mr-1">
+                          {item.invitationNumber}
                         </span>
+                      )}
+                      {item.location && (
+                        <span className="text-[#005f6b] font-bold mr-1">
+                          (Tại {extractTextFromHtml(item.location)})
+                        </span>
+                      )}
+                      <span className="text-gray-800">
+                        {item.content && ` ${extractTextFromHtml(item.content)} `}
                       </span>
-                    </td>
-                    <td className="border border-gray-200 py-2.5 px-4">
-                      {extractTextFromHtml(item.preparingUnit) || 'CƠ QUAN'}
-                    </td>
-                    <td className="border border-gray-200 py-2.5 px-4">
-                      {item.isPublic ? 'Có' : 'Không'}
-                    </td>
-                    <td className="border border-gray-200 py-2.5 px-4">
-                      <a
-                        href="#"
-                        className="text-[#337ab7] hover:underline"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          onEdit(item)
-                        }}
-                      >
-                        Sửa
-                      </a>
-                    </td>
-                    <td className="border border-gray-200 py-2.5 px-4">
-                      <a
-                        href="#"
-                        className="text-[#337ab7] hover:underline"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          onDelete(item.id)
-                        }}
-                      >
-                        Xóa
-                      </a>
-                    </td>
-                  </tr>
-                )
-              })
+                    </span>
+                  </td>
+                  <td className="border border-gray-200 py-2.5 px-4">
+                    {extractTextFromHtml(item.preparingUnit) || 'CƠ QUAN'}
+                  </td>
+                  <td className="border border-gray-200 py-2.5 px-4">
+                    {item.isPublic ? 'Có' : 'Không'}
+                  </td>
+                  <td className="border border-gray-200 py-2.5 px-4">
+                    <a
+                      href="#"
+                      className="text-[#337ab7] hover:underline"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        onEdit(item)
+                      }}
+                    >
+                      Sửa
+                    </a>
+                  </td>
+                  <td className="border border-gray-200 py-2.5 px-4">
+                    <a
+                      href="#"
+                      className="text-[#337ab7] hover:underline"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        onDelete(item.id)
+                      }}
+                    >
+                      Xóa
+                    </a>
+                  </td>
+                </tr>
+              )
+            })
           ) : (
             <tr>
               <td colSpan="7" className="border border-gray-200 py-4 text-gray-500">
