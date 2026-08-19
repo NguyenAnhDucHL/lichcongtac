@@ -1,3 +1,9 @@
+### [2026-08-19 10:46] Dùng Javascript Regex để cắt bỏ triệt để dòng trắng do CSS :has không tương thích
+- **Mô tả**: Rule CSS `[&_p:has(br:only-child)]` không hoạt động trên một số trình duyệt hoặc khi user nhập `<p>&nbsp;</p>`. Đã thay bằng Javascript Regex `cleanContent.replace(/(<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, '')` để quét và tiêu diệt mọi thẻ `<p>` rỗng ở cuối đoạn văn trước khi render HTML.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): dùng regex js thay vì css để cắt bỏ dòng trắng"`
+
 ### [2026-08-19 10:41] Chỉnh sửa khoảng cách và ẩn thẻ p thừa trong UI Lịch
 - **Mô tả**: Khoảng cách giữa các ngày bị thưa do kết hợp margin (`mb-8`) và các dòng trắng sinh ra từ rich text editor (các thẻ `<p><br></p>` hoặc `<p></p>` rỗng ở cuối dòng do user bấm Enter). Đã giảm khoảng cách các ngày xuống `mb-5` và thêm rule Tailwind `[&_p:empty]:hidden [&_p:has(br:only-child)]:hidden` để tự động dọn dẹp khoảng trống thừa do user nhập lỗi.
 - **Tệp thay đổi**:

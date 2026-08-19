@@ -80,6 +80,10 @@ const groupAndTransform = (arrayData) => {
 
 // --- Sub-components (local, small) ---
 function ScheduleItem({ item }) {
+  // Cắt bỏ tận gốc các thẻ <p> rỗng, chứa space, <br> hoặc &nbsp; ở cuối nội dung do user gõ Enter thừa
+  let cleanContent = item.content || ''
+  cleanContent = cleanContent.replace(/(<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, '')
+
   return (
     <div className="flex gap-2">
       {item.startTime?.trim() && (
@@ -101,10 +105,10 @@ function ScheduleItem({ item }) {
             )
           </span>
         )}
-        {item.content && (
+        {cleanContent && (
           <div
-            className="text-gray-900 mt-0.5 [&_p]:m-0 [&_p:empty]:hidden [&_p:has(br:only-child)]:hidden [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-5 [&_ol]:ml-5 [&_li]:m-0"
-            dangerouslySetInnerHTML={{ __html: item.content }}
+            className="text-gray-900 mt-0.5 [&_p]:m-0 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-5 [&_ol]:ml-5 [&_li]:m-0"
+            dangerouslySetInnerHTML={{ __html: cleanContent }}
           />
         )}
       </div>
