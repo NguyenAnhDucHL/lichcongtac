@@ -15,7 +15,8 @@ jobs:
       - name: Create deployment package
         run: |
           export COPYFILE_DISABLE=1
-          tar --exclude='deploy.tar.gz' --exclude='.git' --exclude='node_modules' --exclude='bin' --exclude='obj' --exclude='.env' --exclude='data_dump' --exclude='._*' -czf deploy.tar.gz .
+          tar --exclude='.git' --exclude='node_modules' --exclude='bin' --exclude='obj' --exclude='.env' --exclude='data_dump' --exclude='._*' -czf /tmp/deploy.tar.gz .
+          mv /tmp/deploy.tar.gz .
 
       - name: Copy deployment package to server
         uses: appleboy/scp-action@v0.1.7

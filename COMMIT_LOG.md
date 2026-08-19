@@ -1,3 +1,10 @@
+### [2026-08-19 11:08] Sửa triệt để lỗi "file changed as we read it" của GNU tar
+- **Mô tả**: Tham số `--exclude='deploy.tar.gz'` không hoạt động trên phiên bản GNU tar của GitHub Actions (do nó báo lỗi ngay từ khâu đọc danh sách file trong thư mục hiện tại trước khi kịp exclude). Đã sửa lỗi dứt điểm bằng cách nén và xuất file `deploy.tar.gz` ra thư mục tạm `/tmp` của hệ thống, sau đó dùng lệnh `mv` chuyển nó ngược về lại thư mục gốc để upload lên server.
+- **Tệp thay đổi**:
+  - `.github/workflows/deploy.yml` (Sửa đổi)
+  - `deploy_to_vnpt.sh` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(infra): nén file ra tmp để không bị lỗi file changed as we read it"`
+
 ### [2026-08-19 11:06] Sửa lỗi lệnh tar trong GitHub Actions gây crash "file changed as we read it"
 - **Mô tả**: Khi chạy lệnh `tar -czf deploy.tar.gz .` trên máy chủ Ubuntu của GitHub Actions (sử dụng GNU tar), công cụ nén đọc đụng đúng cái file `deploy.tar.gz` mà nó đang tạo ra, dẫn đến cảnh báo file thay đổi và trả về exit code 1 làm hỏng tiến trình deploy. Đã thêm `--exclude='deploy.tar.gz'` vào cả `deploy.yml` và `deploy_to_vnpt.sh` để khắc phục lỗi này.
 - **Tệp thay đổi**:
