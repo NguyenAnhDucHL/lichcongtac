@@ -1,3 +1,9 @@
+### [2026-08-19 10:03] Fix memory leak retry timeout và tối ưu polling cho người dùng nhiều tab
+- **Mô tả**: Hai fix quan trọng cho kịch bản người dùng PWA + nhiều tab: (1) Thêm `isMountedRef` guard để ngăn `setState` sau khi component unmount — tránh memory leak khi retry timeout 3s vẫn chạy sau khi user chuyển màn hình; (2) Polling 30 phút chỉ chạy khi `document.visibilityState === 'visible'` — tránh trường hợp 5-10 tab đều ẩn cùng poll song song lãng phí CPU và pin điện thoại.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(docs): ngăn memory leak retry timeout và tối ưu polling chỉ khi tab visible"`
+
 ### [2026-08-19 09:59] Bổ sung các trường hợp stale data còn thiếu
 - **Mô tả**: Sau lần fix đầu tiên, phát hiện thêm 3 trường hợp chưa được xử lý: (1) BFCache — iOS Safari và Mobile Chrome khôi phục trang từ cache khi nhấn Back, `visibilitychange` không fire nhưng `pageshow` với `persisted=true` sẽ bắt được; (2) Chuyển mạng WiFi→4G không qua trạng thái offline — thêm auto-retry 1 lần sau 3 giây khi fetch thất bại, chỉ hiện lỗi sau 2 lần thất bại; (3) UTC date parsing — thêm `parseDateStr()` xử lý đúng cả date string dạng `YYYY-MM-DD` lẫn ISO UTC `YYYY-MM-DDTHH:mm:ssZ`, tránh lệch ngày khi server trả timestamp có timezone.
 - **Tệp thay đổi**:

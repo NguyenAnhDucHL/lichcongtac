@@ -122,27 +122,35 @@ export default function WorkSchedule() {
   const { lastScheduleUpdate, lastHolidayUpdate, lastReconnect } = useAppSignalR()
   // Lưu ngày cuối cùng fetch để phát hiện khi ngày thay đổi qua đêm
   const lastFetchDateRef = useRef(null)
+  // Guard: ngăn setState sau khi component unmount (tránh memory leak từ retry timeout)
+  const isMountedRef = useRef(true)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => { isMountedRef.current = false }
+  }, [])
 
   const fetchData = useCallback(async (isRetry = false) => {
     // Ghi nhận ngày đang fetch để phát hiện khi ngày đổi
     lastFetchDateRef.current = getTodayStr()
     try {
-      setError(null)
+      if (isMountedRef.current) setError(null)
       const raw = await scheduleService.getPublicSchedule()
-      setScheduleData(groupAndTransform(Array.isArray(raw) ? raw : raw?.data || []))
+      if (isMountedRef.current) {
+        setScheduleData(groupAndTransform(Array.isArray(raw) ? raw : raw?.data || []))
+      }
     } catch (err) {
       console.error('Lỗi tải lịch:', err)
+      if (!isMountedRef.current) return  // Component đã unmount, bỏ qua
       // Nếu lỗi mạng (chuyển WiFi→4G, mất sóng thoáng qua) → retry 1 lần sau 3s
-      // Không retry nếu đây đã là lần retry để tránh vòng lặp vô tận
       if (!isRetry) {
         console.log('[WorkSchedule] Fetch failed — retrying in 3s...')
-        setTimeout(() => fetchData(true), 3000)
+        setTimeout(() => { if (isMountedRef.current) fetchData(true) }, 3000)
       } else {
         // Sau 2 lần thất bại mới hiện thông báo lỗi
-        setError('Đang mất kết nối máy chủ, vui lòng thử lại sau...')
+        if (isMountedRef.current) setError('Đang mất kết nối máy chủ, vui lòng thử lại sau...')
       }
     } finally {
-      setLoading(false)
+      if (isMountedRef.current) setLoading(false)
     }
     try {
       const notifRaw = await notificationService.getVisibleNotifications()
@@ -228,10 +236,13 @@ export default function WorkSchedule() {
     return () => clearTimeout(timer)
   }, [fetchData])
 
-  // Cơ chế 6: Fallback polling 30 phút — phòng khi tất cả trên đều fail
+  // Cơ chế 6: Fallback polling 30 phút — chỉ chạy khi tab ĐANG VISIBLE
+  // Tránh nhiều tab cùng poll song song lãng phí tài nguyên điện thoại
   useEffect(() => {
     const THIRTY_MINUTES = 30 * 60 * 1000
     const interval = setInterval(() => {
+      // Bỏ qua nếu tab đang ẩn — visibilitychange sẽ xử lý khi quay lại
+      if (document.visibilityState !== 'visible') return
       console.log('[WorkSchedule] Polling fallback — refetching...')
       fetchData()
     }, THIRTY_MINUTES)
