@@ -1,3 +1,10 @@
+### [2026-08-19 10:27] Fix lỗi trống dữ liệu ở trang 2 của AdminSchedules
+- **Mô tả**: Component `ScheduleTable` vẫn giữ logic cũ là tự động cắt mảng (slice) theo trang. Do dữ liệu trả về từ server đã là trang hiện tại rồi nên lúc sang trang 2, component lấy mảng 10 phần tử cắt từ index 10 đến 20 dẫn đến trống không. Đã thêm prop `serverSide={true}` truyền từ `AdminSchedules` xuống để tắt tính năng tự cắt mảng của `ScheduleTable`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/features/schedules/components/ScheduleTable.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(admin): lỗi rỗng bảng ở trang 2 do client tự cắt mảng"`
+
 ### [2026-08-19 10:23] Chuyển trang admin quản lý lịch sang server-side pagination
 - **Mô tả**: Trang `/manager/schedules` đang load toàn bộ 110+ bản ghi về client rồi mới phân trang JS (client-side). Chuyển sang server-side pagination tương tự trang public-search: thêm query params `page`, `pageSize`, `keyword` vào endpoint `GET /api/schedules`, tái dùng `SearchPaginatedAsync` đã có. Frontend `AdminSchedules.jsx` cập nhật dùng `getSchedulesPaginated()`, hiển thị đúng `totalCount` từ server, thêm ô tìm kiếm realtime với debounce 400ms. Sau khi xóa item cuối cùng của trang thì tự động quay về trang trước.
 - **Tệp thay đổi**:

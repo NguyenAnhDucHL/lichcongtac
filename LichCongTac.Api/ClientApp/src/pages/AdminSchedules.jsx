@@ -59,7 +59,7 @@ export default function AdminSchedules() {
     } catch (err) {
       console.error('Lỗi tải danh sách lịch:', err)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Search với debounce 400ms tránh gọi API mỗi ký tự
@@ -69,14 +69,14 @@ export default function AdminSchedules() {
       fetchSchedules(1, keyword)
     }, 400)
     return () => clearTimeout(timer)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyword])
 
   useEffect(() => {
     fetchSchedules(currentPage, keyword)
     adminService.getUsers().then((d) => setUsers(Array.isArray(d) ? d : d?.data || []))
     adminService.getDepartments().then((d) => setDepartments(Array.isArray(d) ? d : d?.data || []))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastScheduleUpdate])
 
   // Mount lần đầu
@@ -84,7 +84,7 @@ export default function AdminSchedules() {
     fetchSchedules(1, '')
     adminService.getUsers().then((d) => setUsers(Array.isArray(d) ? d : d?.data || []))
     adminService.getDepartments().then((d) => setDepartments(Array.isArray(d) ? d : d?.data || []))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleReset = () => {
@@ -111,9 +111,9 @@ export default function AdminSchedules() {
     setSelectedParticipants(
       item.participants
         ? item.participants
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean)
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
         : []
     )
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -220,6 +220,7 @@ export default function AdminSchedules() {
           schedules={schedules}
           currentPage={currentPage}
           pageSize={PAGE_SIZE}
+          serverSide={true}
           onEdit={handleEdit}
           onDelete={(id) => {
             setItemToDelete(id)

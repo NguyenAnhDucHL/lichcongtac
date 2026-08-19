@@ -25,7 +25,7 @@ const formatDateDisplay = (dateString) => {
   }
 }
 
-export function ScheduleTable({ schedules, currentPage, pageSize, onEdit, onDelete }) {
+export function ScheduleTable({ schedules, currentPage, pageSize, onEdit, onDelete, serverSide = false }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse border border-gray-200 text-center">
@@ -42,8 +42,7 @@ export function ScheduleTable({ schedules, currentPage, pageSize, onEdit, onDele
         </thead>
         <tbody>
           {schedules.length > 0 ? (
-            schedules
-              .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+            (serverSide ? schedules : schedules.slice((currentPage - 1) * pageSize, currentPage * pageSize))
               .map((item, index) => {
                 const globalIndex = (currentPage - 1) * pageSize + index + 1
                 const dateInfo = formatDateDisplay(item.date)
