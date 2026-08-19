@@ -1,3 +1,9 @@
+### [2026-08-19 11:00] Thêm luồng CI/CD GitHub Actions để tự động deploy
+- **Mô tả**: Dự án trước đây phải chạy script `deploy_to_vnpt.sh` bằng tay. Đã cấu hình thêm `deploy.yml` cho GitHub Actions sử dụng `appleboy/scp-action` và `appleboy/ssh-action`. Từ nay mỗi khi có code mới đẩy lên nhánh `main`, GitHub sẽ tự động nén mã nguồn và ném sang VNPT y như lệnh deploy tay.
+- **Tệp thay đổi**:
+  - `.github/workflows/deploy.yml` (Mới)
+- **Lệnh git commit**: `git commit -m "feat(infra): thêm github actions cicd tự động deploy lên vnpt"`
+
 ### [2026-08-19 10:52] Cập nhật thuật toán đệ quy cắt thẻ p rỗng chứa style
 - **Mô tả**: Regex cắt bỏ dòng trắng trước đó không bắt được các thẻ `<p>` có chứa attribute do Rich text editor sinh ra (như `<p style="..."><br></p>`). Đã thay thế bằng vòng lặp `while` đệ quy để lột bỏ tận gốc mọi thẻ `p` rỗng, thẻ `br`, thẻ `span` rỗng và khoảng trắng từ ngoài vào trong cho đến khi đoạn văn sạch sẽ.
 - **Tệp thay đổi**:

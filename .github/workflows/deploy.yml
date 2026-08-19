@@ -1,0 +1,41 @@
+name: Deploy to VNPT Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create deployment package
+        run: |
+          export COPYFILE_DISABLE=1
+          tar --exclude='.git' --exclude='node_modules' --exclude='bin' --exclude='obj' --exclude='.env' --exclude='data_dump' --exclude='._*' -czf deploy.tar.gz .
+
+      - name: Copy deployment package to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VNPT_HOST }}
+          username: ${{ secrets.VNPT_USER }}
+          password: ${{ secrets.VNPT_PASS }}
+          source: "deploy.tar.gz"
+          target: "/root/"
+
+      - name: Execute deployment script on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VNPT_HOST }}
+          username: ${{ secrets.VNPT_USER }}
+          password: ${{ secrets.VNPT_PASS }}
+          script: |
+            mkdir -p /root/lichcongtac
+            cd /root/lichcongtac
+            tar -xzf /root/deploy.tar.gz
+            docker compose -p lichcongtac up -d --build
+            docker image prune -f
+            rm /root/deploy.tar.gz
