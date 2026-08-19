@@ -10,6 +10,7 @@ export const SignalRProvider = ({ children }) => {
   const [connection, setConnection] = useState(null)
   const [lastScheduleUpdate, setLastScheduleUpdate] = useState(Date.now())
   const [lastHolidayUpdate, setLastHolidayUpdate] = useState(Date.now())
+  const [lastReconnect, setLastReconnect] = useState(null)
 
   useEffect(() => {
     let newConnection
@@ -22,6 +23,12 @@ export const SignalRProvider = ({ children }) => {
         })
         .withAutomaticReconnect()
         .build()
+
+      // Khi SignalR reconnect thành công sau khi bị đứt (sleep mode, mất mạng)
+      newConnection.onreconnected(() => {
+        console.log('SignalR Global: Reconnected after disconnect.')
+        setLastReconnect(Date.now())
+      })
 
       newConnection
         .start()
@@ -55,7 +62,7 @@ export const SignalRProvider = ({ children }) => {
   }, [token])
 
   return (
-    <SignalRContext.Provider value={{ connection, lastScheduleUpdate, lastHolidayUpdate }}>
+    <SignalRContext.Provider value={{ connection, lastScheduleUpdate, lastHolidayUpdate, lastReconnect }}>
       {children}
     </SignalRContext.Provider>
   )

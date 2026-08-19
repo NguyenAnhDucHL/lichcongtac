@@ -1,3 +1,10 @@
+### [2026-08-19 09:54] Fix dữ liệu bị đóng băng khi để app qua đêm
+- **Mô tả**: Khi người dùng để app mở qua đêm (điện thoại tắt màn hình), dữ liệu lịch công tác bị hiển thị sai ngày vì `groupAndTransform` dùng `new Date()` cứng tại thời điểm mount, không tự refresh khi ngày mới bắt đầu. Thêm 6 cơ chế bảo vệ: (1) SignalR push từ admin, (2) SignalR reconnect sau sleep/mất mạng, (3) `visibilitychange` khi quay lại tab/app, (4) `online` event khi mạng trở lại, (5) Midnight clock-tick lúc 0h01, (6) Fallback polling 30 phút. Tách `getTodayStr()` thành helper riêng để ngày luôn được tính tại thời điểm gọi.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+  - `LichCongTac.Api/ClientApp/src/contexts/SignalRContext.jsx` (Sửa đổi — thêm `onreconnected`, export `lastReconnect`)
+- **Lệnh git commit**: `git commit -m "fix(docs): sửa dữ liệu lịch bị đóng băng khi để app qua đêm"`
+
 ### [2026-08-17 23:20] Tự động dọn dẹp rác (images, file thừa) sau khi deploy
 - **Mô tả**: Bổ sung lệnh `docker image prune -f` vào script `deploy_to_vnpt.sh` để đảm bảo hệ thống tự động xóa các docker images cũ và các rác thải sinh ra trong quá trình build, tuân thủ quy tắc sạch sẽ môi trường deploy.
 - **Tệp thay đổi**:

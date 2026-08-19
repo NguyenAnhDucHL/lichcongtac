@@ -1,5 +1,5 @@
 /* global DOMParser */
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Loader2, Bell } from 'lucide-react'
 import { useAppSignalR } from '../contexts/SignalRContext'
 import { scheduleService } from '../services/schedule.service'
@@ -19,9 +19,14 @@ const formatLocation = (loc) => {
 
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
 
-const groupAndTransform = (arrayData) => {
+// Helper luôn trả về ngày hôm nay thực tế (không bị đóng băng trong closure)
+const getTodayStr = () => {
   const today = new Date()
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+}
+
+const groupAndTransform = (arrayData) => {
+  const todayStr = getTodayStr()
   const grouped = {}
   arrayData.forEach((item) => {
     if (!item.date) return
@@ -29,7 +34,7 @@ const groupAndTransform = (arrayData) => {
     if (!grouped[dateStr]) grouped[dateStr] = []
     grouped[dateStr].push(item)
   })
-  const maxDate = new Date()
+  const maxDate = new Date(todayStr + 'T00:00:00')
   maxDate.setDate(maxDate.getDate() + 7)
   const maxStr = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`
 
@@ -95,9 +100,13 @@ export default function WorkSchedule() {
   const [loading, setLoading] = useState(true)
   const [todayHoliday, setTodayHoliday] = useState(null)
   const [error, setError] = useState(null)
-  const { lastScheduleUpdate, lastHolidayUpdate } = useAppSignalR()
+  const { lastScheduleUpdate, lastHolidayUpdate, lastReconnect } = useAppSignalR()
+  // Lưu ngày cuối cùng fetch để phát hiện khi ngày thay đổi qua đêm
+  const lastFetchDateRef = useRef(null)
 
   const fetchData = useCallback(async () => {
+    // Ghi nhận ngày đang fetch để phát hiện khi ngày đổi
+    lastFetchDateRef.current = getTodayStr()
     try {
       setError(null)
       const raw = await scheduleService.getPublicSchedule()
@@ -122,11 +131,75 @@ export default function WorkSchedule() {
     }
   }, [])
 
+  // Lần mount đầu tiên
   useEffect(() => {
     fetchData()
-  }, [fetchData, lastScheduleUpdate])
+  }, [fetchData])
 
+  // Cơ chế 1: SignalR — admin sửa lịch → server push → fetch ngay
   useEffect(() => {
+    if (lastScheduleUpdate) fetchData()
+  }, [lastScheduleUpdate, fetchData])
+
+  // Cơ chế 2: SignalR reconnect sau sleep/mất mạng → fetch lại
+  useEffect(() => {
+    if (lastReconnect) fetchData()
+  }, [lastReconnect, fetchData])
+
+  // Cơ chế 3: visibilitychange — người dùng quay lại app/tab sau khi để qua đêm
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        // Luôn fetch lại khi quay lại, đặc biệt nếu ngày đã đổi
+        fetchData()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [fetchData])
+
+  // Cơ chế 4: online event — mạng bị mất rồi trở lại → fetch ngay
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('[WorkSchedule] Network online — refetching...')
+      fetchData()
+    }
+    window.addEventListener('online', handleOnline)
+    return () => window.removeEventListener('online', handleOnline)
+  }, [fetchData])
+
+  // Cơ chế 5: Midnight clock-tick — tự động đổi ngày lúc 0h00
+  useEffect(() => {
+    const scheduleMidnightRefresh = () => {
+      const now = new Date()
+      // Tính số ms còn lại đến 00:01 ngày hôm sau (buffer 1 phút)
+      const msToMidnight =
+        new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 1, 0).getTime() - now.getTime()
+      const timer = setTimeout(() => {
+        console.log('[WorkSchedule] Midnight tick — refreshing for new day...')
+        fetchData()
+        // Đặt lại timer cho ngày hôm sau
+        scheduleMidnightRefresh()
+      }, msToMidnight)
+      return timer
+    }
+    const timer = scheduleMidnightRefresh()
+    return () => clearTimeout(timer)
+  }, [fetchData])
+
+  // Cơ chế 6: Fallback polling 30 phút — phòng khi tất cả trên đều fail
+  useEffect(() => {
+    const THIRTY_MINUTES = 30 * 60 * 1000
+    const interval = setInterval(() => {
+      console.log('[WorkSchedule] Polling fallback — refetching...')
+      fetchData()
+    }, THIRTY_MINUTES)
+    return () => clearInterval(interval)
+  }, [fetchData])
+
+  // Holiday update từ SignalR
+  useEffect(() => {
+    if (!lastHolidayUpdate) return
     scheduleService
       .getTodayHoliday()
       .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
