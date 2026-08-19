@@ -1,3 +1,9 @@
+### [2026-08-19 10:52] Cập nhật thuật toán đệ quy cắt thẻ p rỗng chứa style
+- **Mô tả**: Regex cắt bỏ dòng trắng trước đó không bắt được các thẻ `<p>` có chứa attribute do Rich text editor sinh ra (như `<p style="..."><br></p>`). Đã thay thế bằng vòng lặp `while` đệ quy để lột bỏ tận gốc mọi thẻ `p` rỗng, thẻ `br`, thẻ `span` rỗng và khoảng trắng từ ngoài vào trong cho đến khi đoạn văn sạch sẽ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): đệ quy lột bỏ triệt để thẻ p rỗng chứa style cuối đoạn văn"`
+
 ### [2026-08-19 10:46] Dùng Javascript Regex để cắt bỏ triệt để dòng trắng do CSS :has không tương thích
 - **Mô tả**: Rule CSS `[&_p:has(br:only-child)]` không hoạt động trên một số trình duyệt hoặc khi user nhập `<p>&nbsp;</p>`. Đã thay bằng Javascript Regex `cleanContent.replace(/(<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, '')` để quét và tiêu diệt mọi thẻ `<p>` rỗng ở cuối đoạn văn trước khi render HTML.
 - **Tệp thay đổi**:

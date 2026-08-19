@@ -80,9 +80,16 @@ const groupAndTransform = (arrayData) => {
 
 // --- Sub-components (local, small) ---
 function ScheduleItem({ item }) {
-  // Cắt bỏ tận gốc các thẻ <p> rỗng, chứa space, <br> hoặc &nbsp; ở cuối nội dung do user gõ Enter thừa
-  let cleanContent = item.content || ''
-  cleanContent = cleanContent.replace(/(<p>(\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, '')
+  // Cắt bỏ tận gốc các thẻ <p> rỗng (kể cả có chứa style/class), chứa space, <br> hoặc &nbsp; ở cuối nội dung do user gõ Enter thừa
+  let cleanContent = item.content || '';
+  let prev;
+  do {
+    prev = cleanContent;
+    // Bắt các thẻ p rỗng chứa khoảng trắng, br, hoặc span rỗng
+    cleanContent = cleanContent.replace(/(<p[^>]*>(\s|&nbsp;|<br\s*\/?>|<span[^>]*>\s*<\/span>)*<\/p>\s*)+$/gi, '');
+    // Bắt các thẻ br, nbsp thừa ở cuối cùng (bên ngoài hoặc bên trong thẻ p bị sót)
+    cleanContent = cleanContent.replace(/(<br\s*\/?>|&nbsp;|\s)+$/gi, '');
+  } while (cleanContent !== prev);
 
   return (
     <div className="flex gap-2">
