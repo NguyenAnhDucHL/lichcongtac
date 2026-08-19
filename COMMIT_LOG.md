@@ -1,3 +1,10 @@
+### [2026-08-19 11:06] Sửa lỗi lệnh tar trong GitHub Actions gây crash "file changed as we read it"
+- **Mô tả**: Khi chạy lệnh `tar -czf deploy.tar.gz .` trên máy chủ Ubuntu của GitHub Actions (sử dụng GNU tar), công cụ nén đọc đụng đúng cái file `deploy.tar.gz` mà nó đang tạo ra, dẫn đến cảnh báo file thay đổi và trả về exit code 1 làm hỏng tiến trình deploy. Đã thêm `--exclude='deploy.tar.gz'` vào cả `deploy.yml` và `deploy_to_vnpt.sh` để khắc phục lỗi này.
+- **Tệp thay đổi**:
+  - `.github/workflows/deploy.yml` (Sửa đổi)
+  - `deploy_to_vnpt.sh` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(infra): loại trừ file nén khỏi lệnh tar để tránh lỗi file changed as we read it"`
+
 ### [2026-08-19 11:00] Thêm luồng CI/CD GitHub Actions để tự động deploy
 - **Mô tả**: Dự án trước đây phải chạy script `deploy_to_vnpt.sh` bằng tay. Đã cấu hình thêm `deploy.yml` cho GitHub Actions sử dụng `appleboy/scp-action` và `appleboy/ssh-action`. Từ nay mỗi khi có code mới đẩy lên nhánh `main`, GitHub sẽ tự động nén mã nguồn và ném sang VNPT y như lệnh deploy tay.
 - **Tệp thay đổi**:
