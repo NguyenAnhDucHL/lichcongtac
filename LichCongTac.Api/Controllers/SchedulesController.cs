@@ -48,8 +48,29 @@ namespace LichCongTac.Api.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllSchedules([FromQuery] string? startDate, [FromQuery] string? endDate)
+        public async Task<IActionResult> GetAllSchedules(
+            [FromQuery] string? startDate,
+            [FromQuery] string? endDate,
+            [FromQuery] string? keyword,
+            [FromQuery] int? page,
+            [FromQuery] int pageSize = 10)
         {
+            // Server-side pagination: nếu có page thì dùng SearchPaginatedAsync
+            if (page.HasValue)
+            {
+                var result = await _scheduleRepository.SearchPaginatedAsync(
+                    startDate, endDate, keyword, page.Value, pageSize, includeInternal: true);
+                return Ok(ApiResponse<object>.Ok(new
+                {
+                    items = result.Items,
+                    totalCount = result.TotalCount,
+                    page = page.Value,
+                    pageSize,
+                    totalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize)
+                }));
+            }
+
+            // Backward-compat: không có page → trả toàn bộ (LIMIT 1000)
             IEnumerable<Schedule> schedules;
             if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
             {

@@ -1,3 +1,11 @@
+### [2026-08-19 10:23] Chuyển trang admin quản lý lịch sang server-side pagination
+- **Mô tả**: Trang `/manager/schedules` đang load toàn bộ 110+ bản ghi về client rồi mới phân trang JS (client-side). Chuyển sang server-side pagination tương tự trang public-search: thêm query params `page`, `pageSize`, `keyword` vào endpoint `GET /api/schedules`, tái dùng `SearchPaginatedAsync` đã có. Frontend `AdminSchedules.jsx` cập nhật dùng `getSchedulesPaginated()`, hiển thị đúng `totalCount` từ server, thêm ô tìm kiếm realtime với debounce 400ms. Sau khi xóa item cuối cùng của trang thì tự động quay về trang trước.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi — thêm page/pageSize/keyword params)
+  - `LichCongTac.Api/ClientApp/src/services/admin.service.js` (Sửa đổi — thêm getSchedulesPaginated)
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi — server-side pagination + search)
+- **Lệnh git commit**: `git commit -m "feat(admin): chuyển trang quản lý lịch sang server-side pagination và thêm tìm kiếm"`
+
 ### [2026-08-19 10:10] Fix lỗi enterprise-grade: race condition, timeout, deduplication, exponential backoff
 - **Mô tả**: Phân tích theo tiêu chuẩn hệ thống lớn (Facebook/YouTube), phát hiện 4 lỗ hổng: (1) Race condition — 3 trigger (visibilitychange + online + SignalR) cùng lúc tạo 3 fetch song song, response chậm nhất có thể ghi đè data mới hơn → thêm `fetchIdRef` để discard stale response; (2) Request deduplication — `isFetchingRef` ngăn fetch mới khi đã có fetch đang chạy; (3) Request timeout 15s — `AbortController` trong `apiClient.js` ngăn request treo vô hạn trên 2G/Captive Portal; (4) Exponential backoff — thay flat 3s thành 3s→6s→12s (tối đa 3 lần) tránh thundering herd khi server quá tải. Bonus: chỉ fetch notification/holiday khi lịch chính thành công.
 - **Tệp thay đổi**:

@@ -34,26 +34,58 @@ export default function AdminSchedules() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [keyword, setKeyword] = useState('')
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
   const PAGE_SIZE = 10
 
-  const fetchSchedules = useCallback(async () => {
+  const fetchSchedules = useCallback(async (page = 1, kw = keyword) => {
     try {
-      const data = await adminService.getSchedules()
-      setSchedules(Array.isArray(data) ? data : data?.data || [])
+      const data = await adminService.getSchedulesPaginated(page, PAGE_SIZE, kw)
+      // Server trả về { items, totalCount, page, pageSize, totalPages }
+      if (data && 'items' in data) {
+        setSchedules(Array.isArray(data.items) ? data.items : [])
+        setTotalCount(data.totalCount ?? 0)
+        setTotalPages(data.totalPages ?? 1)
+        setCurrentPage(data.page ?? page)
+      } else {
+        // Fallback backward-compat nếu server trả array thẳng
+        setSchedules(Array.isArray(data) ? data : data?.data || [])
+      }
     } catch (err) {
       console.error('Lỗi tải danh sách lịch:', err)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Search với debounce 400ms tránh gọi API mỗi ký tự
   useEffect(() => {
-    fetchSchedules()
+    const timer = setTimeout(() => {
+      setCurrentPage(1)
+      fetchSchedules(1, keyword)
+    }, 400)
+    return () => clearTimeout(timer)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [keyword])
+
+  useEffect(() => {
+    fetchSchedules(currentPage, keyword)
     adminService.getUsers().then((d) => setUsers(Array.isArray(d) ? d : d?.data || []))
     adminService.getDepartments().then((d) => setDepartments(Array.isArray(d) ? d : d?.data || []))
-  }, [fetchSchedules, lastScheduleUpdate])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastScheduleUpdate])
+
+  // Mount lần đầu
+  useEffect(() => {
+    fetchSchedules(1, '')
+    adminService.getUsers().then((d) => setUsers(Array.isArray(d) ? d : d?.data || []))
+    adminService.getDepartments().then((d) => setDepartments(Array.isArray(d) ? d : d?.data || []))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleReset = () => {
     setEditId(null)
@@ -119,7 +151,7 @@ export default function AdminSchedules() {
         toast.success('Thêm lịch công tác thành công!')
       }
       handleReset()
-      fetchSchedules()
+      fetchSchedules(currentPage, keyword)
     } catch (err) {
       setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
@@ -133,7 +165,9 @@ export default function AdminSchedules() {
     try {
       await adminService.deleteSchedule(itemToDelete)
       toast.success('Xóa lịch công tác thành công!')
-      fetchSchedules()
+      // Sau khi xóa: nếu trang hiện tại chỉ còn 1 item thì quay về trang trước
+      const newPage = schedules.length === 1 && currentPage > 1 ? currentPage - 1 : currentPage
+      fetchSchedules(newPage, keyword)
     } catch (e) {
       toast.error(e.message || 'Xóa thất bại')
     } finally {
@@ -164,13 +198,22 @@ export default function AdminSchedules() {
           onReset={handleReset}
         />
 
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-2 gap-4">
           <span className="text-gray-500 text-[15px]">
-            Danh sách lịch làm việc ({schedules.length} bản ghi)
+            Danh sách lịch làm việc ({totalCount} bản ghi)
           </span>
-          <span className="text-gray-400 text-xs">
-            Trang {currentPage}/{Math.max(1, Math.ceil(schedules.length / PAGE_SIZE))}
-          </span>
+          <div className="flex items-center gap-3">
+            <input
+              type="text"
+              placeholder="Tìm kiếm..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              className="border border-gray-300 rounded px-2 py-1 text-sm w-44 focus:outline-none focus:border-blue-400"
+            />
+            <span className="text-gray-400 text-xs whitespace-nowrap">
+              Trang {currentPage}/{totalPages}
+            </span>
+          </div>
         </div>
 
         <ScheduleTable
@@ -186,8 +229,11 @@ export default function AdminSchedules() {
 
         <SchedulePagination
           currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          totalItems={schedules.length}
+          setCurrentPage={(p) => {
+            setCurrentPage(p)
+            fetchSchedules(p, keyword)
+          }}
+          totalItems={totalCount}
           pageSize={PAGE_SIZE}
         />
       </main>

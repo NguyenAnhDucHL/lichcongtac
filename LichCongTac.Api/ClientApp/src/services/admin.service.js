@@ -48,6 +48,11 @@ export const adminService = {
 
   // Schedules
   getSchedules: () => apiClient('/api/schedules'),
+  getSchedulesPaginated: (page = 1, pageSize = 10, keyword = '') => {
+    const params = new URLSearchParams({ page, pageSize })
+    if (keyword) params.append('keyword', keyword)
+    return apiClient(`/api/schedules?${params.toString()}`)
+  },
   createSchedule: (data) =>
     apiClient('/api/schedules', {
       method: 'POST',
