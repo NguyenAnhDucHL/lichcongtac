@@ -22,6 +22,18 @@ const EMPTY_FORM = {
   updatedAt: '',
 }
 
+const cleanHtmlContent = (html) => {
+  if (!html) return ''
+  let result = html
+  const emptyParagraphRegex = /^(\s*<p[^>]*>(\s|&nbsp;|<br>|<\/?span[^>]*>)*<\/p>\s*)+|(\s*<p[^>]*>(\s|&nbsp;|<br>|<\/?span[^>]*>)*<\/p>\s*)+$/gi
+  let prev = ''
+  while (result !== prev) {
+    prev = result
+    result = result.replace(emptyParagraphRegex, '')
+  }
+  return result.trim()
+}
+
 export default function AdminSchedules() {
   const { lastScheduleUpdate } = useAppSignalR()
 
@@ -111,9 +123,9 @@ export default function AdminSchedules() {
     setSelectedParticipants(
       item.participants
         ? item.participants
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean)
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean)
         : []
     )
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -121,7 +133,11 @@ export default function AdminSchedules() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const plainContent = (formData.content || '').replace(/<[^>]*>?/gm, '').trim()
+
+    const cleanedContent = cleanHtmlContent(formData.content)
+    const cleanedInvitationNumber = (formData.invitationNumber || '').trim()
+
+    const plainContent = cleanedContent.replace(/<[^>]*>?/gm, '').trim()
     if (!plainContent) {
       setError('Vui lòng nhập Nội dung chi tiết')
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -132,11 +148,11 @@ export default function AdminSchedules() {
     try {
       const payload = {
         title: plainContent.substring(0, 50) || 'Lịch công tác',
-        invitationNumber: formData.invitationNumber,
+        invitationNumber: cleanedInvitationNumber,
         date: formData.dateStr,
         startTime: formData.timeStr,
         location: formData.location,
-        content: formData.content,
+        content: cleanedContent,
         presider: formData.presider,
         preparingUnit: formData.department,
         participants: selectedParticipants.join(', '),

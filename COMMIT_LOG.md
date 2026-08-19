@@ -1391,3 +1391,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): sửa lỗi popup lịch chọn ngày bị cắt lẹm ở trang tìm kiếm"`
+### [2026-08-19 15:23] Trim whitespace for Giấy mời số and remove trailing/leading empty lines in Nội dung chi tiết
+- **Mô tả**: Khi người dùng nhập liệu form Quản trị lịch, đôi khi họ vô tình nhập thừa khoảng trắng ở Giấy mời số hoặc để lại dòng trống ở Nội dung chi tiết. Thêm logic xóa khoảng trắng và dòng trống ở đầu/cuối của 2 trường này trước khi submit.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(admin): tự động trim Giấy mời số và xóa dòng trống trong Nội dung chi tiết"`
