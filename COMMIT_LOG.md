@@ -1,3 +1,9 @@
+### [2026-08-21 01:25] Thêm dấu gạch ngang ngăn cách lịch hôm nay và ngày mai trên mobile
+- **Mô tả**: Bổ sung thẻ hr kèm khoảng cách (margin) chỉ hiển thị trên giao diện mobile (md:hidden) để ngăn cách rõ ràng giữa phần lịch công tác hôm nay và các ngày sắp tới, giúp giao diện dễ nhìn hơn.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): thêm dấu gạch ngang ngăn cách lịch hôm nay và ngày mai trên mobile"`
+
 ### [2026-08-19 11:08] Sửa triệt để lỗi "file changed as we read it" của GNU tar
 - **Mô tả**: Tham số `--exclude='deploy.tar.gz'` không hoạt động trên phiên bản GNU tar của GitHub Actions (do nó báo lỗi ngay từ khâu đọc danh sách file trong thư mục hiện tại trước khi kịp exclude). Đã sửa lỗi dứt điểm bằng cách nén và xuất file `deploy.tar.gz` ra thư mục tạm `/tmp` của hệ thống, sau đó dùng lệnh `mv` chuyển nó ngược về lại thư mục gốc để upload lên server.
 - **Tệp thay đổi**:

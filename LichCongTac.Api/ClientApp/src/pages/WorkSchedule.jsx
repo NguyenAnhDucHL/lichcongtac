@@ -306,7 +306,7 @@ export default function WorkSchedule() {
     scheduleService
       .getTodayHoliday()
       .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
-      .catch(() => {})
+      .catch(() => { })
   }, [lastHolidayUpdate])
 
   const todayData = scheduleData.find((d) => d.isToday) || {
@@ -374,6 +374,10 @@ export default function WorkSchedule() {
                   </div>
                 </div>
               )}
+            </div>
+            {/* Separator for mobile between Today and Upcoming */}
+            <div className="md:hidden w-full px-4 my-4">
+              <hr className="border-t border-gray-200" />
             </div>
             {/* Right: Upcoming */}
             <div className="bg-[#e6fbda] p-4 rounded-sm md:col-span-2">
