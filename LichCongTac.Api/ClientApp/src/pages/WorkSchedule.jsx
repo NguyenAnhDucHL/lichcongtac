@@ -67,7 +67,7 @@ const groupAndTransform = (arrayData) => {
       return {
         isToday,
         originalDate: dateStr,
-        dayLabel: isToday ? 'Hôm nay' : DAYS[d.getDay()],
+        dayLabel: isToday ? `Hôm nay: ${DAYS[d.getDay()]}` : DAYS[d.getDay()],
         date: dateStr.split('-').reverse().join('/'),
         items: grouped[dateStr].sort((a, b) => {
           const timeCmp = (a.startTime || '').localeCompare(b.startTime || '')
@@ -310,7 +310,7 @@ export default function WorkSchedule() {
   }, [lastHolidayUpdate])
 
   const todayData = scheduleData.find((d) => d.isToday) || {
-    dayLabel: 'Hôm nay',
+    dayLabel: `Hôm nay: ${DAYS[new Date().getDay()]}`,
     date: new Date().toLocaleDateString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
@@ -341,7 +341,7 @@ export default function WorkSchedule() {
             {/* Left: Today */}
             <div className="flex flex-col h-full md:col-span-3 px-4 pt-5">
               <h3 className="text-[18px] md:text-2xl font-bold text-[#1d5792] text-center mb-5">
-                {todayData.dayLabel}: ngày {todayData.date}
+                {todayData.dayLabel}, ngày {todayData.date}
               </h3>
               {todayData.items.length > 0 ? (
                 <div className="space-y-2 px-4">

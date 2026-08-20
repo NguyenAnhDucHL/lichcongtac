@@ -1402,3 +1402,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `docker-compose.yml` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "chore(infra): add docker resource limits for backend"`
+### [2026-08-21 00:01] Cập nhật hiển thị thứ cho mục Hôm nay
+- **Mô tả**: Bổ sung hiển thị ngày trong tuần (Thứ hai, Thứ ba...) cho nhãn Hôm nay trên trang lịch công tác để hiển thị chi tiết giống với yêu cầu.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(ui): bổ sung hiển thị thứ trong tuần cho mục hôm nay trên trang lịch công tác"`
