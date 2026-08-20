@@ -9,6 +9,8 @@ services:
       - "5000"
     ports:
       - "59608:5000"
+    mem_limit: 512m
+    cpus: "1.0"
     security_opt:
       - no-new-privileges:true
     environment:

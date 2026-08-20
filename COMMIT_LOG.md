@@ -1396,3 +1396,9 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(admin): tự động trim Giấy mời số và xóa dòng trống trong Nội dung chi tiết"`
+
+### [2026-08-20 15:44] Thêm giới hạn tài nguyên Docker
+- **Mô tả**: Bổ sung `mem_limit` và `cpus` cho lichcongtac-backend để chống OOM server.
+- **Tệp thay đổi**:
+  - `docker-compose.yml` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "chore(infra): add docker resource limits for backend"`
