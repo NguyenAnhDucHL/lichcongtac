@@ -1,4 +1,10 @@
 ### [2026-08-22 10:16] Fix mobile layout trang SearchSchedule — card layout thay bảng
+
+### [2026-08-22 10:24] Revert mobile layout trang SearchSchedule — đổi từ card sang responsive table
+- **Mô tả**: Theo yêu cầu, trả lại giao diện bảng kết quả tìm kiếm trên điện thoại (bỏ card layout) và sử dụng responsive table không cuộn ngang.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(search): revert mobile layout từ card sang bảng responsive"`
 - **Mô tả**: Trên mobile bảng 4 cột (STT, Ngày, Nội dung, Phòng/ban) bị tràn ngang buộc người dùng phải kéo qua lại. Giải pháp: ẩn bảng trên mobile (`hidden md:block`), thêm card layout riêng (`md:hidden`) hiển thị dạng danh sách dọc — ngày + nội dung + phòng ban theo chiều dọc, tận dụng toàn bộ chiều rộng màn hình, không cần scroll ngang.
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)

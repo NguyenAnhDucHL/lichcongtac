@@ -225,108 +225,77 @@ export default function SearchSchedule() {
             <div className="text-gray-500 text-[14px] mb-2">
               Danh sách lịch làm việc {totalCount > 0 ? `(${totalCount} kết quả)` : ''}
             </div>
-            {/* Mobile: card layout — Desktop: table */}
             <div className="w-full">
-              {/* === DESKTOP TABLE (md+) === */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full min-w-[600px] border-collapse border border-gray-300 text-[15px]">
-                  <thead>
-                    <tr className="bg-[#fce8d5]">
-                      <th className="border border-gray-300 py-2 px-3 font-bold w-12 text-center">STT</th>
-                      <th className="border border-gray-300 py-2 px-3 font-bold w-28 text-center">Ngày</th>
-                      <th className="border border-gray-300 py-2 px-3 font-bold text-center">Nội dung</th>
-                      <th className="border border-gray-300 py-2 px-3 font-bold w-28 text-center">Phòng, ban</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginated.length > 0 ? (
-                      paginated.map((item, index) => {
-                        const di = formatDateDisplay(item.date)
-                        return (
-                          <tr key={item.id} className="hover:bg-gray-50">
-                            <td className="border border-gray-300 py-2.5 px-3 text-center font-bold">
-                              {(currentPage - 1) * PAGE_SIZE + index + 1}
-                            </td>
-                            <td className="border border-gray-300 py-2.5 px-3 text-center leading-tight">
-                              <div>{di.dayName}</div>
-                              <div className="text-[#1d5792] font-bold">{di.date}</div>
-                            </td>
-                            <td className="border border-gray-300 py-2.5 px-3">
+              <table className="w-full table-fixed border-collapse border-t border-gray-300 text-[15px] break-words">
+                <thead>
+                  <tr className="bg-[#fce8d5]">
+                    <th className="border border-gray-300 py-2 px-1 md:px-3 font-bold w-[10%] md:w-12 text-center text-[12px] md:text-base">
+                      TT
+                    </th>
+                    <th className="border border-gray-300 py-2 px-1 md:px-3 font-bold w-[25%] md:w-28 text-center text-[13px] md:text-base">
+                      Ngày
+                    </th>
+                    <th className="border border-gray-300 py-2 px-1 md:px-3 font-bold w-[45%] text-center text-[13px] md:text-base">
+                      Nội dung
+                    </th>
+                    <th className="border border-gray-300 py-2 px-1 md:px-3 font-bold w-[20%] md:w-28 text-center text-[13px] md:text-base">
+                      Phòng, ban
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginated.length > 0 ? (
+                    paginated.map((item, index) => {
+                      const di = formatDateDisplay(item.date)
+                      return (
+                        <tr key={item.id} className="border border-gray-300 hover:bg-gray-50 bg-white">
+                          <td className="border-b border-gray-300 py-2.5 px-1 md:px-3 text-center text-[13px] md:text-base">
+                            <span className="font-bold">{(currentPage - 1) * PAGE_SIZE + index + 1}</span>
+                          </td>
+                          <td className="border-b border-gray-300 py-2.5 px-1 md:px-3 text-center leading-tight text-[13px] md:text-base">
+                            <span className="block">{di.dayName}</span>
+                            <span className="block text-[#1d5792] font-bold">{di.date}</span>
+                          </td>
+                          <td className="border-b border-gray-300 py-2.5 px-1 md:px-3 text-[13px] md:text-base text-justify">
+                            <div className="w-full">
                               {item.startTime?.trim() && (
-                                <span className="text-[#c8102e] font-bold mr-2">{item.startTime.trim()}:</span>
+                                <span className="text-[#c8102e] font-bold mr-2">
+                                  {item.startTime.trim()}:
+                                </span>
                               )}
                               {item.invitationNumber && (
-                                <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>
+                                <span className="text-[#005f6b] font-bold mr-1">
+                                  {item.invitationNumber}
+                                </span>
                               )}
                               {item.location && (
-                                <span className="text-[#005f6b] font-bold mr-1">(Tại {extractText(item.location)})</span>
+                                <span className="text-[#005f6b] font-bold mr-1">
+                                  (Tại {extractText(item.location)})
+                                </span>
                               )}
                               {item.content && (
                                 <span className="text-gray-900">{extractText(item.content)}</span>
                               )}
-                            </td>
-                            <td className="border border-gray-300 py-2.5 px-3 text-center">
-                              {extractText(item.preparingUnit) || 'Văn phòng'}
-                            </td>
-                          </tr>
-                        )
-                      })
-                    ) : (
-                      <tr>
-                        <td colSpan="4" className="border border-gray-300 py-6 text-center text-gray-500 italic">
-                          Không tìm thấy lịch công tác phù hợp.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* === MOBILE CARD LAYOUT (< md) === */}
-              <div className="md:hidden flex flex-col divide-y divide-gray-200 border-t border-gray-300">
-                {paginated.length > 0 ? (
-                  paginated.map((item, index) => {
-                    const di = formatDateDisplay(item.date)
-                    return (
-                      <div key={item.id} className="py-3 px-1 bg-white hover:bg-gray-50">
-                        {/* Dòng trên: STT + Ngày */}
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[12px] text-gray-400 font-semibold min-w-[20px]">
-                            {(currentPage - 1) * PAGE_SIZE + index + 1}.
-                          </span>
-                          <span className="text-[13px] font-bold text-[#1d5792]">{di.date}</span>
-                          <span className="text-[12px] text-gray-500">({di.dayName})</span>
-                        </div>
-                        {/* Nội dung */}
-                        <div className="text-[14px] text-gray-900 leading-snug pl-6">
-                          {item.startTime?.trim() && (
-                            <span className="text-[#c8102e] font-bold mr-1">{item.startTime.trim()}:</span>
-                          )}
-                          {item.invitationNumber && (
-                            <span className="text-[#005f6b] font-bold mr-1">{item.invitationNumber}</span>
-                          )}
-                          {item.location && (
-                            <span className="text-[#005f6b] font-bold mr-1">(Tại {extractText(item.location)})</span>
-                          )}
-                          {item.content && (
-                            <span>{extractText(item.content)}</span>
-                          )}
-                        </div>
-                        {/* Phòng ban (nhỏ, dưới cùng) */}
-                        {extractText(item.preparingUnit) && (
-                          <div className="text-[11px] text-gray-400 mt-1 pl-6 italic">
+                            </div>
+                          </td>
+                          <td className="border-b border-gray-300 py-2.5 px-1 md:px-3 text-center text-[11px] md:text-base">
                             {extractText(item.preparingUnit) || 'Văn phòng'}
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })
-                ) : (
-                  <div className="py-6 text-center text-gray-500 italic text-[14px]">
-                    Không tìm thấy lịch công tác phù hợp.
-                  </div>
-                )}
-              </div>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="4"
+                        className="border border-gray-300 py-6 text-center text-gray-500 italic"
+                      >
+                        Không tìm thấy lịch công tác phù hợp.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
             {/* Pagination */}
             {totalCount > PAGE_SIZE && (
