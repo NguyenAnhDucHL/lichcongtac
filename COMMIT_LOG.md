@@ -1,3 +1,8 @@
+### [2026-08-22 10:16] Fix mobile layout trang SearchSchedule — card layout thay bảng
+- **Mô tả**: Trên mobile bảng 4 cột (STT, Ngày, Nội dung, Phòng/ban) bị tràn ngang buộc người dùng phải kéo qua lại. Giải pháp: ẩn bảng trên mobile (`hidden md:block`), thêm card layout riêng (`md:hidden`) hiển thị dạng danh sách dọc — ngày + nội dung + phòng ban theo chiều dọc, tận dụng toàn bộ chiều rộng màn hình, không cần scroll ngang.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/SearchSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "style(search): chuyển kết quả tìm kiếm sang card layout trên mobile, bỏ scroll ngang"`
 ### [2026-08-21 01:25] Thêm dấu gạch ngang ngăn cách lịch hôm nay và ngày mai trên mobile
 - **Mô tả**: Bổ sung thẻ hr kèm khoảng cách (margin) chỉ hiển thị trên giao diện mobile (md:hidden) để ngăn cách rõ ràng giữa phần lịch công tác hôm nay và các ngày sắp tới, giúp giao diện dễ nhìn hơn.
 - **Tệp thay đổi**:
