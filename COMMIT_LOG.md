@@ -1424,3 +1424,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "style(ui): bổ sung hiển thị thứ trong tuần cho mục hôm nay trên trang lịch công tác"`
+### [2026-08-25 10:05] Cập nhật logic múi giờ lấy lịch công tác
+- **Mô tả**: Ép sử dụng múi giờ Việt Nam (Asia/Ho_Chi_Minh) cho frontend để đồng nhất khái niệm "Hôm nay" không phụ thuộc múi giờ thiết bị và truyền tham số startDate, endDate để tối ưu hóa truy vấn Backend.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "perf(schedule): ép múi giờ Việt Nam và truyền params lấy lịch công tác"`

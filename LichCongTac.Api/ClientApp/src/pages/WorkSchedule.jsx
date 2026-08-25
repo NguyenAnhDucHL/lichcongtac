@@ -20,10 +20,15 @@ const formatLocation = (loc) => {
 const DAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy']
 
 // Helper luôn trả về ngày hôm nay theo giờ Việt Nam (GMT+7)
-// Dùng local time để match với server lưu date theo múi giờ địa phương
+// Đảm bảo không bị sai lệch ngày khi người dùng ở khác múi giờ
 const getTodayStr = () => {
-  const today = new Date()
-  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+  return formatter.format(new Date())
 }
 
 // Parse date string từ server về local date string — xử lý cả 2 dạng:
@@ -164,7 +169,13 @@ export default function WorkSchedule() {
     let scheduleOk = false
     try {
       if (isMountedRef.current) setError(null)
-      const raw = await scheduleService.getPublicSchedule()
+
+      const todayStr = getTodayStr()
+      const maxDate = new Date(todayStr + 'T00:00:00')
+      maxDate.setDate(maxDate.getDate() + 7)
+      const maxStr = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`
+
+      const raw = await scheduleService.getPublicSchedule({ startDate: todayStr, endDate: maxStr })
 
       // Chỉ cập nhật state nếu đây là fetch MỚI NHẤT (bỏ qua response lỗi thời)
       if (fetchIdRef.current !== currentId) {
@@ -306,18 +317,23 @@ export default function WorkSchedule() {
     scheduleService
       .getTodayHoliday()
       .then((d) => setTodayHoliday(d?.content ? d : d?.data || null))
-      .catch(() => { })
+      .catch(() => {})
   }, [lastHolidayUpdate])
 
-  const todayData = scheduleData.find((d) => d.isToday) || {
-    dayLabel: `Hôm nay: ${DAYS[new Date().getDay()]}`,
-    date: new Date().toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }),
-    items: [],
-  }
+  const todayData =
+    scheduleData.find((d) => d.isToday) ||
+    (() => {
+      const vnToday = new Date(getTodayStr() + 'T00:00:00')
+      return {
+        dayLabel: `Hôm nay: ${DAYS[vnToday.getDay()]}`,
+        date: vnToday.toLocaleDateString('vi-VN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }),
+        items: [],
+      }
+    })()
   const upcoming = scheduleData.filter((d) => !d.isToday)
 
   return (
