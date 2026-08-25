@@ -1429,3 +1429,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/WorkSchedule.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "perf(schedule): ép múi giờ Việt Nam và truyền params lấy lịch công tác"`
+### [2026-08-25 10:09] Xóa fallback truy vấn 1000 bản ghi lịch công tác
+- **Mô tả**: Bỏ cơ chế `GetAllAsync` mặc định ở endpoint `GetPublicSchedules` để ép các client bắt buộc truyền ngày tháng, ngăn chặn query quá tải DB.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "refactor(api): bắt buộc truyền startDate và endDate khi lấy lịch công khai"`

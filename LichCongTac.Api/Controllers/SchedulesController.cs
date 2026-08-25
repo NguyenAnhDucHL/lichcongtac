@@ -26,15 +26,12 @@ namespace LichCongTac.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetPublicSchedules([FromQuery] string? startDate, [FromQuery] string? endDate)
         {
-            IEnumerable<Schedule> schedules;
-            if (!string.IsNullOrEmpty(startDate) && !string.IsNullOrEmpty(endDate))
+            if (string.IsNullOrEmpty(startDate) || string.IsNullOrEmpty(endDate))
             {
-                schedules = await _scheduleRepository.GetByDateRangeAsync(startDate, endDate, includeInternal: false);
+                return BadRequest(ApiResponse.Fail("Tham số startDate và endDate là bắt buộc. Không hỗ trợ truy vấn toàn bộ dữ liệu."));
             }
-            else
-            {
-                schedules = await _scheduleRepository.GetAllAsync(includeInternal: false);
-            }
+
+            var schedules = await _scheduleRepository.GetByDateRangeAsync(startDate, endDate, includeInternal: false);
             return Ok(ApiResponse<IEnumerable<Schedule>>.Ok(schedules));
         }
 
