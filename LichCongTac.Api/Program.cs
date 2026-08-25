@@ -274,8 +274,20 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Thêm UsePathBase để hỗ trợ chạy trực tiếp qua /campha
 app.UsePathBase("/campha");
+
+app.Use(async (context, next) =>
+{
+    // Bắt buộc client KHÔNG ĐƯỢC CACHE các kết quả trả về từ API
+    // Đặc biệt hữu ích để chống lỗi ứng dụng Bookmark (PWA) trên iOS/Safari tự ý cache dữ liệu cũ
+    if (context.Request.Path.StartsWithSegments("/api"))
+    {
+        context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+        context.Response.Headers["Pragma"] = "no-cache";
+        context.Response.Headers["Expires"] = "-1";
+    }
+    await next();
+});
 
 app.UseMiddleware<LichCongTac.Api.Middleware.GlobalExceptionMiddleware>();
 

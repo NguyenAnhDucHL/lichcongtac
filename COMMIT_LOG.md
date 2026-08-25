@@ -1,3 +1,10 @@
+### [2026-08-25 11:34] Khắc phục lỗi Cache trên iOS PWA khiến lịch rỗng
+- **Mô tả**: Sửa triệt để lỗi thỉnh thoảng deploy code làm ứng dụng Bookmark (PWA) trên iOS báo không có lịch công tác. Nguyên nhân do bộ nhớ đệm (cache) cứng đầu của iOS. Giải pháp: Thêm tham số _t=Date.now() vào Frontend API và thêm middleware Cache-Control=no-store vào Backend API (Program.cs).
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/services/schedule.service.js` (Sửa đổi)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix: resolve iOS PWA cache issue showing empty schedules"`
+
 ### [2026-08-22 10:16] Fix mobile layout trang SearchSchedule — card layout thay bảng
 
 ### [2026-08-22 10:24] Revert mobile layout trang SearchSchedule — đổi từ card sang responsive table
