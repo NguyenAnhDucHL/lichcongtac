@@ -1,3 +1,12 @@
+### [2026-08-26 12:05] Bật Pooling=True và Kích hoạt WAL cho SQLite
+- **Mô tả**: Sửa toàn bộ các Repository đang set `Pooling=False` thành `Pooling=True` (UserRepository, DepartmentRepository, ScheduleRepository) và gỡ logic thay thế Pooling trong AdminRepository. Đồng thời kích hoạt chế độ WAL (Write-Ahead Logging) cho các file SQLite db bằng lệnh `PRAGMA journal_mode=WAL;` để hỗ trợ đa người đọc và một người ghi đồng thời.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/DepartmentRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/ScheduleRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/AdminRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "perf(db): bật pooling và kích hoạt WAL mode cho sqlite"`
+
 ### [2026-08-26 11:14] Tối ưu hóa Database và Caching cho AdminRepository
 - **Mô tả**: Áp dụng 3 giải pháp tối ưu hóa hiệu năng cao nhất theo yêu cầu: (1) Bổ sung IMemoryCache lưu kết quả GetDepartments trong 30 phút (và invalidate khi dữ liệu thay đổi), (2) Loại bỏ `Pooling=False` để tái sử dụng connection pool, (3) Bật `PRAGMA journal_mode=WAL;` để tối ưu hóa đọc/ghi đồng thời trên SQLite.
 - **Tệp thay đổi**:

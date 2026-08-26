@@ -20,7 +20,7 @@ namespace LichCongTac.Core.Data.Repositories
         {
             _cache = cache;
             string? configConnString = configuration.GetConnectionString("DefaultConnection");
-            if (!string.IsNullOrEmpty(configConnString)) { _connectionString = configConnString.Replace("Pooling=False;", ""); }
+            if (!string.IsNullOrEmpty(configConnString)) { _connectionString = configConnString; }
             else
             {
                 string? envPath = Environment.GetEnvironmentVariable("DB_PATH");
