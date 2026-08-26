@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LichCongTac.Core.Models;
@@ -21,32 +22,32 @@ namespace LichCongTac.Api.Controllers
         // --- DEPARTMENTS ---
         [Authorize(Roles = "Admin,VanThu,LanhDao,CanBo")]
         [HttpGet("departments")]
-        public IActionResult GetDepartments() => Ok(ApiResponse.Ok(_adminRepo.GetDepartments()));
+        public async Task<IActionResult> GetDepartments() => Ok(ApiResponse.Ok(await _adminRepo.GetDepartmentsAsync()));
 
         [Authorize(Roles = "Admin")]
         [HttpPost("departments")]
-        public IActionResult AddDepartment([FromBody] Department dept)
+        public async Task<IActionResult> AddDepartment([FromBody] Department dept)
         {
             if (dept == null) return BadRequest(ApiResponse.Fail("Dữ liệu phòng ban không hợp lệ."));
-            int id = _adminRepo.InsertDepartment(dept);
+            int id = await _adminRepo.InsertDepartmentAsync(dept);
             dept.Id = id;
             return Ok(ApiResponse.Ok(dept));
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("departments")]
-        public IActionResult UpdateDepartment([FromBody] Department dept)
+        public async Task<IActionResult> UpdateDepartment([FromBody] Department dept)
         {
             if (dept == null) return BadRequest(ApiResponse.Fail("Dữ liệu phòng ban không hợp lệ."));
-            _adminRepo.UpdateDepartment(dept);
+            await _adminRepo.UpdateDepartmentAsync(dept);
             return Ok(ApiResponse.Ok(dept));
         }
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("departments/{id}")]
-        public IActionResult DeleteDepartment(int id)
+        public async Task<IActionResult> DeleteDepartment(int id)
         {
-            _adminRepo.DeleteDepartment(id);
+            await _adminRepo.DeleteDepartmentAsync(id);
             return Ok(ApiResponse.Ok("Xóa phòng ban thành công."));
         }
 

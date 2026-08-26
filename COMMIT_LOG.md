@@ -1,3 +1,17 @@
+### [2026-08-26 11:14] Tối ưu hóa Database và Caching cho AdminRepository
+- **Mô tả**: Áp dụng 3 giải pháp tối ưu hóa hiệu năng cao nhất theo yêu cầu: (1) Bổ sung IMemoryCache lưu kết quả GetDepartments trong 30 phút (và invalidate khi dữ liệu thay đổi), (2) Loại bỏ `Pooling=False` để tái sử dụng connection pool, (3) Bật `PRAGMA journal_mode=WAL;` để tối ưu hóa đọc/ghi đồng thời trên SQLite.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Repositories/AdminRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "perf(admin): thêm memory cache, bật wal mode và connection pooling"`
+
+### [2026-08-26 11:10] Refactor AdminRepository và AdminController sang bất đồng bộ (async/await)
+- **Mô tả**: Tối ưu hiệu năng và tránh nghẽn thread pool của ASP.NET Core khi có nhiều người gọi đồng thời. Đã chuyển đổi các phương thức trong AdminRepository, IAdminRepository và AdminController từ đồng bộ (synchronous) sang bất đồng bộ (asynchronous) bằng async/await.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Interfaces/IAdminRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/AdminRepository.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/AdminController.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "refactor(admin): chuyển đổi repository và controller sang xử lý bất đồng bộ"`
+
 ### [2026-08-25 11:34] Khắc phục lỗi Cache trên iOS PWA khiến lịch rỗng
 - **Mô tả**: Sửa triệt để lỗi thỉnh thoảng deploy code làm ứng dụng Bookmark (PWA) trên iOS báo không có lịch công tác. Nguyên nhân do bộ nhớ đệm (cache) cứng đầu của iOS. Giải pháp: Thêm tham số _t=Date.now() vào Frontend API và thêm middleware Cache-Control=no-store vào Backend API (Program.cs).
 - **Tệp thay đổi**:
