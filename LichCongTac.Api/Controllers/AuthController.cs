@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
@@ -96,7 +97,7 @@ namespace LichCongTac.Api.Controllers
 
             // Tạo SessionId mới (duy trì tương thích với hệ thống cũ)
             user.SessionId = Guid.NewGuid().ToString();
-            _userRepository.UpdateSecurityStamp(user.Id, user.SecurityStamp);
+            await _userRepository.UpdateSecurityStampAsync(user.Id, user.SecurityStamp);
 
             // ── Bước 5: Sinh JWT Token ────────────────────────────────────────────
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -131,7 +132,7 @@ namespace LichCongTac.Api.Controllers
             // Generate Refresh Token
             var refreshToken = GenerateRefreshToken();
             var refreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Refresh token valid for 7 days
-            _userRepository.UpdateRefreshToken(user.Id, refreshToken, refreshTokenExpiryTime);
+            await _userRepository.UpdateRefreshTokenAsync(user.Id, refreshToken, refreshTokenExpiryTime);
 
             // Gắn token vào HttpOnly Cookie để trình duyệt tự động gửi khi tải PDF
             Response.Cookies.Append("jwt_cookie", tokenString, new CookieOptions
@@ -204,7 +205,7 @@ namespace LichCongTac.Api.Controllers
             var newRefreshToken = GenerateRefreshToken();
             var newRefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
 
-            _userRepository.UpdateRefreshToken(user.Id, newRefreshToken, newRefreshTokenExpiryTime);
+            await _userRepository.UpdateRefreshTokenAsync(user.Id, newRefreshToken, newRefreshTokenExpiryTime);
 
             Response.Cookies.Append("jwt_cookie", newTokenString, new CookieOptions
             {
@@ -263,12 +264,12 @@ namespace LichCongTac.Api.Controllers
 
         [HttpPost("logout")]
         [Authorize]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
             var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (int.TryParse(userIdStr, out int userId))
             {
-                _userRepository.UpdateRefreshToken(userId, null, null);
+                await _userRepository.UpdateRefreshTokenAsync(userId, null, null);
             }
 
             Response.Cookies.Delete("jwt_cookie");
@@ -324,7 +325,7 @@ namespace LichCongTac.Api.Controllers
                 cache?.Remove($"UserSession_{userId}");
 
                 // Thu hồi Refresh Token
-                _userRepository.UpdateRefreshToken(userId, null, null);
+                await _userRepository.UpdateRefreshTokenAsync(userId, null, null);
 
                 return Ok(ApiResponse.Ok("Đổi mật khẩu thành công. Vui lòng đăng nhập lại."));
             }

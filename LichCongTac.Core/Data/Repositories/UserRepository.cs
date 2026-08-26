@@ -2,6 +2,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using LichCongTac.Core.Data.Interfaces;
 using LichCongTac.Models;
+using System.Threading.Tasks;
 
 namespace LichCongTac.Core.Data.Repositories
 {
@@ -111,11 +112,11 @@ namespace LichCongTac.Core.Data.Repositories
 
         // ─── READ ────────────────────────────────────────────────────────────────
 
-        public List<User> GetUsers()
+        public async Task<List<User>> GetUsersAsync()
         {
             var users = new List<User>();
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             string sql = @"
                 SELECT u.Id, u.Username, u.FullName, u.Email, u.PhoneNumber, u.Role,
                        u.DepartmentId, d.Name as DepartmentName, u.SessionId, u.CreatedAt,
@@ -124,16 +125,16 @@ namespace LichCongTac.Core.Data.Repositories
                 FROM Users u 
                 LEFT JOIN Departments d ON u.DepartmentId = d.Id";
             using var cmd = new SqliteCommand(sql, connection);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
                 users.Add(MapUser(reader));
             return users;
         }
 
-        public User? GetUserById(int id)
+        public async Task<User?> GetUserByIdAsync(int id)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             string sql = @"
                 SELECT u.Id, u.Username, u.PasswordHash, u.FullName, u.Email, u.PhoneNumber, u.Role,
                        u.DepartmentId, d.Name as DepartmentName, u.SessionId, u.CreatedAt,
@@ -144,18 +145,18 @@ namespace LichCongTac.Core.Data.Repositories
                 WHERE u.Id=@id";
             using var cmd = new SqliteCommand(sql, connection);
             cmd.Parameters.AddWithValue("@id", id);
-            using var reader = cmd.ExecuteReader();
-            return reader.Read() ? MapUser(reader, includeSensitive: true) : null;
+            using var reader = await cmd.ExecuteReaderAsync();
+            return await reader.ReadAsync() ? MapUser(reader, includeSensitive: true) : null;
         }
 
         /// <summary>
         /// Tìm user theo username (case-insensitive qua NormalizedUserName).
         /// Được dùng bởi CustomUserStore của Identity.
         /// </summary>
-        public User? GetUserByUsername(string username)
+        public async Task<User?> GetUserByUsernameAsync(string username)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             // Tìm theo NormalizedUserName (in hoa) trước, fallback về Username thường
             string sql = @"
                 SELECT u.Id, u.Username, u.PasswordHash, u.FullName, u.Email, u.PhoneNumber, u.Role,
@@ -168,16 +169,16 @@ namespace LichCongTac.Core.Data.Repositories
             using var cmd = new SqliteCommand(sql, connection);
             cmd.Parameters.AddWithValue("@norm", username.ToUpperInvariant());
             cmd.Parameters.AddWithValue("@raw", username);
-            using var reader = cmd.ExecuteReader();
-            return reader.Read() ? MapUser(reader, includeSensitive: true) : null;
+            using var reader = await cmd.ExecuteReaderAsync();
+            return await reader.ReadAsync() ? MapUser(reader, includeSensitive: true) : null;
         }
 
         // ─── LOGIN (giữ nguyên logic cũ, không thay đổi) ─────────────────────────
 
-        public User? Login(string username, string password)
+        public async Task<User?> LoginAsync(string username, string password)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
 
             string sql = @"SELECT Id, Username, PasswordHash, FullName, Role, DepartmentId,
                                   FailedLoginCount, LockoutUntil, SecurityStamp, NormalizedUserName,
@@ -186,9 +187,9 @@ namespace LichCongTac.Core.Data.Repositories
             using var cmd = new SqliteCommand(sql, connection);
             cmd.Parameters.AddWithValue("@u", username);
             cmd.Parameters.AddWithValue("@norm", username.ToUpperInvariant());
-            using var reader = cmd.ExecuteReader();
+            using var reader = await cmd.ExecuteReaderAsync();
 
-            if (!reader.Read()) return null;
+            if (!await reader.ReadAsync()) return null;
 
             int userId            = Convert.ToInt32(reader["Id"]);
             string storedHash     = reader["PasswordHash"]?.ToString() ?? "";
@@ -251,7 +252,7 @@ namespace LichCongTac.Core.Data.Repositories
                         END
                     WHERE Id = @id", connection);
                 incCmd.Parameters.AddWithValue("@id", userId);
-                incCmd.ExecuteNonQuery();
+                await incCmd.ExecuteNonQueryAsync();
                 return null;
             }
 
@@ -264,7 +265,7 @@ namespace LichCongTac.Core.Data.Repositories
                     "UPDATE Users SET PasswordHash=@h WHERE Id=@id", connection);
                 migrateCmd.Parameters.AddWithValue("@h", newHash);
                 migrateCmd.Parameters.AddWithValue("@id", userId);
-                migrateCmd.ExecuteNonQuery();
+                await migrateCmd.ExecuteNonQueryAsync();
                 Console.WriteLine($"[Security] Đã migrate mật khẩu plain-text → BCrypt cho user: {user.Username}");
             }
 
@@ -277,17 +278,17 @@ namespace LichCongTac.Core.Data.Repositories
                 WHERE Id = @id", connection);
             updateCmd.Parameters.AddWithValue("@s",  user.SessionId);
             updateCmd.Parameters.AddWithValue("@id", userId);
-            updateCmd.ExecuteNonQuery();
+            await updateCmd.ExecuteNonQueryAsync();
 
             return user;
         }
 
         // ─── CREATE / UPDATE / DELETE ────────────────────────────────────────────
 
-        public bool CreateUser(User user)
+        public async Task<bool> CreateUserAsync(User user)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
 
             // Hash mật khẩu nếu chưa hash (hỗ trợ cả BCrypt cũ và Identity PBKDF2 mới)
             var passwordToStore = (user.PasswordHash?.StartsWith("$2") == true || user.PasswordHash?.StartsWith("AQAAAA") == true)
@@ -317,16 +318,16 @@ namespace LichCongTac.Core.Data.Repositories
                 cmd.Parameters.AddWithValue("@norm",  normalizedUserName);
                 cmd.Parameters.AddWithValue("@zalo",  (object?)user.ZaloId ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("@notif", (object?)user.NotificationPreference ?? DBNull.Value);
-                cmd.ExecuteNonQuery();
+                await cmd.ExecuteNonQueryAsync();
                 return true;
             }
             catch { return false; }
         }
 
-        public void UpdateUser(User user)
+        public async Task UpdateUserAsync(User user)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             // Khi cập nhật Role → SecurityStamp thay đổi để vô hiệu hóa token cũ
             string sql = @"
                 UPDATE Users SET 
@@ -354,31 +355,31 @@ namespace LichCongTac.Core.Data.Repositories
             cmd.Parameters.AddWithValue("@zalo",  (object?)user.ZaloId ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@notif", (object?)user.NotificationPreference ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@id",    user.Id);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public void DeleteUser(int id)
+        public async Task DeleteUserAsync(int id)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             using var cmd = new SqliteCommand("DELETE FROM Users WHERE Id=@id", connection);
             cmd.Parameters.AddWithValue("@id", id);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public bool Register(string username, string password, string role = "Guest")
+        public async Task<bool> RegisterAsync(string username, string password, string role = "Guest")
         {
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
-            return CreateUser(new User { Username = username, PasswordHash = hashedPassword, Role = role });
+            return await CreateUserAsync(new User { Username = username, PasswordHash = hashedPassword, Role = role });
         }
 
-        public bool UpdateUserPassword(int userId, string newPassword)
+        public async Task<bool> UpdateUserPasswordAsync(int userId, string newPassword)
         {
             try
             {
                 var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword, workFactor: 12);
                 using var connection = new SqliteConnection(_connectionString);
-                connection.Open();
+                await connection.OpenAsync();
                 // Khi đổi mật khẩu → bắt buộc cập nhật SecurityStamp để vô hiệu hóa tất cả token cũ
                 using var cmd = new SqliteCommand(@"
                     UPDATE Users 
@@ -396,22 +397,22 @@ namespace LichCongTac.Core.Data.Repositories
         // ─── ASP.NET CORE IDENTITY SUPPORT METHODS ───────────────────────────────
 
         /// <summary>Cập nhật SecurityStamp — được gọi khi đổi mật khẩu, đổi role, hoặc bị kick</summary>
-        public void UpdateSecurityStamp(int userId, string securityStamp)
+        public async Task UpdateSecurityStampAsync(int userId, string securityStamp)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             using var cmd = new SqliteCommand(
                 "UPDATE Users SET SecurityStamp = @stamp WHERE Id = @id", connection);
             cmd.Parameters.AddWithValue("@stamp", securityStamp);
             cmd.Parameters.AddWithValue("@id",    userId);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
         /// <summary>Cập nhật AccessFailedCount và LockoutEnd (Identity format, đồng bộ với cột cũ)</summary>
-        public void UpdateLockout(int userId, int accessFailedCount, DateTimeOffset? lockoutEnd)
+        public async Task UpdateLockoutAsync(int userId, int accessFailedCount, DateTimeOffset? lockoutEnd)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             using var cmd = new SqliteCommand(@"
                 UPDATE Users SET
                     AccessFailedCount = @count,
@@ -423,26 +424,26 @@ namespace LichCongTac.Core.Data.Repositories
             cmd.Parameters.AddWithValue("@lockoutEnd",  (object?)lockoutEnd?.ToString("O") ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@lockoutUntil",(object?)lockoutEnd?.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss") ?? DBNull.Value);
             cmd.Parameters.AddWithValue("@id",          userId);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
         /// <summary>Reset bộ đếm sai sau khi đăng nhập thành công</summary>
-        public void ResetAccessFailedCount(int userId)
+        public async Task ResetAccessFailedCountAsync(int userId)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             using var cmd = new SqliteCommand(@"
                 UPDATE Users 
                 SET AccessFailedCount = 0, LockoutEnd = NULL, FailedLoginCount = 0, LockoutUntil = NULL 
                 WHERE Id = @id", connection);
             cmd.Parameters.AddWithValue("@id", userId);
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
 
-        public void UpdateRefreshToken(int userId, string? refreshToken, DateTime? expiryTime)
+        public async Task UpdateRefreshTokenAsync(int userId, string? refreshToken, DateTime? expiryTime)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             using var cmd = new SqliteCommand(@"
                 UPDATE Users 
                 SET RefreshToken = @rt, RefreshTokenExpiryTime = @exp 
@@ -452,7 +453,7 @@ namespace LichCongTac.Core.Data.Repositories
             cmd.Parameters.AddWithValue("@exp", expiryTime.HasValue ? expiryTime.Value.ToString("yyyy-MM-dd HH:mm:ss") : (object)DBNull.Value);
             cmd.Parameters.AddWithValue("@id", userId);
             
-            cmd.ExecuteNonQuery();
+            await cmd.ExecuteNonQueryAsync();
         }
     }
 }

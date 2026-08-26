@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using LichCongTac.Core.Data.Interfaces;
 using LichCongTac.Core.Models;
 using LichCongTac.Models;
+using System.Threading.Tasks;
 
 namespace LichCongTac.Api.Controllers
 {
@@ -19,16 +20,16 @@ namespace LichCongTac.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var departments = _departmentRepository.GetAll();
+            var departments = await _departmentRepository.GetAllAsync();
             return Ok(ApiResponse.Ok(departments));
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var dept = _departmentRepository.GetById(id);
+            var dept = await _departmentRepository.GetByIdAsync(id);
             if (dept == null)
             {
                 return NotFound(ApiResponse.Fail("Không tìm thấy phòng ban"));
@@ -38,14 +39,14 @@ namespace LichCongTac.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public IActionResult Create([FromBody] Department department)
+        public async Task<IActionResult> Create([FromBody] Department department)
         {
             if (string.IsNullOrWhiteSpace(department.Name))
             {
                 return BadRequest(ApiResponse.Fail("Tên phòng ban không được để trống"));
             }
 
-            var success = _departmentRepository.Create(department);
+            var success = await _departmentRepository.CreateAsync(department);
             if (!success)
             {
                 return BadRequest(ApiResponse.Fail("Lỗi khi thêm phòng ban"));
@@ -55,21 +56,21 @@ namespace LichCongTac.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Department department)
+        public async Task<IActionResult> Update(int id, [FromBody] Department department)
         {
             if (string.IsNullOrWhiteSpace(department.Name))
             {
                 return BadRequest(ApiResponse.Fail("Tên phòng ban không được để trống"));
             }
 
-            var existing = _departmentRepository.GetById(id);
+            var existing = await _departmentRepository.GetByIdAsync(id);
             if (existing == null)
             {
                 return NotFound(ApiResponse.Fail("Không tìm thấy phòng ban"));
             }
 
             department.Id = id;
-            var success = _departmentRepository.Update(department);
+            var success = await _departmentRepository.UpdateAsync(department);
             if (!success)
             {
                 return BadRequest(ApiResponse.Fail("Lỗi khi cập nhật phòng ban"));
@@ -79,15 +80,15 @@ namespace LichCongTac.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var existing = _departmentRepository.GetById(id);
+            var existing = await _departmentRepository.GetByIdAsync(id);
             if (existing == null)
             {
                 return NotFound(ApiResponse.Fail("Không tìm thấy phòng ban"));
             }
 
-            var success = _departmentRepository.Delete(id);
+            var success = await _departmentRepository.DeleteAsync(id);
             if (!success)
             {
                 return BadRequest(ApiResponse.Fail("Lỗi khi xóa phòng ban"));

@@ -4,6 +4,7 @@ using LichCongTac.Core.Data.Interfaces;
 using LichCongTac.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace LichCongTac.Core.Data.Repositories
 {
@@ -49,72 +50,72 @@ namespace LichCongTac.Core.Data.Repositories
             };
         }
 
-        public List<Department> GetAll()
+        public async Task<List<Department>> GetAllAsync()
         {
             var list = new List<Department>();
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             using var cmd = new SqliteCommand("SELECT Id, Name, Description, IsActive FROM Departments", connection);
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read())
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
                 list.Add(MapDepartment(reader));
             }
             return list;
         }
 
-        public Department? GetById(int id)
+        public async Task<Department?> GetByIdAsync(int id)
         {
             using var connection = new SqliteConnection(_connectionString);
-            connection.Open();
+            await connection.OpenAsync();
             using var cmd = new SqliteCommand("SELECT Id, Name, Description, IsActive FROM Departments WHERE Id = @id", connection);
             cmd.Parameters.AddWithValue("@id", id);
-            using var reader = cmd.ExecuteReader();
-            return reader.Read() ? MapDepartment(reader) : null;
+            using var reader = await cmd.ExecuteReaderAsync();
+            return await reader.ReadAsync() ? MapDepartment(reader) : null;
         }
 
-        public bool Create(Department department)
+        public async Task<bool> CreateAsync(Department department)
         {
             try
             {
                 using var connection = new SqliteConnection(_connectionString);
-                connection.Open();
+                await connection.OpenAsync();
                 using var cmd = new SqliteCommand(
                     "INSERT INTO Departments (Name, Description, IsActive) VALUES (@n, @d, @a)", connection);
                 cmd.Parameters.AddWithValue("@n", department.Name);
                 cmd.Parameters.AddWithValue("@d", department.Description ?? "");
                 cmd.Parameters.AddWithValue("@a", department.IsActive ? 1 : 0);
-                return cmd.ExecuteNonQuery() > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
             catch { return false; }
         }
 
-        public bool Update(Department department)
+        public async Task<bool> UpdateAsync(Department department)
         {
             try
             {
                 using var connection = new SqliteConnection(_connectionString);
-                connection.Open();
+                await connection.OpenAsync();
                 using var cmd = new SqliteCommand(
                     "UPDATE Departments SET Name = @n, Description = @d, IsActive = @a WHERE Id = @id", connection);
                 cmd.Parameters.AddWithValue("@n", department.Name);
                 cmd.Parameters.AddWithValue("@d", department.Description ?? "");
                 cmd.Parameters.AddWithValue("@a", department.IsActive ? 1 : 0);
                 cmd.Parameters.AddWithValue("@id", department.Id);
-                return cmd.ExecuteNonQuery() > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
             catch { return false; }
         }
 
-        public bool Delete(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             try
             {
                 using var connection = new SqliteConnection(_connectionString);
-                connection.Open();
+                await connection.OpenAsync();
                 using var cmd = new SqliteCommand("DELETE FROM Departments WHERE Id = @id", connection);
                 cmd.Parameters.AddWithValue("@id", id);
-                return cmd.ExecuteNonQuery() > 0;
+                return await cmd.ExecuteNonQueryAsync() > 0;
             }
             catch { return false; }
         }

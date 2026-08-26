@@ -4,6 +4,20 @@
   - `LichCongTac.Core/Data/Repositories/AdminRepository.cs` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "perf(admin): thêm memory cache, bật wal mode và connection pooling"`
 
+### [2026-08-26 11:36] Refactor: Cập nhật bất đồng bộ cho Department và User repositories
+- **Mô tả**: Cập nhật `IDepartmentRepository`, `IUserRepository` và các implementations để sử dụng bất đồng bộ (`async`/`await`). Đồng thời cập nhật `DepartmentsController`, `UsersController`, `AuthController`, `CustomUserStore` và `Program.cs` để hỗ trợ gọi các phương thức repository mới này.
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/Interfaces/IDepartmentRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Interfaces/IUserRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/DepartmentRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/UserRepository.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/DepartmentsController.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/UsersController.cs` (Sửa đổi)
+  - `LichCongTac.Api/Controllers/AuthController.cs` (Sửa đổi)
+  - `LichCongTac.Api/Security/CustomUserStore.cs` (Sửa đổi)
+  - `LichCongTac.Api/Program.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "refactor(api): update department and user repositories to use async/await"`
+
 ### [2026-08-26 11:10] Refactor AdminRepository và AdminController sang bất đồng bộ (async/await)
 - **Mô tả**: Tối ưu hiệu năng và tránh nghẽn thread pool của ASP.NET Core khi có nhiều người gọi đồng thời. Đã chuyển đổi các phương thức trong AdminRepository, IAdminRepository và AdminController từ đồng bộ (synchronous) sang bất đồng bộ (asynchronous) bằng async/await.
 - **Tệp thay đổi**:

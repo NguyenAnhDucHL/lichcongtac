@@ -31,31 +31,31 @@ namespace LichCongTac.Api.Security
 
         // ─── IUserStore ──────────────────────────────────────────────────────────
 
-        public Task<IdentityResult> CreateAsync(User user, CancellationToken ct)
+        public async Task<IdentityResult> CreateAsync(User user, CancellationToken ct)
         {
-            var success = _userRepository.CreateUser(user);
-            return Task.FromResult(success
+            var success = await _userRepository.CreateUserAsync(user);
+            return success
                 ? IdentityResult.Success
-                : IdentityResult.Failed(new IdentityError { Code = "DuplicateUserName", Description = "Tên đăng nhập đã tồn tại." }));
+                : IdentityResult.Failed(new IdentityError { Code = "DuplicateUserName", Description = "Tên đăng nhập đã tồn tại." });
         }
 
-        public Task<IdentityResult> DeleteAsync(User user, CancellationToken ct)
+        public async Task<IdentityResult> DeleteAsync(User user, CancellationToken ct)
         {
-            _userRepository.DeleteUser(user.Id);
-            return Task.FromResult(IdentityResult.Success);
+            await _userRepository.DeleteUserAsync(user.Id);
+            return IdentityResult.Success;
         }
 
-        public Task<User?> FindByIdAsync(string userId, CancellationToken ct)
+        public async Task<User?> FindByIdAsync(string userId, CancellationToken ct)
         {
-            var result = int.TryParse(userId, out int id) ? _userRepository.GetUserById(id) : null;
-            return Task.FromResult(result);
+            var result = int.TryParse(userId, out int id) ? await _userRepository.GetUserByIdAsync(id) : null;
+            return result;
         }
 
-        public Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken ct)
+        public async Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken ct)
         {
             // Tìm theo NormalizedUserName (case-insensitive)
-            var result = _userRepository.GetUserByUsername(normalizedUserName);
-            return Task.FromResult(result);
+            var result = await _userRepository.GetUserByUsernameAsync(normalizedUserName);
+            return result;
         }
 
         public Task<string?> GetNormalizedUserNameAsync(User user, CancellationToken ct)
@@ -79,10 +79,10 @@ namespace LichCongTac.Api.Security
             return Task.CompletedTask;
         }
 
-        public Task<IdentityResult> UpdateAsync(User user, CancellationToken ct)
+        public async Task<IdentityResult> UpdateAsync(User user, CancellationToken ct)
         {
-            _userRepository.UpdateUser(user);
-            return Task.FromResult(IdentityResult.Success);
+            await _userRepository.UpdateUserAsync(user);
+            return IdentityResult.Success;
         }
 
         // ─── IUserPasswordStore ──────────────────────────────────────────────────
@@ -104,11 +104,10 @@ namespace LichCongTac.Api.Security
         public Task<string?> GetSecurityStampAsync(User user, CancellationToken ct)
             => Task.FromResult<string?>(user.SecurityStamp);
 
-        public Task SetSecurityStampAsync(User user, string stamp, CancellationToken ct)
+        public async Task SetSecurityStampAsync(User user, string stamp, CancellationToken ct)
         {
             user.SecurityStamp = stamp;
-            _userRepository.UpdateSecurityStamp(user.Id, stamp);
-            return Task.CompletedTask;
+            await _userRepository.UpdateSecurityStampAsync(user.Id, stamp);
         }
 
         // ─── IUserLockoutStore ───────────────────────────────────────────────────
@@ -122,22 +121,21 @@ namespace LichCongTac.Api.Security
         public Task<DateTimeOffset?> GetLockoutEndDateAsync(User user, CancellationToken ct)
             => Task.FromResult(user.LockoutEnd);
 
-        public Task<int> IncrementAccessFailedCountAsync(User user, CancellationToken ct)
+        public async Task<int> IncrementAccessFailedCountAsync(User user, CancellationToken ct)
         {
             user.AccessFailedCount++;
             user.FailedLoginCount++;
-            _userRepository.UpdateLockout(user.Id, user.AccessFailedCount, user.LockoutEnd);
-            return Task.FromResult(user.AccessFailedCount);
+            await _userRepository.UpdateLockoutAsync(user.Id, user.AccessFailedCount, user.LockoutEnd);
+            return user.AccessFailedCount;
         }
 
-        public Task ResetAccessFailedCountAsync(User user, CancellationToken ct)
+        public async Task ResetAccessFailedCountAsync(User user, CancellationToken ct)
         {
             user.AccessFailedCount = 0;
             user.FailedLoginCount  = 0;
             user.LockoutEnd        = null;
             user.LockoutUntil      = null;
-            _userRepository.ResetAccessFailedCount(user.Id);
-            return Task.CompletedTask;
+            await _userRepository.ResetAccessFailedCountAsync(user.Id);
         }
 
         public Task SetLockoutEnabledAsync(User user, bool enabled, CancellationToken ct)
@@ -146,23 +144,21 @@ namespace LichCongTac.Api.Security
             return Task.CompletedTask;
         }
 
-        public Task SetLockoutEndDateAsync(User user, DateTimeOffset? lockoutEnd, CancellationToken ct)
+        public async Task SetLockoutEndDateAsync(User user, DateTimeOffset? lockoutEnd, CancellationToken ct)
         {
             user.LockoutEnd   = lockoutEnd;
             user.LockoutUntil = lockoutEnd?.UtcDateTime;
-            _userRepository.UpdateLockout(user.Id, user.AccessFailedCount, lockoutEnd);
-            return Task.CompletedTask;
+            await _userRepository.UpdateLockoutAsync(user.Id, user.AccessFailedCount, lockoutEnd);
         }
 
         // ─── IUserRoleStore ──────────────────────────────────────────────────────
         // Hệ thống dùng Role string đơn giản (Admin, VanThu, LanhDao, CanBo, Guest)
         // → không cần bảng RoleClaims, chỉ cần đọc/ghi trường Role trong Users
 
-        public Task AddToRoleAsync(User user, string roleName, CancellationToken ct)
+        public async Task AddToRoleAsync(User user, string roleName, CancellationToken ct)
         {
             user.Role = roleName;
-            _userRepository.UpdateUser(user);
-            return Task.CompletedTask;
+            await _userRepository.UpdateUserAsync(user);
         }
 
         public Task RemoveFromRoleAsync(User user, string roleName, CancellationToken ct)
@@ -183,12 +179,13 @@ namespace LichCongTac.Api.Security
         public Task<bool> IsInRoleAsync(User user, string roleName, CancellationToken ct)
             => Task.FromResult(user.Role.Equals(roleName, StringComparison.OrdinalIgnoreCase));
 
-        public Task<IList<User>> GetUsersInRoleAsync(string roleName, CancellationToken ct)
+        public async Task<IList<User>> GetUsersInRoleAsync(string roleName, CancellationToken ct)
         {
-            IList<User> result = _userRepository.GetUsers()
+            var users = await _userRepository.GetUsersAsync();
+            IList<User> result = users
                 .Where(u => u.Role.Equals(roleName, StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            return Task.FromResult(result);
+            return result;
         }
 
         // ─── IDisposable ─────────────────────────────────────────────────────────
