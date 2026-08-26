@@ -39,4 +39,4 @@ jobs:
             tar -xzf /root/deploy.tar.gz
             docker compose -p lichcongtac up -d --build
             docker image prune -f
-            rm /root/deploy.tar.gz
+            rm -f /root/deploy.tar.gz

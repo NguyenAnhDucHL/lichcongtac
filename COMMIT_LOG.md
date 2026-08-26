@@ -1,3 +1,9 @@
+### [2026-08-26 12:20] Fix Github Actions deploy script rm error
+- **Mô tả**: Thêm cờ `-f` vào lệnh `rm /root/deploy.tar.gz` trong file `.github/workflows/deploy.yml` để tránh lỗi CI/CD khi file không tồn tại (lỗi "cannot remove ... No such file or directory").
+- **Tệp thay đổi**:
+  - `.github/workflows/deploy.yml` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(infra): thêm cờ -f cho lệnh rm trong github actions để tránh crash"`
+
 ### [2026-08-26 12:11] Sửa lỗi ghi đè WAL mode và bổ sung Pooling=True còn sót
 - **Mô tả**: 
   1. Phát hiện và xóa đoạn code `PRAGMA journal_mode=DELETE;` trong `DatabaseService.cs` (đoạn code này ghi đè lên thiết lập WAL mode của file cơ sở dữ liệu mỗi khi khởi động).
