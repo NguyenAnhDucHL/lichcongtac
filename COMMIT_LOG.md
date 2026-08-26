@@ -1,3 +1,13 @@
+### [2026-08-26 12:11] Sửa lỗi ghi đè WAL mode và bổ sung Pooling=True còn sót
+- **Mô tả**: 
+  1. Phát hiện và xóa đoạn code `PRAGMA journal_mode=DELETE;` trong `DatabaseService.cs` (đoạn code này ghi đè lên thiết lập WAL mode của file cơ sở dữ liệu mỗi khi khởi động).
+  2. Bổ sung `Pooling=True` cho `AdminRepository.cs` và `NotificationRepository.cs` (những file chưa có thiết lập này khi fallback về DB nội bộ).
+- **Tệp thay đổi**:
+  - `LichCongTac.Core/Data/DatabaseService.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/AdminRepository.cs` (Sửa đổi)
+  - `LichCongTac.Core/Data/Repositories/NotificationRepository.cs` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(db): xóa code ghi đè WAL mode và thêm pooling cho admin/notification repo"`
+
 ### [2026-08-26 12:05] Bật Pooling=True và Kích hoạt WAL cho SQLite
 - **Mô tả**: Sửa toàn bộ các Repository đang set `Pooling=False` thành `Pooling=True` (UserRepository, DepartmentRepository, ScheduleRepository) và gỡ logic thay thế Pooling trong AdminRepository. Đồng thời kích hoạt chế độ WAL (Write-Ahead Logging) cho các file SQLite db bằng lệnh `PRAGMA journal_mode=WAL;` để hỗ trợ đa người đọc và một người ghi đồng thời.
 - **Tệp thay đổi**:

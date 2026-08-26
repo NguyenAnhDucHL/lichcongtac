@@ -21,7 +21,7 @@ namespace LichCongTac.Core.Data.Repositories
             {
                 string? envPath = Environment.GetEnvironmentVariable("DB_PATH");
                 string dbPath = !string.IsNullOrEmpty(envPath) ? envPath : "data_dump/documents.db";
-                _connectionString = $"Data Source={dbPath}";
+                _connectionString = $"Data Source={dbPath};Pooling=True;Default Timeout=30";
             }
         }
 
