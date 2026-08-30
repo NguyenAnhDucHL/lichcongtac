@@ -1494,3 +1494,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/Controllers/SchedulesController.cs` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "refactor(api): bắt buộc truyền startDate và endDate khi lấy lịch công khai"`
+### [2026-08-30 12:31] Thêm chức năng chọn số lượng bản ghi trên trang
+- **Mô tả**: Thêm dropdown (10, 20, 50 dòng) ở giao diện Quản trị lịch để thay đổi số lượng bản ghi hiển thị trên mỗi trang thay vì hardcode 10.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "feat(admin): them dropdown chon so luong ban ghi pageSize trong quan tri lich"`

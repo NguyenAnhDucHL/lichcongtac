@@ -25,7 +25,8 @@ const EMPTY_FORM = {
 const cleanHtmlContent = (html) => {
   if (!html) return ''
   let result = html
-  const emptyParagraphRegex = /^(\s*<p[^>]*>(\s|&nbsp;|<br>|<\/?span[^>]*>)*<\/p>\s*)+|(\s*<p[^>]*>(\s|&nbsp;|<br>|<\/?span[^>]*>)*<\/p>\s*)+$/gi
+  const emptyParagraphRegex =
+    /^(\s*<p[^>]*>(\s|&nbsp;|<br>|<\/?span[^>]*>)*<\/p>\s*)+|(\s*<p[^>]*>(\s|&nbsp;|<br>|<\/?span[^>]*>)*<\/p>\s*)+$/gi
   let prev = ''
   while (result !== prev) {
     prev = result
@@ -52,12 +53,11 @@ export default function AdminSchedules() {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [pageSize, setPageSize] = useState(10)
 
-  const PAGE_SIZE = 10
-
-  const fetchSchedules = useCallback(async (page = 1, kw = keyword) => {
+  const fetchSchedules = useCallback(async (page = 1, kw = '', size = 10) => {
     try {
-      const data = await adminService.getSchedulesPaginated(page, PAGE_SIZE, kw)
+      const data = await adminService.getSchedulesPaginated(page, size, kw)
       // Server trả về { items, totalCount, page, pageSize, totalPages }
       if (data && 'items' in data) {
         setSchedules(Array.isArray(data.items) ? data.items : [])
@@ -71,21 +71,20 @@ export default function AdminSchedules() {
     } catch (err) {
       console.error('Lỗi tải danh sách lịch:', err)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Search với debounce 400ms tránh gọi API mỗi ký tự
   useEffect(() => {
     const timer = setTimeout(() => {
       setCurrentPage(1)
-      fetchSchedules(1, keyword)
+      fetchSchedules(1, keyword, pageSize)
     }, 400)
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [keyword])
 
   useEffect(() => {
-    fetchSchedules(currentPage, keyword)
+    fetchSchedules(currentPage, keyword, pageSize)
     adminService.getUsers().then((d) => setUsers(Array.isArray(d) ? d : d?.data || []))
     adminService.getDepartments().then((d) => setDepartments(Array.isArray(d) ? d : d?.data || []))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,7 +92,7 @@ export default function AdminSchedules() {
 
   // Mount lần đầu
   useEffect(() => {
-    fetchSchedules(1, '')
+    fetchSchedules(1, '', 10)
     adminService.getUsers().then((d) => setUsers(Array.isArray(d) ? d : d?.data || []))
     adminService.getDepartments().then((d) => setDepartments(Array.isArray(d) ? d : d?.data || []))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,7 +166,7 @@ export default function AdminSchedules() {
         toast.success('Thêm lịch công tác thành công!')
       }
       handleReset()
-      fetchSchedules(currentPage, keyword)
+      fetchSchedules(currentPage, keyword, pageSize)
     } catch (err) {
       setError(err.message || 'Lỗi kết nối máy chủ')
     } finally {
@@ -183,7 +182,7 @@ export default function AdminSchedules() {
       toast.success('Xóa lịch công tác thành công!')
       // Sau khi xóa: nếu trang hiện tại chỉ còn 1 item thì quay về trang trước
       const newPage = schedules.length === 1 && currentPage > 1 ? currentPage - 1 : currentPage
-      fetchSchedules(newPage, keyword)
+      fetchSchedules(newPage, keyword, pageSize)
     } catch (e) {
       toast.error(e.message || 'Xóa thất bại')
     } finally {
@@ -219,6 +218,20 @@ export default function AdminSchedules() {
             Danh sách lịch làm việc ({totalCount} bản ghi)
           </span>
           <div className="flex items-center gap-3">
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                const newSize = parseInt(e.target.value, 10)
+                setPageSize(newSize)
+                setCurrentPage(1)
+                fetchSchedules(1, keyword, newSize)
+              }}
+              className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-400 bg-white"
+            >
+              <option value={10}>10 dòng</option>
+              <option value={20}>20 dòng</option>
+              <option value={50}>50 dòng</option>
+            </select>
             <input
               type="text"
               placeholder="Tìm kiếm..."
@@ -235,7 +248,7 @@ export default function AdminSchedules() {
         <ScheduleTable
           schedules={schedules}
           currentPage={currentPage}
-          pageSize={PAGE_SIZE}
+          pageSize={pageSize}
           serverSide={true}
           onEdit={handleEdit}
           onDelete={(id) => {
@@ -248,10 +261,10 @@ export default function AdminSchedules() {
           currentPage={currentPage}
           setCurrentPage={(p) => {
             setCurrentPage(p)
-            fetchSchedules(p, keyword)
+            fetchSchedules(p, keyword, pageSize)
           }}
           totalItems={totalCount}
-          pageSize={PAGE_SIZE}
+          pageSize={pageSize}
         />
       </main>
 

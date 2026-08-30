@@ -59,7 +59,7 @@ export default function SearchSchedule() {
     scheduleService
       .getTodayHoliday()
       .then((data) => setTodayHoliday(data?.content ? data : data?.data || null))
-      .catch(() => { })
+      .catch(() => {})
   }, [lastHolidayUpdate])
 
   const fetchResults = async (page) => {
@@ -248,9 +248,14 @@ export default function SearchSchedule() {
                     paginated.map((item, index) => {
                       const di = formatDateDisplay(item.date)
                       return (
-                        <tr key={item.id} className="border border-gray-300 hover:bg-gray-50 bg-white">
+                        <tr
+                          key={item.id}
+                          className="border border-gray-300 hover:bg-gray-50 bg-white"
+                        >
                           <td className="border-b border-gray-300 py-2.5 px-1 md:px-3 text-center text-[13px] md:text-base">
-                            <span className="font-bold">{(currentPage - 1) * PAGE_SIZE + index + 1}</span>
+                            <span className="font-bold">
+                              {(currentPage - 1) * PAGE_SIZE + index + 1}
+                            </span>
                           </td>
                           <td className="border-b border-gray-300 py-2.5 px-1 md:px-3 text-center leading-tight text-[13px] md:text-base">
                             <span className="block">{di.dayName}</span>
