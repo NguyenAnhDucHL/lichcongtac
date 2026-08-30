@@ -110,14 +110,14 @@ export default function AdminHolidays() {
         />
       </main>
       <ConfirmationModal
-        isOpen={deleteConfirmOpen}
-        onClose={() => setDeleteConfirmOpen(false)}
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
         onConfirm={handleDeleteConfirm}
         title="Xác nhận xóa"
-        message="Bạn có chắc chắn muốn xóa ngày lễ này không?"
-        confirmText="Xóa"
-        cancelText="Hủy"
-        type="danger"
+        description="Bạn có chắc chắn muốn xóa ngày lễ này không?"
+        confirmLabel="Xóa"
+        cancelLabel="Hủy"
+        variant="destructive"
         isLoading={isDeleting}
       />
     </div>

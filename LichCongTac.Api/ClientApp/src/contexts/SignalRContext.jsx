@@ -55,7 +55,9 @@ export const SignalRProvider = ({ children }) => {
           })
           newConnection.on('ForceLogout', (message) => {
             console.log('SignalR Global: Received ForceLogout')
-            document.dispatchEvent(new window.CustomEvent('auth:forcelogout', { detail: { message } }))
+            document.dispatchEvent(
+              new window.CustomEvent('auth:forcelogout', { detail: { message } })
+            )
           })
         })
         .catch((e) => console.error('SignalR Global Connection Error: ', e))

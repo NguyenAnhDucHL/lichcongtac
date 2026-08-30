@@ -1499,3 +1499,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminSchedules.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "feat(admin): them dropdown chon so luong ban ghi pageSize trong quan tri lich"`
+### [2026-08-30 12:43] Sửa lỗi nút xoá ở trang Quản lý ngày lễ
+- **Mô tả**: Cập nhật lại các props truyền vào component ConfirmationModal trong trang AdminHolidays.jsx cho khớp với thiết kế của component này, giúp modal xác nhận xoá hiển thị chính xác.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(admin): update ConfirmationModal props in AdminHolidays.jsx to fix delete button"`
