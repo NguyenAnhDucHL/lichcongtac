@@ -1504,3 +1504,8 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/pages/AdminHolidays.jsx` (Sửa đổi)
 - **Lệnh git commit**: `git commit -m "fix(admin): update ConfirmationModal props in AdminHolidays.jsx to fix delete button"`
+### [2026-08-31 11:21] Dọn dẹp file thừa (constants.js)
+- **Mô tả**: Xóa file `constants.js` do không được sử dụng ở bất kỳ đâu trong codebase theo yêu cầu của user.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/lib/constants.js` (Xóa)
+- **Lệnh git commit**: `git commit -m "chore: xoa file constants.js khong su dung"`
