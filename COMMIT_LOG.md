@@ -1,3 +1,15 @@
+### [2026-09-08 16:50] Xóa thư viện không dùng và tối ưu ảnh WebP
+
+- **Mô tả**: Quét toàn bộ source code để phát hiện thư viện không còn được import ở đâu trong codebase. Kết quả: xóa 14 packages (34 sub-packages) bao gồm @fullcalendar/* (6 packages), jodit+jodit-react, i18next+i18next-browser-languagedetector+react-i18next, docx+file-saver. Xóa file `ReportExportLogic.js` là file duy nhất import docx/file-saver nhưng không được gọi ở đâu. Ngoài ra, chuyển đổi header-banner.jpg (264KB) sang WebP (113KB) — tiết kiệm 57% dung lượng — phục vụ qua thẻ `<picture>` với fallback JPG cho browser cũ.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/package.json` (Sửa đổi — xóa 14 dependencies thừa)
+  - `LichCongTac.Api/ClientApp/src/lib/ReportExportLogic.js` (Xóa — không được import ở đâu)
+  - `LichCongTac.Api/ClientApp/public/assets/header-banner.webp` (Mới — WebP 113KB từ JPG 264KB)
+  - `LichCongTac.Api/ClientApp/src/shared/components/PublicLayout.jsx` (Sửa đổi — dùng thẻ picture+WebP)
+  - `LichCongTac.Api/ClientApp/index.html` (Sửa đổi — preload WebP)
+  - `LichCongTac.Api/wwwroot/assets/header-banner.webp` (Mới — copy vào wwwroot)
+- **Lệnh git commit**: `git commit -m "perf(api): xóa 14 packages thừa và tối ưu ảnh header sang WebP"`
+
 ### [2026-09-08 16:35] Thêm file xác minh Google Search Console
 
 - **Mô tả**: Thêm file HTML (`googlee237149bd50ebec4.html`) do Google Search Console cung cấp vào thư mục `public` để phục vụ cho việc xác minh quyền sở hữu tên miền. Đồng thời xóa bỏ phần comment placeholder trong `index.html` vì đã dùng phương thức xác minh bằng file.

@@ -31,18 +31,21 @@ export function PublicLayout({ children, activeHref, todayHoliday }) {
       {/* Header Image */}
       <div className="max-w-6xl mx-auto bg-white relative flex flex-col justify-center min-h-[86px] overflow-hidden">
         <div className="absolute inset-0 z-0 flex justify-start">
-          <img
-            src="/assets/header-banner.jpg"
-            alt="Lịch Công Tác UBND Phường Cẩm Phả"
-            className="h-full w-auto max-h-[86px] object-contain"
-            width="600"
-            height="86"
-            loading="eager"
-            fetchPriority="high"
-            onError={(e) => {
-              e.target.style.display = 'none'
-            }}
-          />
+          <picture>
+            <source srcSet="/assets/header-banner.webp" type="image/webp" />
+            <img
+              src="/assets/header-banner.jpg"
+              alt="Lịch Công Tác UBND Phường Cẩm Phả"
+              className="h-full w-auto max-h-[86px] object-contain"
+              width="600"
+              height="86"
+              loading="eager"
+              fetchPriority="high"
+              onError={(e) => {
+                e.target.style.display = 'none'
+              }}
+            />
+          </picture>
         </div>
         <div className="relative z-10 pl-[90px] md:pl-[130px] py-2 pr-2">
           {/* Chỉ 1 thẻ h1 trên toàn trang — chuẩn SEO */}
