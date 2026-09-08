@@ -1,3 +1,11 @@
+### [2026-09-08 16:35] Thêm file xác minh Google Search Console
+
+- **Mô tả**: Thêm file HTML (`googlee237149bd50ebec4.html`) do Google Search Console cung cấp vào thư mục `public` để phục vụ cho việc xác minh quyền sở hữu tên miền. Đồng thời xóa bỏ phần comment placeholder trong `index.html` vì đã dùng phương thức xác minh bằng file.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/public/googlee237149bd50ebec4.html` (Mới)
+  - `LichCongTac.Api/ClientApp/index.html` (Sửa đổi — Xóa comment thừa)
+- **Lệnh git commit**: `git commit -m "chore(api): thêm file xác minh google search console"`
+
 ### [2026-09-08 16:00] Cải thiện SEO & Performance Lighthouse (88→95+)
 
 - **Mô tả**: Tối ưu toàn diện SEO và Performance để nâng điểm Lighthouse và cải thiện indexing trên Google Search Console. Thay đổi bao gồm: (1) Thêm đầy đủ meta SEO vào index.html (title, description, canonical, OG tags, JSON-LD GovernmentOrganization schema); (2) Tối ưu Google Fonts với `font-display=optional` thay `swap` để không block LCP; (3) Preload header banner image để cải thiện LCP; (4) Fix 2 thẻ `<h1>` → 1 thẻ `<h1>` (chuẩn SEO); (5) Thêm `width/height` và `fetchPriority="high"` cho ảnh header để tránh CLS; (6) Fix viewport bỏ `user-scalable=no` (fix Accessibility score); (7) Chuyển Admin pages sang `React.lazy()` dynamic import — giảm main bundle từ 1012KB → 606KB (giảm 40%); (8) Thêm `robots.txt` và `sitemap.xml`; (9) Cải thiện PWA manifest với đầy đủ metadata.
