@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Trang chủ - Lịch Công Tác -->
+  <url>
+    <loc>https://lichcongtac.vpdtcampha.vn/campha/</loc>
+    <lastmod>2026-09-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://lichcongtac.vpdtcampha.vn/campha/" />
+  </url>
+  <!-- Trang tìm kiếm lịch -->
+  <url>
+    <loc>https://lichcongtac.vpdtcampha.vn/campha/search</loc>
+    <lastmod>2026-09-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://lichcongtac.vpdtcampha.vn/campha/search" />
+  </url>
+</urlset>

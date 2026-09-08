@@ -11,22 +11,84 @@
       }
     </script>
     <meta charset="UTF-8" />
+    <!-- Viewport: bỏ user-scalable=no để không bị Accessibility penalize -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ── Primary SEO ──────────────────────────────────────────────────── -->
+    <title>Lịch Công Tác UBND Phường Cẩm Phả - Quảng Ninh</title>
     <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="description"
+      content="Lịch công tác chính thức của UBND Phường Cẩm Phả, thành phố Cẩm Phả, tỉnh Quảng Ninh. Tra cứu lịch hàng ngày, lịch tuần, tìm kiếm sự kiện và thông báo nội bộ."
     />
+    <meta
+      name="keywords"
+      content="lịch công tác, UBND phường Cẩm Phả, Quảng Ninh, lịch tuần, lịch hàng ngày, tra cứu lịch"
+    />
+    <meta name="author" content="UBND Phường Cẩm Phả" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://lichcongtac.vpdtcampha.vn/campha/" />
+
+    <!-- ── Google Search Console Verification ───────────────────────────── -->
+    <!-- TODO: Thay PLACEHOLDER bằng code từ Google Search Console -->
+    <!-- <meta name="google-site-verification" content="PASTE_YOUR_VERIFICATION_CODE_HERE" /> -->
+
+    <!-- ── Open Graph (Zalo, Facebook preview) ──────────────────────────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lichcongtac.vpdtcampha.vn/campha/" />
+    <meta property="og:title" content="Lịch Công Tác UBND Phường Cẩm Phả - Quảng Ninh" />
+    <meta
+      property="og:description"
+      content="Tra cứu lịch công tác chính thức của UBND Phường Cẩm Phả, thành phố Cẩm Phả, tỉnh Quảng Ninh."
+    />
+    <meta property="og:image" content="https://lichcongtac.vpdtcampha.vn/assets/header-banner.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:site_name" content="Lịch Công Tác UBND Phường Cẩm Phả" />
+
+    <!-- ── JSON-LD Structured Data ───────────────────────────────────────── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "GovernmentOrganization",
+        "name": "UBND Phường Cẩm Phả",
+        "alternateName": "Ủy ban Nhân dân Phường Cẩm Phả",
+        "url": "https://lichcongtac.vpdtcampha.vn/campha/",
+        "description": "Lịch công tác chính thức của UBND Phường Cẩm Phả, thành phố Cẩm Phả, tỉnh Quảng Ninh",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Cẩm Phả",
+          "addressRegion": "Quảng Ninh",
+          "addressCountry": "VN"
+        },
+        "sameAs": [
+          "https://quangninh.gov.vn"
+        ]
+      }
+    </script>
+
+    <!-- ── PWA / Mobile ─────────────────────────────────────────────────── -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Lịch CT" />
-    <title>Phần Mềm Lịch Công Tác | Dashboard</title>
+    <meta name="apple-mobile-web-app-title" content="Lịch CT Cẩm Phả" />
+    <meta name="theme-color" content="#1d5792" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- ── Favicon ──────────────────────────────────────────────────────── -->
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <link rel="apple-touch-icon" href="/assets/logo.png" />
+
+    <!-- ── Font: preconnect + async load (không block render) ───────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- font-display=optional: dùng system font ngay, tải Inter trong nền, không block LCP -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=optional"
       rel="stylesheet"
     />
-    <link rel="icon" type="image/png" href="/assets/logo.png" />
-    <link rel="manifest" href="/manifest.json" />
+
+    <!-- ── Preload LCP image (header banner) ────────────────────────────── -->
+    <link rel="preload" as="image" href="/assets/header-banner.jpg" />
   </head>
 
   <body class="app-booting">

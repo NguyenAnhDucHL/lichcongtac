@@ -1,15 +1,21 @@
 {
-  "name": "Lịch công tác",
-  "short_name": "Lịch CT",
-  "start_url": ".",
+  "name": "Lịch Công Tác UBND Phường Cẩm Phả",
+  "short_name": "Lịch CT Cẩm Phả",
+  "description": "Tra cứu lịch công tác chính thức của UBND Phường Cẩm Phả, thành phố Cẩm Phả, tỉnh Quảng Ninh",
+  "start_url": "/campha/",
+  "scope": "/campha/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#1d5792",
+  "lang": "vi",
+  "categories": ["government", "productivity"],
   "icons": [
     {
       "src": "/assets/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

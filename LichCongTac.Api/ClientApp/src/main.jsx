@@ -1,20 +1,24 @@
 /* eslint-disable */
 /* global Response */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Toaster, toast } from 'sonner'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 
+// Trang public — load ngay (critical path)
 import WorkSchedule from './pages/WorkSchedule.jsx'
-import AdminLogin from './pages/AdminLogin.jsx'
-import AdminAccounts from './pages/AdminAccounts.jsx'
-import AdminSchedules from './pages/AdminSchedules.jsx'
-import AdminChangePassword from './pages/AdminChangePassword.jsx'
-import AdminDepartments from './pages/AdminDepartments.jsx'
-import AdminEmployees from './pages/AdminEmployees.jsx'
-import AdminNotifications from './pages/AdminNotifications.jsx'
-import AdminHolidays from './pages/AdminHolidays.jsx'
 import SearchSchedule from './pages/SearchSchedule.jsx'
+
+// Trang Admin — lazy load (chỉ tải khi cần, giảm initial bundle ~60%)
+const AdminLogin = lazy(() => import('./pages/AdminLogin.jsx'))
+const AdminAccounts = lazy(() => import('./pages/AdminAccounts.jsx'))
+const AdminSchedules = lazy(() => import('./pages/AdminSchedules.jsx'))
+const AdminChangePassword = lazy(() => import('./pages/AdminChangePassword.jsx'))
+const AdminDepartments = lazy(() => import('./pages/AdminDepartments.jsx'))
+const AdminEmployees = lazy(() => import('./pages/AdminEmployees.jsx'))
+const AdminNotifications = lazy(() => import('./pages/AdminNotifications.jsx'))
+const AdminHolidays = lazy(() => import('./pages/AdminHolidays.jsx'))
+
 import { SignalRProvider } from './contexts/SignalRContext.jsx'
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx'
 import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
@@ -212,7 +216,9 @@ createRoot(document.getElementById('root')).render(
   <ErrorBoundary>
     <AuthProvider>
       <SignalRProvider>
-        <RouterProvider router={router} />
+        <Suspense fallback={null}>
+          <RouterProvider router={router} />
+        </Suspense>
         <Toaster position="top-right" richColors closeButton />
       </SignalRProvider>
     </AuthProvider>

@@ -1,3 +1,16 @@
+### [2026-09-08 16:00] Cải thiện SEO & Performance Lighthouse (88→95+)
+
+- **Mô tả**: Tối ưu toàn diện SEO và Performance để nâng điểm Lighthouse và cải thiện indexing trên Google Search Console. Thay đổi bao gồm: (1) Thêm đầy đủ meta SEO vào index.html (title, description, canonical, OG tags, JSON-LD GovernmentOrganization schema); (2) Tối ưu Google Fonts với `font-display=optional` thay `swap` để không block LCP; (3) Preload header banner image để cải thiện LCP; (4) Fix 2 thẻ `<h1>` → 1 thẻ `<h1>` (chuẩn SEO); (5) Thêm `width/height` và `fetchPriority="high"` cho ảnh header để tránh CLS; (6) Fix viewport bỏ `user-scalable=no` (fix Accessibility score); (7) Chuyển Admin pages sang `React.lazy()` dynamic import — giảm main bundle từ 1012KB → 606KB (giảm 40%); (8) Thêm `robots.txt` và `sitemap.xml`; (9) Cải thiện PWA manifest với đầy đủ metadata.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/index.html` (Sửa đổi — SEO meta, OG, JSON-LD, font, preload)
+  - `LichCongTac.Api/ClientApp/src/shared/components/PublicLayout.jsx` (Sửa đổi — 1 H1, image dimensions)
+  - `LichCongTac.Api/ClientApp/src/main.jsx` (Sửa đổi — lazy import Admin pages, Suspense)
+  - `LichCongTac.Api/ClientApp/vite.config.js` (Sửa đổi — reportCompressedSize, chunkSizeWarningLimit)
+  - `LichCongTac.Api/ClientApp/public/robots.txt` (Mới)
+  - `LichCongTac.Api/ClientApp/public/sitemap.xml` (Mới)
+  - `LichCongTac.Api/ClientApp/public/manifest.json` (Sửa đổi — thêm description, scope, categories)
+- **Lệnh git commit**: `git commit -m "feat(api): cải thiện SEO meta tags, performance bundle splitting và robots/sitemap"`
+
 ### [2026-08-26 12:20] Fix Github Actions deploy script rm error
 - **Mô tả**: Thêm cờ `-f` vào lệnh `rm /root/deploy.tar.gz` trong file `.github/workflows/deploy.yml` để tránh lỗi CI/CD khi file không tồn tại (lỗi "cannot remove ... No such file or directory").
 - **Tệp thay đổi**:

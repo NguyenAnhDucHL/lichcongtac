@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /campha/
+Allow: /campha/search
+
+# Chặn các trang quản trị — không cần index trên Google
+Disallow: /campha/manager/
+
+# Sitemap
+Sitemap: https://lichcongtac.vpdtcampha.vn/campha/sitemap.xml

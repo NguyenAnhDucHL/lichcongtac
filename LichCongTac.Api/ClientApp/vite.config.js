@@ -50,6 +50,10 @@ export default defineConfig({
     outDir: '../wwwroot',
     emptyOutDir: false,
     assetsDir: 'vite-assets',
+    // Tắt log kích thước chunk nén để build nhanh hơn
+    reportCompressedSize: false,
+    // Tăng ngưỡng cảnh báo chunk size (legacy plugin sinh chunk lớn hơn bình thường)
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       input: {
         index: resolve(__dirname, 'index.html'),
@@ -57,3 +61,4 @@ export default defineConfig({
     },
   },
 })
+
