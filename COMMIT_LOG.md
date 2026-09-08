@@ -1509,3 +1509,10 @@ Tệp này lưu trữ lịch sử các thay đổi và tính năng mới đượ
 - **Tệp thay đổi**:
   - `LichCongTac.Api/ClientApp/src/lib/constants.js` (Xóa)
 - **Lệnh git commit**: `git commit -m "chore: xoa file constants.js khong su dung"`
+
+### [2026-09-08 10:45] Chuyển CI/CD sang dùng GHCR
+- **Mô tả**: Chuyển việc build Docker image của backend lên Github Actions để lưu ở GHCR, giúp tiết kiệm bộ nhớ trên VPS.
+- **Tệp thay đổi**:
+  - `docker-compose.yml` (Sửa đổi)
+  - `.github/workflows/deploy.yml` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "chore(infra): use ghcr for backend deployment"`

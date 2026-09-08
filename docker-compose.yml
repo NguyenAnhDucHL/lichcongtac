@@ -1,9 +1,7 @@
 version: "3.3"
 services:
   lichcongtac-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/nguyenanhduchl/lichcongtac:latest
     container_name: lichcongtac-backend
     expose:
       - "5000"
