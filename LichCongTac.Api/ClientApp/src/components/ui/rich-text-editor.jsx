@@ -57,12 +57,12 @@ const FontSize = Extension.create({
     return {
       setFontSize:
         (fontSize) =>
-        ({ chain }) =>
-          chain().setMark('textStyle', { fontSize }).run(),
+          ({ chain }) =>
+            chain().setMark('textStyle', { fontSize }).run(),
       unsetFontSize:
         () =>
-        ({ chain }) =>
-          chain().setMark('textStyle', { fontSize: null }).run(),
+          ({ chain }) =>
+            chain().setMark('textStyle', { fontSize: null }).run(),
     }
   },
 })
@@ -78,7 +78,7 @@ const FONT_FAMILIES = [
 ]
 
 const MenuBar = ({ editor, minimal }) => {
-  if (!editor) {
+  if (!editor || editor.isDestroyed) {
     return null
   }
 
@@ -370,7 +370,7 @@ export function RichTextEditor({ value, onChange, minimal = false }) {
   })
 
   React.useEffect(() => {
-    if (!editor) return
+    if (!editor || editor.isDestroyed) return
 
     const val = value || ''
     const currentHtml = editor.getHTML()

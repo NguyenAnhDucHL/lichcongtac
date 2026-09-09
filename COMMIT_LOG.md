@@ -1,3 +1,9 @@
+### [2026-09-09 16:07] Fix lỗi crash RichTextEditor "reading 'cached'" trên React 19
+- **Mô tả**: Sửa lỗi trang quản trị bị crash trắng xóa (`TypeError: Cannot read properties of undefined (reading 'cached')`) khi mount/unmount component. Nguyên nhân do thư viện `@tiptap/react` bị hủy instance trong React 19 StrictMode, nhưng các hook như `useEffect` và `MenuBar` vẫn cố truy cập vào editor đã bị hủy. Đã thêm kiểm tra `editor.isDestroyed` trước khi gọi `getHTML()` và render `MenuBar`.
+- **Tệp thay đổi**:
+  - `LichCongTac.Api/ClientApp/src/components/ui/rich-text-editor.jsx` (Sửa đổi)
+- **Lệnh git commit**: `git commit -m "fix(ui): sửa lỗi crash rich-text-editor reading cached do editor bị hủy"`
+
 ### [2026-09-08 16:50] Xóa thư viện không dùng và tối ưu ảnh WebP
 
 - **Mô tả**: Quét toàn bộ source code để phát hiện thư viện không còn được import ở đâu trong codebase. Kết quả: xóa 14 packages (34 sub-packages) bao gồm @fullcalendar/* (6 packages), jodit+jodit-react, i18next+i18next-browser-languagedetector+react-i18next, docx+file-saver. Xóa file `ReportExportLogic.js` là file duy nhất import docx/file-saver nhưng không được gọi ở đâu. Ngoài ra, chuyển đổi header-banner.jpg (264KB) sang WebP (113KB) — tiết kiệm 57% dung lượng — phục vụ qua thẻ `<picture>` với fallback JPG cho browser cũ.
